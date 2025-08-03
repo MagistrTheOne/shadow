@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useState } from "react";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 //icons
 import { FaGoogle,FaGithub  } from "react-icons/fa";
  
@@ -27,7 +27,7 @@ import { FaGoogle,FaGithub  } from "react-icons/fa";
 
 export const SignInView =() => {
 
-    
+    const router = useRouter();
     const [error,setError] = useState<string | null>(null);
     const [pending,setPending] =useState(false);
 
@@ -51,7 +51,8 @@ export const SignInView =() => {
                 },
                 {
                     onSuccess: () => {
-                        
+                         setPending(false);
+                     router.push("/")
                     },
                     onError: ({error}) => {
                         setError(error.message)
