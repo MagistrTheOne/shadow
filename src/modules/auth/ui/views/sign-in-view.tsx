@@ -14,7 +14,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useState } from "react";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; //  
+
 //icons
 import { FaGoogle,FaGithub  } from "react-icons/fa";
  
