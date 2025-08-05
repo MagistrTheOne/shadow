@@ -69,4 +69,14 @@ Any infringement will be pursued under applicable **copyright law, trade secret 
 ---
 
 **YOU HAVE BEEN WARNED.**
+⚖️ Enforcement & Penalties
 
+Any use, reproduction, or implementation of any component, module, or architectural element of Shadow.AI without direct written consent from the copyright holder — issued personally via LinkedIn — will incur:
+
+Immediate contractual penalty of USD $66,666 per infringement, payable within 10 business days.
+
+Transfer of ownership of the infringing startup, company, or project to the copyright holder as moral compensation.
+
+Additional damages as determined under applicable law, including but not limited to loss of profits, legal costs, and reputational harm.
+
+By accessing, cloning, or referencing this repository, you acknowledge that you have read, understood, and agreed to these terms, and consent to jurisdiction under applicable international intellectual property and trade secret laws.
