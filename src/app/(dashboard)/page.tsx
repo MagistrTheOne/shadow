@@ -8,7 +8,7 @@ import { caller } from "@/trpc/server";
 
 const Page = async () => {
   //trpc
-  const data = await caller.hello({text:"Magistr server"});
+  // const data = await caller.hello({text:"Magistr server"});
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -18,7 +18,7 @@ const Page = async () => {
     redirect("/sign-in")
   }
 
-  return <p>{data.greeting}</p>
+  // return <p>{data.greeting}</p>
 
   return <HomeView/>
 }
