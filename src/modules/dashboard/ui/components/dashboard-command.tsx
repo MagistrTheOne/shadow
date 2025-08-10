@@ -1,4 +1,4 @@
-import { CommandDialog, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { CommandDialog,CommandResponsiveDialog, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Dispatch, SetStateAction } from "react";
 
 interface Props {
@@ -16,6 +16,9 @@ export const DashboardCommand = ({open,setOpen}: Props) => {
             <CommandList>
                 <CommandItem>
                     Test-Agent
+                </CommandItem>
+            <CommandItem>
+                    Test-Agent 2
                 </CommandItem>
             </CommandList>
         </CommandDialog>
