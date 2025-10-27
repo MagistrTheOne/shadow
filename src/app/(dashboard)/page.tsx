@@ -1,20 +1,9 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ClockIcon, BotIcon, VideoIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 
 const Page = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if(!session){
-    redirect("/sign-in")
-  }
-
   return (
     <div className="py-6 px-4 md:px-8 flex flex-col gap-8">
       {/* Welcome Section */}

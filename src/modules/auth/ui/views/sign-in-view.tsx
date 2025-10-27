@@ -53,7 +53,7 @@ export const SignInView =() => {
                 {
                     onSuccess: () => {
                          setPending(false);
-                     router.push("/dashboard")
+                     router.push("/")
                     },
                     onError: ({error}) => {
                         setError(error.message);
@@ -70,12 +70,12 @@ export const SignInView =() => {
            authClient.signIn.social(
                 {
                      provider: provider,
-                     callbackURL:"/dashboard"
+                     callbackURL:"/"
                 },
                 {
                     onSuccess: () => {
                     setPending(false);
-                     router.push("/dashboard")
+                     router.push("/")
                     },
                     onError: ({error}) => {
                         setError(error.message);
@@ -149,7 +149,7 @@ export const SignInView =() => {
 
                 {!!error && (
                     <Alert className="bg-destructive/10 border-none">
-                    <OctagonAlertIcon className=" h-4 w-4 !text-destrictive"/>
+                    <OctagonAlertIcon className=" h-4 w-4 !text-destructive"/>
                      <AlertTitle>{error}</AlertTitle>
                     </Alert>
                 )}

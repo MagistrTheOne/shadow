@@ -60,7 +60,7 @@ export const SignUpView =() => {
                 {
                     onSuccess: () => {
                      setPending(false);
-                     router.push("/dashboard")
+                     router.push("/")
                     },
                     onError: ({error}) => {
                         setError(error.message);
@@ -186,7 +186,7 @@ export const SignUpView =() => {
 
                 {!!error && (
                     <Alert className="bg-destructive/10 border-none">
-                    <OctagonAlertIcon className=" h-4 w-4 !text-destrictive"/>
+                    <OctagonAlertIcon className=" h-4 w-4 !text-destructive"/>
                      <AlertTitle>{error}</AlertTitle>
                     </Alert>
                 )}
@@ -194,7 +194,7 @@ export const SignUpView =() => {
                 disabled={pending}
                 type="submit"
                 className="w-full"
-                >Sign in
+                >Sign up
                 </Button>
                  <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className=" bg-card text-muted-foreground relative z-10 px-2">
