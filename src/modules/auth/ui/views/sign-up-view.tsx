@@ -60,7 +60,7 @@ export const SignUpView =() => {
                 {
                     onSuccess: () => {
                      setPending(false);
-                     router.push("/")
+                     router.push("/dashboard")
                     },
                     onError: ({error}) => {
                         setError(error.message);
@@ -76,12 +76,12 @@ export const SignUpView =() => {
            authClient.signIn.social(
                 {
                      provider: provider,
-                     callbackURL:"/"
+                     callbackURL:"/dashboard"
                 },
                 {
                     onSuccess: () => {
                         setPending(false);
-                        router.push("/");
+                        router.push("/dashboard");
                     },
                     onError: ({error}) => {
                         setError(error.message);
