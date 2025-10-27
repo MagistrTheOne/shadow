@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
 
-export const Navbar = () => {
+interface NavbarProps {
+  session?: any;
+}
+
+export const Navbar = ({ session }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -38,16 +42,26 @@ export const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
-              <Link href="/sign-in">
-                Sign In
-              </Link>
-            </Button>
-            <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
-              <Link href="/sign-up">
-                Get Started
-              </Link>
-            </Button>
+            {session ? (
+              <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                <Link href="/dashboard">
+                  Go to Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
+                  <Link href="/sign-in">
+                    Sign In
+                  </Link>
+                </Button>
+                <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                  <Link href="/sign-up">
+                    Get Started
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -96,16 +110,26 @@ export const Navbar = () => {
                 Pricing
               </Link>
               <div className="px-3 py-2 space-y-2">
-                <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
-                  <Link href="/sign-in">
-                    Sign In
-                  </Link>
-                </Button>
-                <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
-                  <Link href="/sign-up">
-                    Get Started
-                  </Link>
-                </Button>
+                {session ? (
+                  <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                    <Link href="/dashboard">
+                      Go to Dashboard
+                    </Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
+                      <Link href="/sign-in">
+                        Sign In
+                      </Link>
+                    </Button>
+                    <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                      <Link href="/sign-up">
+                        Get Started
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

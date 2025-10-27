@@ -4,12 +4,15 @@ import { ErrorState } from "@/components/error-state";
 import { trpc } from "@/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, ClockIcon, VideoIcon, BotIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, VideoIcon, BotIcon, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RecordingList } from "@/modules/meetings/ui/components/recording-list";
 import { TranscriptViewer } from "@/modules/meetings/ui/components/transcript-viewer";
+import { MeetingDeleteDialog } from "@/modules/meetings/ui/components/meeting-delete-dialog";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface MeetingDetailsPageProps {
   params: {
@@ -17,12 +20,28 @@ interface MeetingDetailsPageProps {
   };
 }
 
+"use client";
+
 const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
+  const router = useRouter();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { data: meeting, isLoading, isError, error } = trpc.meetings.getOne.useQuery({ id: meetingId });
 
   if (isLoading) return <LoadingState title="Loading meeting details..." description="Fetching meeting information." />;
   if (isError) return <ErrorState title="Error loading meeting" description={error?.message || "Something went wrong."} />;
   if (!meeting) return <ErrorState title="Meeting not found" description="The requested meeting could not be found." />;
+
+  const handleEdit = () => {
+    router.push(`/meetings/${meetingId}/edit`);
+  };
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSuccess = () => {
+    router.push("/meetings");
+  };
 
   return (
     <div className="space-y-6">
@@ -63,6 +82,14 @@ const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
             )}
           </div>
           <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={handleEdit}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+            <Button variant="outline" onClick={handleDelete}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
             {meeting.status === "scheduled" && (
               <Button asChild>
                 <Link href={`/meetings/${meeting.id}/call`}>Start Call</Link>
@@ -104,6 +131,14 @@ const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
           </CardContent>
         </Card>
       )}
+
+      <MeetingDeleteDialog
+        meetingId={meetingId}
+        meetingTitle={meeting.title}
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 };

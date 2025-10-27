@@ -6,9 +6,11 @@ import { StreamChat, Channel, MessageList, MessageInput, useChannelStateContext 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Users, Mic, MicOff } from "lucide-react";
+import { MessageSquare, Users, Mic, MicOff, BotIcon } from "lucide-react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { trpc } from "@/trpc/client";
+import { toast } from "sonner";
 
 interface MeetingChatProps {
   meetingId: string;
@@ -25,6 +27,8 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [isAskingAI, setIsAskingAI] = useState(false);
   const chatClientRef = useRef<any>(null);
 
   useEffect(() => {
@@ -86,6 +90,47 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
     };
   }, [user]);
 
+  const askAI = async () => {
+    if (!aiQuestion.trim()) return;
+
+    setIsAskingAI(true);
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: aiQuestion,
+          meetingId,
+          context: "meeting_assistance",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get AI response");
+      }
+
+      const data = await response.json();
+
+      // Send AI response to chat
+      if (chatClientRef.current && chatClientRef.current.channel) {
+        await chatClientRef.current.channel.sendMessage({
+          text: `[AI Assistant]: ${data.response || "Извините, я не смог обработать ваш запрос."}`,
+          user_id: "ai-assistant",
+        });
+      }
+
+      setAiQuestion("");
+      toast.success("AI response sent to chat");
+    } catch (error) {
+      console.error("AI chat error:", error);
+      toast.error("Failed to get AI response");
+    } finally {
+      setIsAskingAI(false);
+    }
+  };
+
   if (isLoading) {
     return <LoadingState title="Connecting to chat..." description="Setting up real-time messaging" />;
   }
@@ -124,6 +169,32 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
+        {/* AI Question Input */}
+        <div className="border-b p-3 bg-blue-900/10">
+          <div className="flex items-center gap-2 mb-2">
+            <BotIcon className="w-4 h-4 text-blue-400" />
+            <span className="text-sm text-blue-400 font-medium">Ask AI Assistant</span>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={aiQuestion}
+              onChange={(e) => setAiQuestion(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && askAI()}
+              placeholder="Ask a question to AI..."
+              className="flex-1 px-3 py-2 bg-white/5 border border-white/20 rounded-md text-white placeholder-gray-400 text-sm focus:outline-none focus:border-blue-400"
+            />
+            <Button
+              onClick={askAI}
+              disabled={isAskingAI || !aiQuestion.trim()}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isAskingAI ? "..." : "Ask"}
+            </Button>
+          </div>
+        </div>
+
         <StreamChat client={chatClientRef.current}>
           <Channel channelId={`meeting-${meetingId}`} channelType="messaging">
             <div className="flex flex-col h-full">

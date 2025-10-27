@@ -1,9 +1,24 @@
+import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, ClockIcon, BotIcon, VideoIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { trpc } from "@/trpc/client";
+import { LoadingState } from "@/components/loading-state";
+import { ErrorState } from "@/components/error-state";
+import { format } from "date-fns";
 
-const Page = async () => {
+const DashboardContent = () => {
+  const { data: upcomingMeetings } = trpc.meetings.getUpcoming.useQuery({ limit: 3 });
+  const { data: agents } = trpc.agents.getMany.useQuery();
+  const { data: recentMeetings } = trpc.meetings.getHistory.useQuery({ limit: 3 });
+  const { data: subscription } = trpc.subscriptions.getCurrent.useQuery();
+
+  // Calculate stats
+  const upcomingCount = upcomingMeetings?.length || 0;
+  const agentsCount = agents?.length || 0;
+  const recentCount = recentMeetings?.length || 0;
+
   return (
     <div className="py-6 px-4 md:px-8 flex flex-col gap-8">
       {/* Welcome Section */}
@@ -28,9 +43,9 @@ const Page = async () => {
             <CalendarIcon className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">1</div>
+            <div className="text-2xl font-bold text-white">{upcomingCount}</div>
             <p className="text-xs text-gray-400">
-              Scheduled for today
+              Upcoming meetings
             </p>
           </CardContent>
         </Card>
@@ -41,7 +56,7 @@ const Page = async () => {
             <BotIcon className="h-4 w-4 text-purple-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">2</div>
+            <div className="text-2xl font-bold text-white">{agentsCount}</div>
             <p className="text-xs text-gray-400">
               Available agents
             </p>
@@ -54,9 +69,9 @@ const Page = async () => {
             <ClockIcon className="h-4 w-4 text-green-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">2</div>
+            <div className="text-2xl font-bold text-white">{recentCount}</div>
             <p className="text-xs text-gray-400">
-              Completed this week
+              Recent meetings
             </p>
           </CardContent>
         </Card>
@@ -72,23 +87,39 @@ const Page = async () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200">
-              <div className="flex-1">
-                <h4 className="font-medium text-white">Weekly Team Sync</h4>
-                <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
-                  <CalendarIcon className="w-4 h-4" />
-                  Tomorrow, 10:00 AM
+            {upcomingMeetings && upcomingMeetings.length > 0 ? (
+              upcomingMeetings.map((meeting) => (
+                <div key={meeting.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-white">{meeting.title}</h4>
+                    <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
+                      <CalendarIcon className="w-4 h-4" />
+                      {meeting.scheduledAt
+                        ? format(new Date(meeting.scheduledAt), "MMM dd, yyyy 'at' HH:mm")
+                        : "Scheduled"
+                      }
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-400/30">
+                      {meeting.status}
+                    </span>
+                    <Button asChild size="sm" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
+                      <Link href={`/meetings/${meeting.id}/call`}>
+                        Start
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-400/30">Scheduled</span>
-                <Button asChild size="sm" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
-                  <Link href="/meetings/weekly-team-sync/call">
-                    Start
-                  </Link>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-400">No upcoming meetings</p>
+                <Button size="sm" className="mt-2" asChild>
+                  <Link href="/meetings/new">Schedule Meeting</Link>
                 </Button>
               </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -139,6 +170,14 @@ const Page = async () => {
       </Card>
     </div>
   );
-}
- 
+};
+
+const Page = () => {
+  return (
+    <Suspense fallback={<LoadingState title="Loading dashboard..." description="Fetching your data" />}>
+      <DashboardContent />
+    </Suspense>
+  );
+};
+
 export default Page;

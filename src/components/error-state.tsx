@@ -1,11 +1,62 @@
-import { AlertCircleIcon} from "lucide-react";
+import { AlertCircleIcon, RefreshCwIcon, ArrowLeftIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+type ErrorType = "network" | "auth" | "validation" | "server" | "unknown";
 
 interface Props {
   title: string;
   description: string;
+  errorType?: ErrorType;
+  onRetry?: () => void;
+  showGoBack?: boolean;
+  error?: Error;
 }
 
-export const ErrorState = ({ title, description }: Props) => {
+export const ErrorState = ({
+  title,
+  description,
+  errorType = "unknown",
+  onRetry,
+  showGoBack = true,
+  error
+}: Props) => {
+  const router = useRouter();
+
+  // Log error for monitoring
+  if (error) {
+    console.error(`ErrorState [${errorType}]:`, error);
+  }
+
+  const getErrorIcon = () => {
+    switch (errorType) {
+      case "network":
+        return "🌐";
+      case "auth":
+        return "🔐";
+      case "validation":
+        return "⚠️";
+      case "server":
+        return "🔥";
+      default:
+        return <AlertCircleIcon className="size-8 md:size-10 text-red-500" />;
+    }
+  };
+
+  const getErrorColor = () => {
+    switch (errorType) {
+      case "network":
+        return "text-orange-500";
+      case "auth":
+        return "text-yellow-500";
+      case "validation":
+        return "text-blue-500";
+      case "server":
+        return "text-red-500";
+      default:
+        return "text-red-500";
+    }
+  };
   return (
     <div className="flex flex-1 items-center justify-center px-8 py-6">
       <div
@@ -22,7 +73,11 @@ export const ErrorState = ({ title, description }: Props) => {
         <div className="relative flex h-full flex-col items-center justify-center gap-y-6 p-8 md:p-10">
           <div className="relative grid place-items-center">
             <div className="absolute inset-0 -m-3 rounded-full blur-xl opacity-40 bg-primary/20" />
-            <AlertCircleIcon className="size-8 md:size-10  text-red-500" />
+            {typeof getErrorIcon() === "string" ? (
+              <span className="text-4xl md:text-5xl">{getErrorIcon()}</span>
+            ) : (
+              getErrorIcon()
+            )}
           </div>
 
           <div className="flex max-w-[44ch] flex-col gap-y-2 text-center">
@@ -30,12 +85,29 @@ export const ErrorState = ({ title, description }: Props) => {
             <p className="text-sm md:text-base text-muted-foreground">{description}</p>
           </div>
 
-          {/* прогресс бар */}
-          <div className="h-1 w-40 md:w-56 overflow-hidden rounded-full bg-muted/60">
-            <div className="h-full w-1/3 animate-pulse bg-primary/60" />
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            {onRetry && (
+              <Button
+                onClick={onRetry}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <RefreshCwIcon className="w-4 h-4" />
+                Try Again
+              </Button>
+            )}
+            {showGoBack && (
+              <Button
+                onClick={() => router.back()}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <ArrowLeftIcon className="w-4 h-4" />
+                Go Back
+              </Button>
+            )}
           </div>
-
-          <span className="sr-only">Loading</span>
         </div>
       </div>
     </div>

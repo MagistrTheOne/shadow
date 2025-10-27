@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { MeetingActionsDropdown } from "./meeting-actions-dropdown";
 import type { Meeting } from "@/trpc/types";
 
 export const MeetingList = () => {
@@ -39,13 +40,36 @@ export const MeetingList = () => {
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   <span className="text-white">{meeting.title}</span>
-                  <Badge className={
-                    meeting.status === "scheduled"
-                      ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                      : "bg-white/20 text-gray-300 border-white/30"
-                  }>
-                    {meeting.status}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={
+                      meeting.status === "scheduled"
+                        ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                        : "bg-white/20 text-gray-300 border-white/30"
+                    }>
+                      {meeting.status}
+                    </Badge>
+                    <MeetingActionsDropdown
+                      meeting={meeting}
+                      onEdit={(meetingId) => {
+                        // Handle edit - could navigate to edit page or open modal
+                        window.location.href = `/meetings/${meetingId}/edit`;
+                      }}
+                      onDuplicate={async (meetingId) => {
+                        // Handle duplicate
+                        try {
+                          await trpc.meetings.duplicate.mutateAsync({ id: meetingId });
+                          // Refetch meetings
+                          window.location.reload();
+                        } catch (error) {
+                          console.error('Failed to duplicate meeting:', error);
+                        }
+                      }}
+                      onDelete={() => {
+                        // Refetch meetings after delete
+                        window.location.reload();
+                      }}
+                    />
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">

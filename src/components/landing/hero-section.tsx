@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 
-export const HeroSection = () => {
+interface HeroSectionProps {
+  session?: any;
+}
+
+export const HeroSection = ({ session }: HeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Effects */}
@@ -35,19 +39,30 @@ export const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button size="lg" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 text-lg px-8 py-4" asChild>
-            <Link href="/sign-up">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            {session ? (
+              <Button size="lg" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 text-lg px-8 py-4" asChild>
+                <Link href="/dashboard">
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
               </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/20 text-black hover:bg-white/10 text-lg px-8 py-4"
-            >
-              View Enterprise Demo
-            </Button>
+            ) : (
+              <>
+                <Button size="lg" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 text-lg px-8 py-4" asChild>
+                  <Link href="/sign-up">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-white/20 text-black hover:bg-white/10 text-lg px-8 py-4"
+                >
+                  View Enterprise Demo
+                </Button>
+              </>
+            )}
           </div>
 
         </div>

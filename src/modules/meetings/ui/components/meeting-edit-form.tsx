@@ -16,72 +16,66 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { CalendarIcon, Loader2, BotIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
-import { meetingInsertSchema } from "@/modules/schemas";
 
-interface MeetingFormProps {
+const formSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().optional(),
+  scheduledAt: z.date().optional(),
+});
+
+interface MeetingEditFormProps {
+  meetingId: string;
+  initialData: {
+    title: string;
+    description?: string;
+    scheduledAt?: Date;
+  };
   onSuccess?: () => void;
-  initialValues?: z.infer<typeof meetingInsertSchema>;
+  onCancel?: () => void;
 }
 
-export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
+export const MeetingEditForm = ({ meetingId, initialData, onSuccess, onCancel }: MeetingEditFormProps) => {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
 
-  // Получаем список агентов
-  const { data: agents } = trpc.agents.getMany.useQuery();
-
-  const createMeetingMutation = trpc.meetings.create.useMutation({
+  const updateMeetingMutation = trpc.meetings.update.useMutation({
     onSuccess: () => {
-      toast.success("Meeting created successfully!");
-      router.push("/meetings");
+      toast.success("Meeting updated successfully!");
       onSuccess?.();
     },
     onError: (error) => {
-      toast.error("Failed to create meeting", {
+      toast.error("Failed to update meeting", {
         description: error.message,
       });
     },
   });
 
-  const form = useForm<z.infer<typeof meetingInsertSchema>>({
-    resolver: zodResolver(meetingInsertSchema),
-    defaultValues: initialValues || {
-      title: "",
-      description: "",
-      scheduledAt: new Date(),
-      agentId: "",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: initialData.title || "",
+      description: initialData.description || "",
+      scheduledAt: initialData.scheduledAt,
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof meetingInsertSchema>) => {
-    setIsPending(true);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await createMeetingMutation.mutateAsync(values);
-      toast.success("Meeting created successfully!");
-      onSuccess?.();
-      router.push("/meetings");
-    } catch (error: any) {
-      toast.error("Failed to create meeting", {
-        description: error.message || "An unexpected error occurred.",
+      await updateMeetingMutation.mutateAsync({
+        id: meetingId,
+        ...values,
       });
-    } finally {
-      setIsPending(false);
+    } catch (error) {
+      // Error handled by mutation
     }
   };
+
+  const isPending = updateMeetingMutation.isPending;
 
   return (
     <Form {...form}>
@@ -99,7 +93,7 @@ export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -113,7 +107,7 @@ export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="scheduledAt"
@@ -153,39 +147,17 @@ export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="agentId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <BotIcon className="w-4 h-4" />
-                AI Agent (Optional)
-              </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an AI agent for this meeting" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="">No agent</SelectItem>
-                  {agents?.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
+        <div className="flex justify-end gap-3">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
           )}
-        />
-
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Create Meeting
-        </Button>
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Update Meeting
+          </Button>
+        </div>
       </form>
     </Form>
   );

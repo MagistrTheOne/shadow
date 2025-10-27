@@ -98,6 +98,41 @@ export const meetingsRouter = createTRPCRouter({
       return updatedMeeting;
     }),
 
+  duplicate: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      // Получаем оригинальную встречу
+      const [originalMeeting] = await db
+        .select()
+        .from(meetings)
+        .where(
+          and(
+            eq(meetings.id, input.id),
+            eq(meetings.userId, ctx.auth.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!originalMeeting) {
+        throw new Error("Meeting not found");
+      }
+
+      // Создаем дубликат с новым ID и названием
+      const [duplicatedMeeting] = await db
+        .insert(meetings)
+        .values({
+          title: `${originalMeeting.title} (Copy)`,
+          description: originalMeeting.description,
+          agentId: originalMeeting.agentId,
+          userId: ctx.auth.user.id,
+          scheduledAt: null, // Сбрасываем время для новой встречи
+          status: "scheduled",
+        })
+        .returning();
+
+      return duplicatedMeeting;
+    }),
+
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {

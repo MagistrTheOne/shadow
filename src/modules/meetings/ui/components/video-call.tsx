@@ -17,6 +17,7 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { SmartAvatar } from "@/components/smart-avatar";
 import { MeetingChat, MeetingParticipants } from "./meeting-chat";
+import { AIAvatarController } from "./ai-avatar-controller";
 
 interface VideoCallProps {
   callId: string;
@@ -68,6 +69,7 @@ export const VideoCall = ({ callId }: VideoCallProps) => {
 const CallUI = ({ callId }: { callId: string }) => {
   const [showAIAvatar, setShowAIAvatar] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [aiAvatarVisible, setAiAvatarVisible] = useState(false);
 
   // Моковые данные участников
   const participants = [
@@ -98,24 +100,24 @@ const CallUI = ({ callId }: { callId: string }) => {
         
         <div className="flex items-center justify-between p-4 bg-black/20 backdrop-blur-sm">
           <CallControls />
-          
+
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setShowAIAvatar(!showAIAvatar)}
+              onClick={() => setAiAvatarVisible(!aiAvatarVisible)}
               className={`px-4 py-2 rounded-lg transition-colors ${
-                showAIAvatar 
-                  ? 'bg-purple-600 text-white' 
+                aiAvatarVisible
+                  ? 'bg-purple-600 text-white'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              {showAIAvatar ? 'Hide AI Avatar' : 'Show AI Avatar'}
+              {aiAvatarVisible ? 'Hide AI Assistant' : 'Show AI Assistant'}
             </button>
-            
+
             <button
               onClick={() => setShowChat(!showChat)}
               className={`px-4 py-2 rounded-lg transition-colors ${
-                showChat 
-                  ? 'bg-blue-600 text-white' 
+                showChat
+                  ? 'bg-blue-600 text-white'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
@@ -141,6 +143,14 @@ const CallUI = ({ callId }: { callId: string }) => {
           </div>
         </div>
       )}
+
+      {/* AI Avatar Controller */}
+      <AIAvatarController
+        meetingId={callId}
+        isVisible={aiAvatarVisible}
+        onToggle={() => setAiAvatarVisible(!aiAvatarVisible)}
+        agentId="default-agent" // TODO: Get from meeting data
+      />
     </div>
   );
 };
