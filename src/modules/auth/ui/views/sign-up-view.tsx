@@ -1,6 +1,6 @@
 "use client"
 //client component( COMMENT NOT CHATGPT THIS..MY CHAOS)
-import {date, email, z} from "zod";
+import {z} from "zod";
 import {zodResolver}  from "@hookform/resolvers/zod";
 import {   OctagonAlertIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -21,7 +21,7 @@ import { FaGoogle,FaGithub  } from "react-icons/fa";
     const formSchema =z.object(
         {
            name: z.string().min(1,{message: "Name is required"}),
-           email: z.email(),
+           email: z.string().email({message: "Invalid email address"}),
            password: z.string().min(1, {message: "Password is required"}),
            confirmPassword: z.string().min(1, {message: "Password is required"}),
         })
@@ -63,12 +63,11 @@ export const SignUpView =() => {
                      router.push("/")
                     },
                     onError: ({error}) => {
-                        setError(error.message)
+                        setError(error.message);
+                        setPending(false);
                     }
                 },
             );
-
-            setPending(false);
         };
 
             const onSocial = (provider:"github" | "google") => {
@@ -81,15 +80,15 @@ export const SignUpView =() => {
                 },
                 {
                     onSuccess: () => {
-                        
+                        setPending(false);
+                        router.push("/");
                     },
                     onError: ({error}) => {
-                        setError(error.message)
+                        setError(error.message);
+                        setPending(false);
                     }
                 },
             );
-
-            setPending(false);
         };
 
 

@@ -1,6 +1,6 @@
 "use client"
 //client component( COMMENT NOT CHATGPT THIS..MY CHAOS)
-import {email, z} from "zod";
+import {z} from "zod";
 import {zodResolver}  from "@hookform/resolvers/zod";
 import {   OctagonAlertIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -22,7 +22,7 @@ import { FaGoogle,FaGithub  } from "react-icons/fa";
 
     const formSchema =z.object(
         {
-           email: z.email(),
+           email: z.string().email({message: "Invalid email address"}),
             password: z.string().min(1, {message: "Password is required"}),
         });
 
@@ -56,12 +56,11 @@ export const SignInView =() => {
                      router.push("/")
                     },
                     onError: ({error}) => {
-                        setError(error.message)
+                        setError(error.message);
+                        setPending(false);
                     }
                 },
             );
-
-            setPending(false);
         };
 
         //Soscial auth
@@ -79,12 +78,11 @@ export const SignInView =() => {
                      router.push("/")
                     },
                     onError: ({error}) => {
-                        setError(error.message)
+                        setError(error.message);
+                        setPending(false);
                     }
                 },
             );
-
-            setPending(false);
         };
 
 

@@ -38,16 +38,16 @@ export const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/sign-in">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
+            <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
+              <Link href="/sign-in">
                 Sign In
-              </Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
+              </Link>
+            </Button>
+            <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+              <Link href="/sign-up">
                 Get Started
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
 
           {/* Mobile menu button */}
@@ -96,16 +96,16 @@ export const Navbar = () => {
                 Pricing
               </Link>
               <div className="px-3 py-2 space-y-2">
-                <Link href="/sign-in" className="block">
-                  <Button variant="ghost" className="w-full text-white hover:bg-white/10">
+                <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
+                  <Link href="/sign-in">
                     Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up" className="block">
-                  <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
+                  </Link>
+                </Button>
+                <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                  <Link href="/sign-up">
                     Get Started
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
