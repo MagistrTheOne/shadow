@@ -3,43 +3,68 @@
 import { useEffect, useRef, useState } from 'react';
 import { HeyGenAvatarService } from '@/lib/heygen-avatar';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Mic, MicOff, Volume2, VolumeX, Loader2, Users, User } from 'lucide-react';
+
+export type AvatarGender = 'male' | 'female';
 
 interface HeyGenAvatarProps {
   apiKey: string;
-  avatarId: string;
+  avatarId?: string;
   voiceId?: string;
+  gender?: AvatarGender;
   language?: string;
   quality?: 'low' | 'medium' | 'high';
   onReady?: () => void;
   onError?: (error: Error) => void;
+  onGenderChange?: (gender: AvatarGender) => void;
 }
 
 export const HeyGenAvatar = ({
   apiKey,
   avatarId,
   voiceId,
+  gender = 'female',
   language = 'en',
   quality = 'medium',
   onReady,
-  onError
+  onError,
+  onGenderChange,
 }: HeyGenAvatarProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLDivElement>(null);
   const avatarServiceRef = useRef<HeyGenAvatarService | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentGender, setCurrentGender] = useState<AvatarGender>(gender);
+
+  // Получаем правильные ID в зависимости от пола
+  const getAvatarConfig = (selectedGender: AvatarGender) => {
+    if (selectedGender === 'male') {
+      return {
+        avatarId: avatarId || process.env.NEXT_PUBLIC_HEYGEN_MALE_AVATAR_ID || 'default-male',
+        voiceId: voiceId || process.env.NEXT_PUBLIC_HEYGEN_MALE_VOICE_ID || 'default-male-voice',
+      };
+    } else {
+      return {
+        avatarId: avatarId || process.env.NEXT_PUBLIC_HEYGEN_AVATAR_ID || 'default-female',
+        voiceId: voiceId || process.env.NEXT_PUBLIC_HEYGEN_VOICE_ID || 'default-female-voice',
+      };
+    }
+  };
 
   useEffect(() => {
     const initializeAvatar = async () => {
       try {
         setIsLoading(true);
         
+        const config = getAvatarConfig(currentGender);
         const avatarService = new HeyGenAvatarService({
           apiKey,
-          avatarId,
-          voiceId,
+          avatarId: config.avatarId,
+          voiceId: config.voiceId,
           language,
           quality
         });
@@ -68,7 +93,7 @@ export const HeyGenAvatar = ({
         avatarServiceRef.current.destroy();
       }
     };
-  }, [apiKey, avatarId, voiceId, language, quality, onReady, onError]);
+  }, [apiKey, currentGender, language, quality, onReady, onError]);
 
   const handleSpeak = async (text: string) => {
     if (!avatarServiceRef.current || !isReady) return;
@@ -77,90 +102,97 @@ export const HeyGenAvatar = ({
       setIsSpeaking(true);
       await avatarServiceRef.current.speak(text);
     } catch (error) {
-      console.error('Failed to speak:', error);
+      console.error('Error during avatar speak:', error);
       onError?.(error as Error);
     } finally {
       setIsSpeaking(false);
     }
-  };
+    };
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
-    // Implement mute functionality
+    setIsMuted(prev => !prev);
+    console.log(`Avatar audio ${isMuted ? 'unmuted' : 'muted'}`);
+  };
+
+  const handleGenderChange = (newGender: AvatarGender) => {
+    setCurrentGender(newGender);
+    onGenderChange?.(newGender);
   };
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-2xl border border-purple-500/30 overflow-hidden">
-      {/* Video Container */}
-      <div className="relative w-full h-full">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
-              <p className="text-white font-semibold">Initializing AI Avatar...</p>
-              <p className="text-purple-300 text-sm">Powered by HeyGen</p>
+    <div className="relative w-full h-full bg-black rounded-lg overflow-hidden flex flex-col">
+      {/* Gender Selection */}
+      <div className="absolute top-4 left-4 z-20">
+        <Card className="bg-black/50 backdrop-blur-sm border-white/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-white text-sm flex items-center">
+              <Users className="w-4 h-4 mr-2" />
+              AI Avatar
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant={currentGender === 'female' ? 'default' : 'outline'}
+                onClick={() => handleGenderChange('female')}
+                className={`text-xs ${
+                  currentGender === 'female' 
+                    ? 'bg-pink-600 hover:bg-pink-700' 
+                    : 'border-white/20 text-white hover:bg-white/10'
+                }`}
+              >
+                <User className="w-3 h-3 mr-1" />
+                Female
+              </Button>
+              <Button
+                size="sm"
+                variant={currentGender === 'male' ? 'default' : 'outline'}
+                onClick={() => handleGenderChange('male')}
+                className={`text-xs ${
+                  currentGender === 'male' 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'border-white/20 text-white hover:bg-white/10'
+                }`}
+              >
+                <User className="w-3 h-3 mr-1" />
+                Male
+              </Button>
             </div>
-          </div>
-        ) : (
-          <>
-            {/* Video Element */}
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted={isMuted}
-              playsInline
-            />
-            
-            {/* Overlay Controls */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-white text-sm font-medium">AI Avatar Active</span>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleMute}
-                    className="border-white/20 text-white hover:bg-white/10"
-                  >
-                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                  </Button>
-                  
-                  {isSpeaking && (
-                    <div className="flex items-center space-x-2 px-3 py-1 bg-purple-500/20 rounded-full">
-                      <Mic className="w-4 h-4 text-purple-300 animate-pulse" />
-                      <span className="text-purple-300 text-sm">Speaking...</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Avatar Info */}
-            <div className="absolute top-4 left-4">
-              <div className="bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2">
-                <p className="text-white font-semibold text-sm">AI Assistant</p>
-                <p className="text-purple-300 text-xs">Powered by HeyGen</p>
-              </div>
-            </div>
-          </>
-        )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Debug Controls (only in development) */}
-      {process.env.NODE_ENV === 'development' && isReady && (
-        <div className="absolute top-4 right-4 space-y-2">
-          <Button
-            size="sm"
-            onClick={() => handleSpeak("Hello! I'm your AI assistant. How can I help you today?")}
+      {/* Loading State */}
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/80 text-white z-10">
+          <Loader2 className="w-8 h-8 animate-spin mb-2" />
+          <p>Loading AI Avatar...</p>
+          <Badge variant="secondary" className="mt-2">
+            {currentGender === 'male' ? 'Male Avatar' : 'Female Avatar'}
+          </Badge>
+        </div>
+      )}
+
+      {/* Avatar Container */}
+      <div ref={videoRef} className="w-full h-full">
+        {/* HeyGen avatar will be rendered inside this div */}
+      </div>
+      
+      {/* Controls */}
+      {isReady && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/50 rounded-full backdrop-blur-sm">
+          <Button size="icon" variant="ghost" onClick={toggleMute} className="text-white hover:bg-white/20">
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </Button>
+          <Button 
+            size="sm" 
+            onClick={() => handleSpeak("Hello, how can I assist you today?")} 
             disabled={isSpeaking}
             className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-            Test Speech
+            {isSpeaking ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Mic className="w-4 h-4 mr-2" />}
+            Speak
           </Button>
         </div>
       )}

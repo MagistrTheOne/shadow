@@ -3,7 +3,7 @@ import { db } from '@/db';
 import { recordings, transcripts, transcriptSummaries, meetings } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { transcribeAudio, formatTranscript } from '@/lib/deepgram';
-import { generateSummary } from '@/lib/gigachat';
+import { generateSummary } from '@/lib/gigachat-summary';
 
 // Process recording after meeting ends
 export const processRecording = inngest.createFunction(

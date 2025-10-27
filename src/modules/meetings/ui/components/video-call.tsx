@@ -15,7 +15,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-import { HeyGenAvatar } from "@/components/heygen-avatar";
+import { SmartAvatar } from "@/components/smart-avatar";
 import { MeetingChat, MeetingParticipants } from "./meeting-chat";
 
 interface VideoCallProps {
@@ -85,12 +85,12 @@ const CallUI = ({ callId }: { callId: string }) => {
           {/* AI Avatar Overlay */}
           {showAIAvatar && (
             <div className="absolute top-4 right-4 w-80 h-60 z-10">
-              <HeyGenAvatar
+              <SmartAvatar
                 apiKey={process.env.NEXT_PUBLIC_HEYGEN_API_KEY || ''}
-                avatarId={process.env.NEXT_PUBLIC_HEYGEN_AVATAR_ID || 'default'}
-                voiceId={process.env.NEXT_PUBLIC_HEYGEN_VOICE_ID || 'default'}
-                onReady={() => console.log('AI Avatar ready')}
-                onError={(error) => console.error('AI Avatar error:', error)}
+                meetingId={callId}
+                meetingType="business"
+                onReady={() => console.log('Smart Avatar ready')}
+                onError={(error) => console.error('Smart Avatar error:', error)}
               />
             </div>
           )}
