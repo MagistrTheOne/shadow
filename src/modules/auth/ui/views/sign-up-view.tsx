@@ -76,12 +76,12 @@ export const SignUpView =() => {
            authClient.signIn.social(
                 {
                      provider: provider,
-                     callbackURL:"/dashboard"
+                     callbackURL:"/"
                 },
                 {
                     onSuccess: () => {
                         setPending(false);
-                        router.push("/dashboard");
+                        router.push("/");
                     },
                     onError: ({error}) => {
                         setError(error.message);
