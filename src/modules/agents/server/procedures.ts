@@ -33,6 +33,14 @@ export const agentsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(agentsInsertSchema)
     .mutation(async ({ input, ctx }) => {
+      // Check subscription limits
+      const { checkAgentLimit } = await import("@/lib/subscription-limits");
+      const limitCheck = await checkAgentLimit(ctx.auth.user.id);
+
+      if (!limitCheck.canCreate) {
+        throw new Error(`Agent limit reached. You can create ${limitCheck.limit} agents. Current: ${limitCheck.current}`);
+      }
+
       const [createdAgent] = await db
         .insert(agents)
         .values({

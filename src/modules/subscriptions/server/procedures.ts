@@ -20,6 +20,20 @@ export const subscriptionsRouter = createTRPCRouter({
         .orderBy(desc(subscriptions.createdAt))
         .limit(1);
 
+      // If no active subscription found, return free plan as default
+      if (!subscription) {
+        return {
+          id: "free-default",
+          userId: ctx.auth.user.id,
+          plan: "free" as const,
+          status: "active" as const,
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      }
+
       return subscription;
     }),
 
@@ -83,7 +97,7 @@ export const subscriptionsRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ 
+    .input(z.object({
       plan: z.enum(["free", "pro", "enterprise"]),
     }))
     .mutation(async ({ input, ctx }) => {
@@ -99,79 +113,53 @@ export const subscriptionsRouter = createTRPCRouter({
         )
         .limit(1);
 
+      const now = new Date();
+
       if (existingSubscription) {
-        throw new Error("User already has an active subscription");
+        // Update existing subscription to new plan
+        const [updatedSubscription] = await db
+          .update(subscriptions)
+          .set({
+            plan: input.plan,
+            status: "active",
+            currentPeriodStart: now,
+            currentPeriodEnd: input.plan === "free" ? null : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days for paid plans
+            updatedAt: now,
+          })
+          .where(eq(subscriptions.userId, ctx.auth.user.id))
+          .returning();
+
+        return updatedSubscription;
+      } else {
+        // Create new subscription record (mock - no Polar integration yet)
+        const [createdSubscription] = await db
+          .insert(subscriptions)
+          .values({
+            userId: ctx.auth.user.id,
+            polarSubscriptionId: null, // Will be added when Polar is integrated
+            plan: input.plan,
+            status: "active",
+            currentPeriodStart: now,
+            currentPeriodEnd: input.plan === "free" ? null : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days for paid plans
+          })
+          .returning();
+
+        return createdSubscription;
       }
-
-      let polarSubscriptionId: string | null = null;
-
-      // Create Polar subscription for paid plans
-      if (input.plan !== "free") {
-        try {
-          const polarSubscription = await createSubscription(ctx.auth.user.id, input.plan);
-          polarSubscriptionId = polarSubscription.id;
-        } catch (error) {
-          console.error("Failed to create Polar subscription:", error);
-          throw new Error("Failed to create subscription");
-        }
-      }
-
-      // Create local subscription record
-      const [createdSubscription] = await db
-        .insert(subscriptions)
-        .values({
-          userId: ctx.auth.user.id,
-          polarSubscriptionId,
-          plan: input.plan,
-          status: "active",
-          currentPeriodStart: new Date(),
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        })
-        .returning();
-
-      return createdSubscription;
     }),
 
   cancel: protectedProcedure
-    .input(z.object({ subscriptionId: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      // Get subscription and verify ownership
-      const [subscription] = await db
-        .select()
-        .from(subscriptions)
-        .where(
-          and(
-            eq(subscriptions.id, input.subscriptionId),
-            eq(subscriptions.userId, ctx.auth.user.id)
-          )
-        )
-        .limit(1);
-
-      if (!subscription) {
-        throw new Error("Subscription not found");
-      }
-
-      // Cancel Polar subscription if exists
-      if (subscription.polarSubscriptionId) {
-        try {
-          await cancelSubscription(subscription.polarSubscriptionId);
-        } catch (error) {
-          console.error("Failed to cancel Polar subscription:", error);
-          // Continue with local cancellation even if Polar fails
-        }
-      }
-
-      // Update local subscription
-      const [updatedSubscription] = await db
+    .mutation(async ({ ctx }) => {
+      // Cancel user's current subscription (mock - no Polar integration yet)
+      const result = await db
         .update(subscriptions)
         .set({
           status: "cancelled",
           updatedAt: new Date(),
         })
-        .where(eq(subscriptions.id, input.subscriptionId))
-        .returning();
+        .where(eq(subscriptions.userId, ctx.auth.user.id));
 
-      return updatedSubscription;
+      return { success: true };
     }),
 
   updatePaymentMethod: protectedProcedure

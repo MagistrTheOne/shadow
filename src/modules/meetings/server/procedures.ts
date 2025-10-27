@@ -24,6 +24,14 @@ export const meetingsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(meetingCreateSchema)
     .mutation(async ({ input, ctx }) => {
+      // Check subscription limits
+      const { checkMeetingLimit } = await import("@/lib/subscription-limits");
+      const limitCheck = await checkMeetingLimit(ctx.auth.user.id);
+
+      if (!limitCheck.canCreate) {
+        throw new Error(`Meeting limit reached. You can create ${limitCheck.limit} meetings per month. Current: ${limitCheck.current}`);
+      }
+
       const [createdMeeting] = await db
         .insert(meetings)
         .values({

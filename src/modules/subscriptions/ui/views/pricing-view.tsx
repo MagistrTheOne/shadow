@@ -24,16 +24,79 @@ interface PricingPlan {
   };
 }
 
-export const PricingView = () => {
-  const { data: plans, isLoading, isError, error } = trpc.subscriptions.getPlans.useQuery();
+export // Static pricing data for free/pro/enterprise plans
+const pricingPlans = [
+  {
+    id: "free",
+    name: "Free",
+    price: 0,
+    currency: "USD",
+    features: [
+      "Up to 5 meetings per month",
+      "1 GB storage",
+      "Basic AI summaries",
+      "Community support",
+      "1 AI agent",
+    ],
+    limits: {
+      meetingsPerMonth: 5,
+      storageGB: 1,
+      transcriptWords: 10000,
+    },
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 29,
+    currency: "USD",
+    features: [
+      "Up to 50 meetings per month",
+      "100 GB storage",
+      "Advanced AI summaries",
+      "Priority support",
+      "Up to 5 AI agents",
+      "Custom integrations",
+      "Analytics dashboard",
+    ],
+    limits: {
+      meetingsPerMonth: 50,
+      storageGB: 100,
+      transcriptWords: 100000,
+    },
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: 99,
+    currency: "USD",
+    features: [
+      "Unlimited meetings",
+      "Unlimited storage",
+      "Premium AI features",
+      "Dedicated support",
+      "Unlimited AI agents",
+      "White-label solution",
+      "API access",
+      "Custom integrations",
+      "Advanced analytics",
+      "SLA guarantee",
+    ],
+    limits: {
+      meetingsPerMonth: -1,
+      storageGB: -1,
+      transcriptWords: -1,
+    },
+  },
+];
+
+const PricingView = () => {
   const createSubscriptionMutation = trpc.subscriptions.create.useMutation({
     onSuccess: () => {
-      toast.success("Subscription created successfully!");
-      // Redirect to dashboard or payment
+      toast.success("Plan upgraded successfully!");
       window.location.href = "/dashboard";
     },
     onError: (error) => {
-      toast.error("Failed to create subscription", {
+      toast.error("Failed to upgrade plan", {
         description: error.message,
       });
     },
@@ -41,10 +104,13 @@ export const PricingView = () => {
 
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  if (isLoading) return <LoadingState title="Loading pricing plans..." description="Fetching subscription options." />;
-  if (isError) return <ErrorState title="Error loading pricing" description={error?.message || "Something went wrong."} />;
-
   const handleSelectPlan = async (planId: string) => {
+    if (planId === "free") {
+      // Free plan is always available
+      toast.success("You're already on the free plan!");
+      return;
+    }
+
     setSelectedPlan(planId);
     try {
       await createSubscriptionMutation.mutateAsync({ plan: planId as any });
@@ -68,7 +134,7 @@ export const PricingView = () => {
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans?.map((plan: PricingPlan) => (
+          {pricingPlans.map((plan: PricingPlan) => (
             <Card
               key={plan.id}
               className={`relative bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200 ${
@@ -140,7 +206,7 @@ export const PricingView = () => {
                       Processing...
                     </>
                   ) : plan.price === 0 ? (
-                    "Get Started Free"
+                    "Current Plan"
                   ) : (
                     `Choose ${plan.name}`
                   )}

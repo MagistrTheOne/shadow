@@ -26,31 +26,36 @@ export const SubscriptionStatus = () => {
     );
   }
 
-  if (!subscription) {
+  // Default to free plan if no subscription
+  const currentPlan = subscription?.plan || "free";
+  const isActive = subscription?.status === "active" || currentPlan === "free";
+
+  if (!isActive && currentPlan !== "free") {
     return (
       <Card className="bg-white/5 backdrop-blur-sm border-white/10">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangleIcon className="w-5 h-5 text-yellow-400" />
-            No Active Subscription
+            Subscription Inactive
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-400 mb-4">
-            You don't have an active subscription. Upgrade to unlock premium features.
+            Your {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} plan is inactive.
+            Renew to continue using premium features.
           </p>
           <Button asChild>
-            <Link href="/pricing">View Plans</Link>
+            <Link href="/upgrade">Renew Plan</Link>
           </Button>
         </CardContent>
       </Card>
     );
   }
 
-  const isExpiringSoon = subscription.currentPeriodEnd &&
+  const isExpiringSoon = subscription?.currentPeriodEnd &&
     new Date(subscription.currentPeriodEnd).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000; // 7 days
 
-  const planName = subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1);
+  const planName = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
 
   return (
     <Card className="bg-white/5 backdrop-blur-sm border-white/10">
@@ -60,16 +65,18 @@ export const SubscriptionStatus = () => {
             <CreditCardIcon className="w-5 h-5 text-blue-400" />
             Current Plan
           </div>
-          <Badge variant={subscription.status === "active" ? "default" : "secondary"}>
-            {subscription.status}
-          </Badge>
+          {currentPlan !== "free" && subscription && (
+            <Badge variant={subscription.status === "active" ? "default" : "secondary"}>
+              {subscription.status}
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+        <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-white font-medium">{planName} Plan</span>
           <span className="text-gray-400">
-            {subscription.plan === "free" ? "Free" : `$${getPlanPrice(subscription.plan)}/mo`}
+            {currentPlan === "free" ? "Free" : `$${getPlanPrice(currentPlan)}/mo`}
           </span>
         </div>
 
@@ -95,7 +102,7 @@ export const SubscriptionStatus = () => {
         )}
 
         {/* Usage Progress - Mock data for now */}
-        {subscription.plan !== "free" && (
+        {currentPlan !== "free" && (
           <div className="space-y-3 pt-4 border-t border-white/10">
             <h4 className="text-white font-medium">Usage This Month</h4>
 
@@ -118,12 +125,13 @@ export const SubscriptionStatus = () => {
         )}
 
         <div className="flex gap-3 pt-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/upgrade">Manage Plan</Link>
-          </Button>
-          {subscription.plan === "free" && (
+          {currentPlan === "free" ? (
             <Button size="sm" asChild>
               <Link href="/pricing">Upgrade</Link>
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/upgrade">Manage Plan</Link>
             </Button>
           )}
         </div>
