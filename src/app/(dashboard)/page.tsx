@@ -90,27 +90,27 @@ const DashboardContent = () => {
             {upcomingMeetings && upcomingMeetings.length > 0 ? (
               upcomingMeetings.map((meeting) => (
                 <div key={meeting.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200">
-                  <div className="flex-1">
+              <div className="flex-1">
                     <h4 className="font-medium text-white">{meeting.title}</h4>
-                    <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
-                      <CalendarIcon className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
+                  <CalendarIcon className="w-4 h-4" />
                       {meeting.scheduledAt
                         ? format(new Date(meeting.scheduledAt), "MMM dd, yyyy 'at' HH:mm")
                         : "Scheduled"
                       }
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
                     <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-400/30">
                       {meeting.status}
                     </span>
-                    <Button asChild size="sm" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
+                <Button asChild size="sm" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
                       <Link href={`/meetings/${meeting.id}/call`}>
-                        Start
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
+                    Start
+                  </Link>
+                </Button>
+              </div>
+            </div>
               ))
             ) : (
               <div className="text-center py-8">
@@ -179,5 +179,5 @@ const Page = () => {
     </Suspense>
   );
 };
-
+ 
 export default Page;

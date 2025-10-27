@@ -5,7 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BotIcon, MicIcon, MicOffIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
-import { SmartAvatar } from "@/components/smart-avatar";
+
+// Type declarations for Web Speech API
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
 
 type AvatarState = "idle" | "listening" | "thinking" | "speaking";
 
@@ -28,13 +45,13 @@ export const AIAvatarController = ({
   const [transcript, setTranscript] = useState<string>("");
   const [lastResponse, setLastResponse] = useState<string>("");
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
   useEffect(() => {
     // Initialize speech recognition
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
-      const recognition = new webkitSpeechRecognition();
+      const recognition = new (window as any).webkitSpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "ru-RU"; // Russian language
@@ -43,7 +60,7 @@ export const AIAvatarController = ({
         setAvatarState("listening");
       };
 
-      recognition.onresult = async (event) => {
+      recognition.onresult = async (event: SpeechRecognitionEvent) => {
         const speechResult = event.results[0][0].transcript;
         setTranscript(speechResult);
         setAvatarState("thinking");
@@ -209,15 +226,12 @@ export const AIAvatarController = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Avatar Display */}
-          <div className="relative w-full h-32 bg-gray-900 rounded-lg overflow-hidden">
-            <SmartAvatar
-              apiKey={process.env.NEXT_PUBLIC_HEYGEN_API_KEY || ""}
-              meetingId={meetingId}
-              meetingType="business"
-              onReady={() => console.log("AI Avatar ready")}
-              onError={(error) => console.error("AI Avatar error:", error)}
-            />
+          {/* Avatar Placeholder */}
+          <div className="relative w-full h-32 bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
+            <div className="text-center">
+              <BotIcon className="w-12 h-12 text-blue-400 mx-auto mb-2" />
+              <p className="text-xs text-gray-400">AI Avatar</p>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           </div>
 

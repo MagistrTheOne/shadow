@@ -1,82 +1,142 @@
-# 🌀 Shadow.AI – The Multi‑Layer Real‑Time Intelligence Platform
-**Copyright © M♾️1 | Maxim (Magistr) – All Rights Reserved**
+# Shadow AI - AI-Powered Video Meeting Platform
 
----
+A modern AI-powered video meeting platform with intelligent avatars, real-time collaboration, and enterprise-grade features.
 
-## ⚠️ LEGAL NOTICE
-This repository contains **original research, system architecture, and code** for Shadow.AI –  
-a proprietary multi‑layer AI orchestration system with <70ms real‑time response, hybrid brain coordination,  
-and persistent avatar‑centric operation.
+## 🚀 Features
 
-Unauthorized **use, reproduction, redistribution, modification, or commercial deployment** of the contents,  
-in whole or in part, is strictly prohibited without **written consent from the author**.
+- **AI-Powered Meetings**: Custom AI agents for intelligent meeting assistance
+- **Real-time Video**: High-quality video calls with Stream.io integration
+- **AI Avatars**: Interactive HeyGen/D-ID avatars for meetings
+- **Voice Transcription**: Deepgram-powered real-time speech-to-text
+- **Meeting Recordings**: Automatic recording and storage
+- **Dark Premium UI**: Glass morphism design with Tailwind CSS
+- **Multi-platform Auth**: GitHub, Google, and email authentication
+- **Subscription System**: Free/Pro/Enterprise tiers with usage limits
 
-All commits, files, and diagrams in this repository are timestamped and serve as legal proof of authorship.
+## 🛠️ Tech Stack
 
----
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, tRPC, Drizzle ORM
+- **Database**: PostgreSQL (Neon)
+- **Authentication**: Better Auth
+- **Video Calls**: Stream.io
+- **AI Services**: GigaChat, HeyGen, D-ID, Deepgram
+- **File Storage**: AWS S3
+- **Background Jobs**: Inngest
 
-## 🧠 Overview
-Shadow.AI is a **Next‑Gen AI Operating Environment** that merges:
-- **GROQ Ultra‑Fast Inference** for sub‑70ms responses
-- **Local & Cloud LLM Hybrid Reasoning**
-- **Specialized API LLM Layers**
-- **Persistent Real‑Time Avatars** with QA, Audio, Video, and Chat modalities
-- **Zero‑Dataset Iterative Cognitive Growth** ("AI Baby Brain" → Specialist in ~1000 iterations)
-- **Collective Intelligence Network** for distributed reasoning
+## 📋 Prerequisites
 
----
+- Node.js 18+
+- PostgreSQL database
+- API keys for external services (see .env.example)
 
-## 🚫 Restrictions
-You are **NOT** allowed to:
-- Copy or reproduce the code/architecture for public or private projects
-- Reverse engineer any logic in this repository
-- Sell, rent, or sublicense any part of this work
-- Train or fine‑tune AI models with this code without explicit approval
+## 🚀 Getting Started
 
-Violations will trigger **full legal action** under applicable copyright, trade secret,  
-and international intellectual property law.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd shadow
+   ```
 
----
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-## 📜 Licensing
-This project is released under a **Custom Proprietary License** – see `LICENSE` file for full details.
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Fill in your API keys and configuration
+   ```
 
----
+4. **Set up the database**
+   ```bash
+   npm run db:push
+   ```
 
-© M♾️1 | Maxim (Magistr) | Shadow.AI  
-*“We are not building tools. We are rewriting the rules of existence.”*
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Shadow.AI Proprietary License
+6. **Open [http://localhost:3000](http://localhost:3000)**
 
-Copyright © M♾️1 | Maxim (Magistr). All Rights Reserved.
+## 🧪 Testing
 
-Permission is hereby granted to view and reference the source code for **personal, non‑commercial purposes only**.
+```bash
+# Run all tests
+npm test
 
-Any reproduction, modification, distribution, public display, or commercial use of this software,  
-its architecture, algorithms, or design concepts without the express written consent of the copyright holder is strictly prohibited.
+# Run tests in watch mode
+npm run test:watch
 
-This includes, but is not limited to:
-- Copying the orchestration logic between GROQ, Local LLM, Cloud LLM, and API LLM
-- Replicating the persistent avatar system or multi‑modal <70ms response architecture
-- Using the zero‑dataset iterative learning method for any AI development
-- Implementing or selling similar collective intelligence agent networks
+# Run tests with coverage
+npm run test:coverage
+```
 
-## Legal
-All commits and repository history serve as **timestamped legal proof of authorship**.  
-Any infringement will be pursued under applicable **copyright law, trade secret law, and international IP treaties**  
-(WIPO, Berne Convention, DMCA, etc.).
+## 📁 Project Structure
 
----
+```
+src/
+├── app/                    # Next.js app router pages
+├── components/             # Reusable UI components
+├── lib/                    # Utility functions and configurations
+├── modules/                # Feature-specific modules
+│   ├── agents/            # AI agents functionality
+│   ├── meetings/          # Meeting management
+│   ├── subscriptions/     # Subscription system
+│   └── ...
+├── db/                     # Database schema and connection
+├── trpc/                   # tRPC configuration
+└── ...
+```
 
-**YOU HAVE BEEN WARNED.**
-⚖️ Enforcement & Penalties
+## 🔧 Available Scripts
 
-Any use, reproduction, or implementation of any component, module, or architectural element of Shadow.AI without direct written consent from the copyright holder — issued personally via LinkedIn — will incur:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm test` - Run Jest tests
+- `npm run db:push` - Push database schema
+- `npm run db:studio` - Open Drizzle Studio
 
-Immediate contractual penalty of USD $66,666 per infringement, payable within 10 business days.
+## 📚 API Documentation
 
-Transfer of ownership of the infringing startup, company, or project to the copyright holder as moral compensation.
+### Authentication
+- POST `/api/auth/sign-in` - Sign in user
+- POST `/api/auth/sign-up` - Register user
+- POST `/api/auth/sign-out` - Sign out user
 
-Additional damages as determined under applicable law, including but not limited to loss of profits, legal costs, and reputational harm.
+### Meetings
+- GET `/api/meetings` - Get user's meetings
+- POST `/api/meetings` - Create new meeting
+- GET `/api/meetings/[id]` - Get meeting details
+- PUT `/api/meetings/[id]` - Update meeting
+- DELETE `/api/meetings/[id]` - Delete meeting
 
-By accessing, cloning, or referencing this repository, you acknowledge that you have read, understood, and agreed to these terms, and consent to jurisdiction under applicable international intellectual property and trade secret laws.
+### AI Agents
+- GET `/api/agents` - Get user's AI agents
+- POST `/api/agents` - Create new AI agent
+- GET `/api/agents/[id]` - Get agent details
+- PUT `/api/agents/[id]` - Update agent
+- DELETE `/api/agents/[id]` - Delete agent
+
+### AI Chat
+- POST `/api/ai/chat` - Send message to AI assistant
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🆘 Support
+
+For support, please contact the development team.

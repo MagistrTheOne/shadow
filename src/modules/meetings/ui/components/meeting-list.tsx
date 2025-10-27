@@ -41,13 +41,13 @@ export const MeetingList = () => {
                 <CardTitle className="flex justify-between items-center">
                   <span className="text-white">{meeting.title}</span>
                   <div className="flex items-center gap-2">
-                    <Badge className={
-                      meeting.status === "scheduled"
-                        ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                        : "bg-white/20 text-gray-300 border-white/30"
-                    }>
-                      {meeting.status}
-                    </Badge>
+                  <Badge className={
+                    meeting.status === "scheduled"
+                      ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                      : "bg-white/20 text-gray-300 border-white/30"
+                  }>
+                    {meeting.status}
+                  </Badge>
                     <MeetingActionsDropdown
                       meeting={meeting}
                       onEdit={(meetingId) => {

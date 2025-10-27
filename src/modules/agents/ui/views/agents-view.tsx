@@ -17,7 +17,7 @@ export const AgentsView = () => {
   if (isLoading) return <LoadingState title="Loading agents..." description="Fetching your AI agents." />;
   if (isError) return <ErrorState title="Error loading agents" description={error?.message || "Something went wrong."} />;
 
-  return (
+    return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
@@ -73,8 +73,8 @@ export const AgentsView = () => {
           </Button>
         </div>
       )}
-    </div>
-  );
+        </div>
+    );
 };
 
 export const AgentsViewLoading = () => {

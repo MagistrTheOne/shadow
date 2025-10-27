@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/lib/auth-client";
-import { StreamChat, Channel, MessageList, MessageInput, useChannelStateContext } from "@stream-io/react-chat-sdk";
+import { StreamChat, Channel, MessageList, MessageInput } from "stream-chat-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,10 +56,8 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
         const { token } = await response.json();
 
         // Инициализируем Stream Chat клиент
-        const { StreamChat: StreamChatSDK } = await import('@stream-io/react-chat-sdk');
-        
-        const client = StreamChatSDK.getInstance(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
-        
+        const client = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
+
         await client.connectUser(
           {
             id: user?.id!,

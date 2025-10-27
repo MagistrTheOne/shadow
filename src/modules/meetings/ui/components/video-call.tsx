@@ -15,7 +15,6 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-import { SmartAvatar } from "@/components/smart-avatar";
 import { MeetingChat, MeetingParticipants } from "./meeting-chat";
 import { AIAvatarController } from "./ai-avatar-controller";
 
@@ -67,7 +66,6 @@ export const VideoCall = ({ callId }: VideoCallProps) => {
 };
 
 const CallUI = ({ callId }: { callId: string }) => {
-  const [showAIAvatar, setShowAIAvatar] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [aiAvatarVisible, setAiAvatarVisible] = useState(false);
 
@@ -84,23 +82,11 @@ const CallUI = ({ callId }: { callId: string }) => {
         <div className="flex-1 relative">
           <SpeakerLayout />
           
-          {/* AI Avatar Overlay */}
-          {showAIAvatar && (
-            <div className="absolute top-4 right-4 w-80 h-60 z-10">
-              <SmartAvatar
-                apiKey={process.env.NEXT_PUBLIC_HEYGEN_API_KEY || ''}
-                meetingId={callId}
-                meetingType="business"
-                onReady={() => console.log('Smart Avatar ready')}
-                onError={(error) => console.error('Smart Avatar error:', error)}
-              />
-            </div>
-          )}
         </div>
         
         <div className="flex items-center justify-between p-4 bg-black/20 backdrop-blur-sm">
           <CallControls />
-
+          
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setAiAvatarVisible(!aiAvatarVisible)}

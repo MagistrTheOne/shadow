@@ -5,21 +5,25 @@ import { useRouter } from "next/navigation";
 type ErrorType = "network" | "auth" | "validation" | "server" | "unknown";
 
 interface Props {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   errorType?: ErrorType;
   onRetry?: () => void;
   showGoBack?: boolean;
   error?: Error;
+  showStackTrace?: boolean;
+  className?: string;
 }
 
 export const ErrorState = ({
-  title,
-  description,
+  title = "Something went wrong",
+  description = "We encountered an error. Please try again.",
   errorType = "unknown",
   onRetry,
   showGoBack = true,
-  error
+  error,
+  showStackTrace = false,
+  className
 }: Props) => {
   const router = useRouter();
 
@@ -58,11 +62,10 @@ export const ErrorState = ({
     }
   };
   return (
-    <div className="flex flex-1 items-center justify-center px-8 py-6">
+    <div className={`flex flex-1 items-center justify-center px-8 py-6 ${className || ""}`}>
       <div
-        role="status"
-        aria-live="polite"
-        aria-busy="true"
+        role="alert"
+        aria-live="assertive"
         className="relative w-full max-w-md md:max-w-lg min-h-[220px] md:min-h-[260px]
                    rounded-2xl border bg-background/70 backdrop-blur-xl shadow-lg ring-1 ring-black/5"
       >
@@ -83,6 +86,22 @@ export const ErrorState = ({
           <div className="flex max-w-[44ch] flex-col gap-y-2 text-center">
             <h6 className="text-xl md:text-2xl font-semibold tracking-tight">{title}</h6>
             <p className="text-sm md:text-base text-muted-foreground">{description}</p>
+
+            {/* Error details */}
+            {error && (
+              <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <p className="text-sm text-red-400 font-mono">{error.message}</p>
+              </div>
+            )}
+
+            {/* Stack trace */}
+            {showStackTrace && error?.stack && (
+              <div className="mt-4 p-3 bg-gray-500/10 border border-gray-500/20 rounded-lg max-h-32 overflow-y-auto">
+                <pre className="text-xs text-gray-400 font-mono whitespace-pre-wrap">
+                  {error.stack}
+                </pre>
+              </div>
+            )}
           </div>
 
           {/* Action buttons */}

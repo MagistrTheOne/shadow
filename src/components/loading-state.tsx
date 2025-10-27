@@ -1,13 +1,31 @@
 import { Loader2Icon } from "lucide-react";
 
 interface Props {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
+  size?: "sm" | "md" | "lg";
+  className?: string;
 }
 
-export const LoadingState = ({ title, description }: Props) => {
+export const LoadingState = ({
+  title = "Loading...",
+  description = "Please wait while we load your content.",
+  size = "md",
+  className
+}: Props) => {
+  const getSizeClasses = () => {
+    switch (size) {
+      case "sm":
+        return "size-6";
+      case "lg":
+        return "size-12";
+      default:
+        return "size-8 md:size-10";
+    }
+  };
+
   return (
-    <div className="flex flex-1 items-center justify-center px-8 py-6">
+    <div className={`flex flex-1 items-center justify-center px-8 py-6 ${className || ""}`}>
       <div
         role="status"
         aria-live="polite"
@@ -22,7 +40,7 @@ export const LoadingState = ({ title, description }: Props) => {
         <div className="relative flex h-full flex-col items-center justify-center gap-y-6 p-8 md:p-10">
           <div className="relative grid place-items-center">
             <div className="absolute inset-0 -m-3 rounded-full blur-xl opacity-40 bg-primary/20" />
-            <Loader2Icon className="size-8 md:size-10 animate-spin text-primary" />
+            <Loader2Icon className={`${getSizeClasses()} animate-spin text-primary`} />
           </div>
 
           <div className="flex max-w-[44ch] flex-col gap-y-2 text-center">

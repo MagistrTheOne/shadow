@@ -108,11 +108,11 @@ export const DashboardCommand = ({ open, setOpen }: Props) => {
                     <CommandItem onSelect={() => handleSelect("/agents")}>
                         <BotIcon className="mr-2 h-4 w-4" />
                         All Agents
-                    </CommandItem>
+                </CommandItem>
                     <CommandItem onSelect={() => handleSelect("/upgrade")}>
                         <SearchIcon className="mr-2 h-4 w-4" />
                         Subscription
-                    </CommandItem>
+                </CommandItem>
                 </CommandGroup>
             </CommandList>
         </CommandDialog>

@@ -50,16 +50,16 @@ export const Navbar = ({ session }: NavbarProps) => {
               </Button>
             ) : (
               <>
-                <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
-                  <Link href="/sign-in">
-                    Sign In
-                  </Link>
-                </Button>
-                <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
-                  <Link href="/sign-up">
-                    Get Started
-                  </Link>
-                </Button>
+            <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
+              <Link href="/sign-in">
+                Sign In
+              </Link>
+            </Button>
+            <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+              <Link href="/sign-up">
+                Get Started
+              </Link>
+            </Button>
               </>
             )}
           </div>
@@ -118,16 +118,16 @@ export const Navbar = ({ session }: NavbarProps) => {
                   </Button>
                 ) : (
                   <>
-                    <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
-                      <Link href="/sign-in">
-                        Sign In
-                      </Link>
-                    </Button>
-                    <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
-                      <Link href="/sign-up">
-                        Get Started
-                      </Link>
-                    </Button>
+                <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
+                  <Link href="/sign-in">
+                    Sign In
+                  </Link>
+                </Button>
+                <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20" asChild>
+                  <Link href="/sign-up">
+                    Get Started
+                  </Link>
+                </Button>
                   </>
                 )}
               </div>

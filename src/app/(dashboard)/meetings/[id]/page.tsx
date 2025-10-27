@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
@@ -8,8 +10,6 @@ import { CalendarIcon, ClockIcon, VideoIcon, BotIcon, Edit, Trash2 } from "lucid
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { RecordingList } from "@/modules/meetings/ui/components/recording-list";
-import { TranscriptViewer } from "@/modules/meetings/ui/components/transcript-viewer";
 import { MeetingDeleteDialog } from "@/modules/meetings/ui/components/meeting-delete-dialog";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,8 +19,6 @@ interface MeetingDetailsPageProps {
     id: string;
   };
 }
-
-"use client";
 
 const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
   const router = useRouter();
@@ -104,33 +102,6 @@ const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
         </CardContent>
       </Card>
 
-      {/* Recordings */}
-      {meeting.status === "completed" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recordings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={<LoadingState title="Loading recordings..." description="Fetching meeting recordings." />}>
-              <RecordingList meetingId={meetingId} />
-            </Suspense>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Transcript */}
-      {meeting.status === "completed" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Transcript & AI Q&A</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={<LoadingState title="Loading transcript..." description="Fetching meeting transcript." />}>
-              <TranscriptViewer meetingId={meetingId} />
-            </Suspense>
-          </CardContent>
-        </Card>
-      )}
 
       <MeetingDeleteDialog
         meetingId={meetingId}
