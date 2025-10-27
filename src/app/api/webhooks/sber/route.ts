@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sberPaymentService } from '@/lib/sber-payments';
+import { processSberPayment } from '@/lib/sber-payments';
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     
-    await sberPaymentService.handleWebhook(data);
+    await processSberPayment(data);
 
     return NextResponse.json({ received: true });
   } catch (error) {

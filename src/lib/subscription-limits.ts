@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { subscriptions, meetings, transcripts, agents } from "@/db/schema";
-import { eq, and, gte, lte } from "drizzle-orm";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface SubscriptionLimits {
   meetingsPerMonth: number;
@@ -63,7 +63,7 @@ export async function checkMeetingLimit(userId: string): Promise<{
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
   const [result] = await db
-    .select({ count: db.fn.count(meetings.id) })
+    .select({ count: sql<number>`count(*)` })
     .from(meetings)
     .where(
       and(
@@ -148,7 +148,7 @@ export async function checkAgentLimit(userId: string): Promise<{
 
   // Count active agents
   const [result] = await db
-    .select({ count: db.fn.count() })
+    .select({ count: sql<number>`count(*)` })
     .from(db.select().from(agents).where(eq(agents.userId, userId)).as("agents"));
 
   const current = Number(result?.count || 0);

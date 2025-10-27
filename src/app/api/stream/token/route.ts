@@ -19,10 +19,7 @@ export async function POST(request: NextRequest) {
     const chatClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
     
     // Создаем токен для пользователя
-    const token = chatClient.createToken(userId, {
-      exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 час
-      iat: Math.floor(Date.now() / 1000) - 60, // 1 минута назад
-    });
+    const token = chatClient.createToken(userId);
 
     return NextResponse.json({ token });
   } catch (error: any) {

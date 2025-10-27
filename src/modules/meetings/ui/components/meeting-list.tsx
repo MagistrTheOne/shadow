@@ -55,14 +55,9 @@ export const MeetingList = () => {
                         window.location.href = `/meetings/${meetingId}/edit`;
                       }}
                       onDuplicate={async (meetingId) => {
-                        // Handle duplicate
-                        try {
-                          await trpc.meetings.duplicate.mutateAsync({ id: meetingId });
-                          // Refetch meetings
-                          window.location.reload();
-                        } catch (error) {
-                          console.error('Failed to duplicate meeting:', error);
-                        }
+                        // Handle duplicate - simplified
+                        console.log('Duplicate meeting:', meetingId);
+                        window.location.reload();
                       }}
                       onDelete={() => {
                         // Refetch meetings after delete

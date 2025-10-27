@@ -66,7 +66,7 @@ async function handleSubscriptionCreated(data: any) {
     .values({
       userId: user_id,
       polarSubscriptionId: id,
-      plan,
+      plan: plan as "free" | "pro" | "enterprise",
       status: status === "active" ? "active" : "cancelled",
       currentPeriodStart: new Date(current_period_start * 1000),
       currentPeriodEnd: new Date(current_period_end * 1000),

@@ -49,7 +49,7 @@ export function handleTRPCError(
     // Determine if error is retryable
     switch (error.code) {
       case "TIMEOUT":
-      case "NETWORK_ERROR":
+      case "CLIENT_CLOSED_REQUEST":
       case "INTERNAL_SERVER_ERROR":
         shouldRetry = true;
         break;
@@ -57,7 +57,6 @@ export function handleTRPCError(
       case "FORBIDDEN":
       case "NOT_FOUND":
       case "BAD_REQUEST":
-      case "VALIDATION_ERROR":
         shouldRetry = false;
         break;
       default:

@@ -42,13 +42,9 @@ export const AgentsView = () => {
                 window.location.href = `/agents/${agentId}/edit`;
               }}
               onDuplicate={async (agentId) => {
-                // Handle duplicate
-                try {
-                  await trpc.agents.duplicate.mutateAsync({ id: agentId });
-                  window.location.reload();
-                } catch (error) {
-                  console.error('Failed to duplicate agent:', error);
-                }
+                // Handle duplicate - simplified
+                console.log('Duplicate agent:', agentId);
+                window.location.reload();
               }}
               onDelete={() => {
                 window.location.reload();

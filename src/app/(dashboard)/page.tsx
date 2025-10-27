@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/error-state";
 import { format } from "date-fns";
 
 const DashboardContent = () => {
-  const { data: upcomingMeetings } = trpc.meetings.getUpcoming.useQuery({ limit: 3 });
+  const { data: upcomingMeetings } = trpc.meetings.getUpcoming.useQuery();
   const { data: agents } = trpc.agents.getMany.useQuery();
   const { data: recentMeetings } = trpc.meetings.getHistory.useQuery({ limit: 3 });
   const { data: subscription } = trpc.subscriptions.getCurrent.useQuery();

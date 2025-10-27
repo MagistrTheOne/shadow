@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BotIcon, MoreHorizontal, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { MeetingActionsDropdown } from "./meeting-actions-dropdown"; // Можно переиспользовать или создать аналогичный
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface Agent {
   id: string;
   name: string;
   instructions: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 interface AgentCardProps {
@@ -54,9 +54,18 @@ export const AgentCard = ({ agent, onEdit, onDuplicate, onDelete }: AgentCardPro
             <Badge variant="secondary" className="text-xs">
               AI Agent
             </Badge>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                <DropdownMenuItem>Delete</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardTitle>
       </CardHeader>
@@ -68,7 +77,7 @@ export const AgentCard = ({ agent, onEdit, onDuplicate, onDelete }: AgentCardPro
           <span>Created: {format(agent.createdAt, 'MMM dd, yyyy')}</span>
         </div>
 
-        {agent.updatedAt.getTime() !== agent.createdAt.getTime() && (
+        {new Date(agent.updatedAt).getTime() !== new Date(agent.createdAt).getTime() && (
           <div className="flex items-center gap-2 text-sm text-gray-400">
             <CalendarIcon className="w-4 h-4" />
             <span>Updated: {format(agent.updatedAt, 'MMM dd, yyyy')}</span>

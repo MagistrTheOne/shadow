@@ -30,7 +30,7 @@ export const SubscriptionStatus = () => {
   const currentPlan = subscription?.plan || "free";
   const isActive = subscription?.status === "active" || currentPlan === "free";
 
-  if (!isActive && currentPlan !== "free") {
+  if (!isActive) {
     return (
       <Card className="bg-white/5 backdrop-blur-sm border-white/10">
         <CardHeader>
@@ -80,7 +80,7 @@ export const SubscriptionStatus = () => {
           </span>
         </div>
 
-        {subscription.currentPeriodEnd && (
+        {subscription?.currentPeriodEnd && (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2">

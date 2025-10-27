@@ -3,7 +3,8 @@ import { subscriptions, payments } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and, desc } from "drizzle-orm";
 import { z } from "zod";
-import { createSubscription, cancelSubscription, getSubscription } from "@/lib/polar";
+import { createPolarSubscription, cancelPolarSubscription } from "@/lib/polar";
+import { createSubscription, cancelSubscription, getSubscription } from "@/lib/polar-subscriptions";
 
 export const subscriptionsRouter = createTRPCRouter({
   getCurrent: protectedProcedure

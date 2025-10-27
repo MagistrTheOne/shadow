@@ -31,9 +31,7 @@ export const agentUpdateSchema = z.object({
 
 // Subscription schemas
 export const subscriptionSchema = z.object({
-  plan: z.enum(["free", "pro", "enterprise"], {
-    errorMap: () => ({ message: "Выберите корректный тарифный план" })
-  }),
+  plan: z.enum(["free", "pro", "enterprise"]),
 });
 
 // Type exports

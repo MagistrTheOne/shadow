@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/landing/navbar";
 import { FooterSection } from "@/components/landing/footer-section";
 import { Button } from "@/components/ui/button";
-import { Book, Code, Zap, Users } from "lucide-react";
+import { Book, Code, Zap, Users, Video } from "lucide-react";
 import Link from "next/link";
 
 const docSections = [

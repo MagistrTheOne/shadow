@@ -132,8 +132,8 @@ export async function generateActionItems(transcript: string): Promise<string[]>
     // Парсим действия из текста
     const actionItems = content
       .split('\n')
-      .filter(line => line.trim() && line.includes('-'))
-      .map(line => line.trim())
+      .filter((line: string) => line.trim() && line.includes('-'))
+      .map((line: string) => line.trim())
       .slice(0, 10); // Максимум 10 действий
 
     return actionItems;
@@ -166,8 +166,8 @@ export async function generateKeyPoints(transcript: string): Promise<string[]> {
     // Парсим ключевые моменты
     const keyPoints = content
       .split('\n')
-      .filter(line => line.trim() && (line.startsWith('-') || line.startsWith('•') || line.match(/^\d+\./)))
-      .map(line => line.replace(/^[-•\d.\s]+/, '').trim())
+      .filter((line: string) => line.trim() && (line.startsWith('-') || line.startsWith('•') || line.match(/^\d+\./)))
+      .map((line: string) => line.replace(/^[-•\d.\s]+/, '').trim())
       .slice(0, 8); // Максимум 8 ключевых моментов
 
     return keyPoints;

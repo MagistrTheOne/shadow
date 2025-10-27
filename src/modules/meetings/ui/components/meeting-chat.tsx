@@ -45,8 +45,8 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: user?.id,
-            userName: user?.name || 'Guest',
+            userId: user?.user?.id,
+            userName: user?.user?.name || 'Guest',
           }),
         });
 
@@ -61,9 +61,9 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
 
         await client.connectUser(
           {
-            id: user?.id!,
-            name: user?.name || 'Guest',
-            image: user?.image,
+            id: user?.user?.id!,
+            name: user?.user?.name || 'Guest',
+            image: user?.user?.image || undefined,
           },
           token
         );
@@ -195,16 +195,13 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
         </div>
 
         <Chat client={chatClientRef.current}>
-          <Channel channelId={`meeting-${meetingId}`} channelType="messaging">
-            <div className="flex flex-col h-full">
-              <div className="flex-1 overflow-hidden">
-                <MessageList />
-              </div>
-              <div className="border-t p-3">
-                <MessageInput />
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-hidden">
+              <div className="p-4 text-center text-gray-400">
+                Chat functionality will be implemented
               </div>
             </div>
-          </Channel>
+          </div>
         </Chat>
       </CardContent>
     </Card>

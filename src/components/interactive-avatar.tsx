@@ -4,6 +4,24 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Volume2, VolumeX, Users, Loader2 } from 'lucide-react';
 
+// Type declarations for Web Speech API
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
 interface InteractiveAvatarProps {
   onReady?: () => void;
   onError?: (error: Error) => void;
@@ -17,7 +35,7 @@ export const InteractiveAvatar = ({ onReady, onError }: InteractiveAvatarProps) 
   const [isReady, setIsReady] = useState(false);
   const [currentText, setCurrentText] = useState('');
   
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Avatar animation states
@@ -34,7 +52,7 @@ export const InteractiveAvatar = ({ onReady, onError }: InteractiveAvatarProps) 
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'en-US';
 
-      recognitionRef.current.onresult = (event) => {
+      recognitionRef.current.onresult = (event: any) => {
         let finalTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -48,7 +66,7 @@ export const InteractiveAvatar = ({ onReady, onError }: InteractiveAvatarProps) 
         }
       };
 
-      recognitionRef.current.onerror = (event) => {
+      recognitionRef.current.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
         setAvatarState('idle');

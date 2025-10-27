@@ -17,7 +17,7 @@ export const DashboardCommand = ({ open, setOpen }: Props) => {
 
     // Fetch data for search
     const { data: meetings } = trpc.meetings.getMany.useQuery({}, { enabled: open });
-    const { data: agents } = trpc.agents.getMany.useQuery({}, { enabled: open });
+    const { data: agents } = trpc.agents.getMany.useQuery(undefined, { enabled: open });
 
     const handleSelect = (href: string) => {
         setOpen(false);
