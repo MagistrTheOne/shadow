@@ -1,43 +1,43 @@
 "use client";
 
-import { Bot, Video, MessageSquare, FileText, Brain, Shield, Zap, Users } from "lucide-react";
+import { Bot, Video, MessageSquare, FileText, Brain, Shield, Zap } from "lucide-react";
 
 const features = [
   {
     icon: Bot,
     title: "AI Avatars",
-    description: "Intelligent avatars that understand context and respond naturally to your meetings.",
-    gradient: "from-blue-500 to-cyan-500"
+    description: "Sophisticated avatars that understand context and respond naturally to your meetings.",
+    color: "text-gray-400"
   },
   {
     icon: Video,
-    title: "HD Video Calls",
-    description: "Crystal clear video quality with advanced noise cancellation and background blur.",
-    gradient: "from-purple-500 to-pink-500"
+    title: "Premium Video Calls",
+    description: "Crystal clear video quality with advanced noise cancellation and background effects.",
+    color: "text-gray-400"
   },
   {
     icon: MessageSquare,
     title: "Real-time Chat",
     description: "Instant messaging during meetings with AI-powered suggestions and translations.",
-    gradient: "from-green-500 to-emerald-500"
+    color: "text-gray-400"
   },
   {
     icon: FileText,
     title: "Smart Transcripts",
     description: "Automatic transcription with AI-powered summaries and action item extraction.",
-    gradient: "from-orange-500 to-red-500"
+    color: "text-gray-400"
   },
   {
     icon: Brain,
     title: "AI Insights",
     description: "Get intelligent insights, sentiment analysis, and meeting effectiveness metrics.",
-    gradient: "from-indigo-500 to-purple-500"
+    color: "text-gray-400"
   },
   {
     icon: Shield,
     title: "Enterprise Security",
     description: "Bank-level encryption, SOC 2 compliance, and advanced privacy controls.",
-    gradient: "from-teal-500 to-blue-500"
+    color: "text-gray-400"
   }
 ];
 
@@ -47,18 +47,18 @@ export const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-            <Zap className="w-4 h-4 text-yellow-400 mr-2" />
-            <span className="text-sm text-white">Features</span>
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+            <Zap className="w-4 h-4 text-gray-400 mr-2" />
+            <span className="text-sm text-gray-300">Product Features</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Everything you need for{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              AI-powered meetings
+            <span className="bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent">
+              professional meetings
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Experience the next generation of video conferencing with AI avatars, 
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Experience enterprise-grade video conferencing with sophisticated AI avatars,
             intelligent automation, and seamless collaboration tools.
           </p>
         </div>
@@ -70,29 +70,25 @@ export const FeaturesSection = () => {
               key={index}
               className="group relative p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105"
             >
-              {/* Background Gradient */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`} />
-              
               {/* Icon */}
-              <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} mb-6`}>
-                <feature.icon className="w-6 h-6 text-white" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+                <feature.icon className={`w-6 h-6 ${feature.color}`} />
               </div>
 
               {/* Content */}
               <h3 className="text-xl font-semibold text-white mb-4">{feature.title}</h3>
-              <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+              <p className="text-gray-400 leading-relaxed">{feature.description}</p>
 
               {/* Hover Effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           ))}
         </div>
 
         {/* Bottom CTA */}
         <div className="text-center mt-16">
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20">
-            <Users className="w-5 h-5 text-blue-400 mr-2" />
-            <span className="text-white">Join thousands of teams already using Shadow AI</span>
+          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10">
+            <span className="text-gray-300">Trusted by enterprise teams worldwide</span>
           </div>
         </div>
       </div>

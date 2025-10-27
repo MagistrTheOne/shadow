@@ -1,6 +1,6 @@
 "use client";
 //ico(for our)
-import { BotIcon, StarIcon, VideoIcon } from "lucide-react"
+import { BotIcon, StarIcon, VideoIcon, ZapIcon } from "lucide-react"
 //server
 import Link from "next/link";
 import Image from "next/image";
@@ -41,15 +41,17 @@ export const DashboardSidebar = () => {
 
 
     return (
-        <Sidebar>
-            <SidebarHeader className="text-sidebar-accent-foreground">
+        <Sidebar className="bg-black/40 backdrop-blur-xl border-r border-white/10">
+            <SidebarHeader className="text-white">
                 <Link href="/" className="flex items-center gap-2 px-2 pt-2">
-                     <Image src="/logo.svg" height={36} width={36} alt="Shadow"/>
-                     <p className="text-2xl font-semibold">Shadow.Ai</p>
+                     <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                         <ZapIcon className="w-5 h-5 text-white" />
+                     </div>
+                     <p className="text-2xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Shadow.Ai</p>
                 </Link>
             </SidebarHeader>
             <div className="px-4 py-2">
-                <Separator className="opacity-10 text-[#5D6B68]"/>
+                <Separator className="opacity-20 bg-white/20"/>
             </div>
             <SidebarContent>
                 <SidebarGroup>
@@ -59,11 +61,10 @@ export const DashboardSidebar = () => {
                             <SidebarMenuItem key={Item.href}>
                             <SidebarMenuButton 
                             asChild
-                            className= {cn
-                                (
-                                "h-10 hover:bg-linear-to-r/oklch border border-transparent hover:border-[#5D6B68]/10 from-sidebar-accent from-5% via-30% via-sidebar/50 to-sidebar/50",
-                                pathname === Item.href && "bg-linear-to-r/oklch border-[#5D6B68]/10"
-                                )}
+                            className= {cn(
+                                "h-10 hover:bg-white/10 border border-transparent hover:border-white/20 text-white hover:text-white transition-all duration-200",
+                                pathname === Item.href && "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white"
+                            )}
                                 isActive ={pathname === Item.href}
                                 >  
                                 <Link href={Item.href}>
@@ -78,7 +79,7 @@ export const DashboardSidebar = () => {
                         </SidebarMenu>
                     </SidebarGroupContent>
             <div className="px-4 py-2">
-            <Separator className="opacity-10 text-[#5D6B68]"/>
+            <Separator className="opacity-20 bg-white/20"/>
             </div>
                 </SidebarGroup>
                 <SidebarGroup>
@@ -88,11 +89,10 @@ export const DashboardSidebar = () => {
                             <SidebarMenuItem key={Item.href}>
                             <SidebarMenuButton 
                             asChild
-                            className= {cn
-                                (
-                                "h-10 hover:bg-linear-to-r/oklch border border-transparent hover:border-[#5D6B68]/10 from-sidebar-accent from-5% via-30% via-sidebar/50 to-sidebar/50",
-                                pathname === Item.href && "bg-linear-to-r/oklch border-[#5D6B68]/10"
-                                )}
+                            className= {cn(
+                                "h-10 hover:bg-white/10 border border-transparent hover:border-white/20 text-white hover:text-white transition-all duration-200",
+                                pathname === Item.href && "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/30 text-white"
+                            )}
                                 isActive ={pathname === Item.href}
                                 >  
                                 <Link href={Item.href}>

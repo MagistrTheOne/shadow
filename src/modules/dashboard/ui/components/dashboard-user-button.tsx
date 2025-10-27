@@ -50,7 +50,7 @@ export const DashboardUserButton = () => {
     if (isMobile) {
         return(
             <Drawer>
-                <DrawerTrigger className="flex w-full items-center rounded-lg border border-border/10 bg-white/5 p-3 hover:bg-white/10 overflow-hidden" >
+                <DrawerTrigger className="flex w-full items-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-3 hover:bg-white/10 overflow-hidden" >
                  {data.user.image ? (
                     <Avatar>
                         <AvatarImage src={data.user.image} />
@@ -63,21 +63,21 @@ export const DashboardUserButton = () => {
                     />
                 )}
                 <div className="ml-3 flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden text-left">
-                    <p className="w-full truncate text-sm font-medium">
+                    <p className="w-full truncate text-sm font-medium text-white">
                         {data.user.name}
                     </p>
-                    <p className="w-full truncate text-xs text-muted-foreground">
+                    <p className="w-full truncate text-xs text-gray-400">
                         {data.user.email}
                     </p>
                 </div>
-                <ChevronDownIcon className="size-4 shrink-0" />
+                <ChevronDownIcon className="size-4 shrink-0 text-gray-400" />
                 </DrawerTrigger>
-                <DrawerContent>
+                <DrawerContent className="bg-black/95 backdrop-blur-xl border-white/10">
                     <DrawerHeader>
-                        <DrawerTitle>
+                        <DrawerTitle className="text-white">
                             {data.user.name}
                         </DrawerTitle>
-                        <DrawerDescription>
+                        <DrawerDescription className="text-gray-400">
                             {data.user.email}
                         </DrawerDescription>
                     </DrawerHeader>
@@ -85,15 +85,17 @@ export const DashboardUserButton = () => {
                         <Button
                         variant="outline"
                         onClick={() =>{}}
+                        className="border-white/20 text-gray-300 hover:bg-white/10"
                         >
-                        <CreditCardIcon className=" size-4 text-black"/>
+                        <CreditCardIcon className="size-4"/>
                          Billing
                         </Button>
                          <Button
                         variant="outline"
                         onClick={onLogout}
+                        className="border-red-500/20 text-red-400 hover:bg-red-500/20"
                         >
-                        <LogOutIcon className=" size-4 text-black"/>
+                        <LogOutIcon className="size-4"/>
                          Logout
                         </Button>
                     </DrawerFooter>
@@ -106,7 +108,7 @@ export const DashboardUserButton = () => {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="flex w-full items-center rounded-lg border border-border/10 bg-white/5 p-3 hover:bg-white/10 overflow-hidden">
+            <DropdownMenuTrigger className="flex w-full items-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-3 hover:bg-white/10 overflow-hidden">
                 {data.user.image ? (
                     <Avatar>
                         <AvatarImage src={data.user.image} />
@@ -119,21 +121,21 @@ export const DashboardUserButton = () => {
                     />
                 )}
                 <div className="ml-3 flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden text-left">
-                    <p className="w-full truncate text-sm font-medium">
+                    <p className="w-full truncate text-sm font-medium text-white">
                         {data.user.name}
                     </p>
-                    <p className="w-full truncate text-xs text-muted-foreground">
+                    <p className="w-full truncate text-xs text-gray-400">
                         {data.user.email}
                     </p>
                 </div>
-                <ChevronDownIcon className="size-4 shrink-0" />
+                <ChevronDownIcon className="size-4 shrink-0 text-gray-400" />
             </DropdownMenuTrigger>
 
             {/* Dark glass dropdown */}
             <DropdownMenuContent
                 align="end"
                 side="right"
-                className="w-72 rounded-xl border border-white/10 bg-[rgba(7,7,7,0.8)] backdrop-blur-lg shadow-2xl p-1 animate-fade-slide"
+                className="w-72 rounded-xl border border-white/10 bg-black/60 backdrop-blur-lg shadow-2xl p-1 animate-fade-slide"
             >
                 {/* User info */}
                 <DropdownMenuLabel className="flex items-center gap-3 px-3 py-2">
@@ -161,15 +163,15 @@ export const DashboardUserButton = () => {
                 <DropdownMenuSeparator className="my-1 bg-white/10" />
 
                 {/* Billing */}
-                <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-200 hover:bg-white/5 hover:text-white rounded-md cursor-pointer transition-colors">
+                <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white rounded-md cursor-pointer transition-colors">
                     <CreditCardIcon className="size-4 text-gray-400" />
                     <span className="flex-1">Billing</span>
                 </DropdownMenuItem>
 
                 {/* Logout */}
-                <DropdownMenuItem 
+                <DropdownMenuItem
                 onClick={onLogout}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-md cursor-pointer transition-colors">
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-md cursor-pointer transition-colors">
                     <LogOutIcon className="size-4" />
                     <span className="flex-1">Logout</span>
                 </DropdownMenuItem>

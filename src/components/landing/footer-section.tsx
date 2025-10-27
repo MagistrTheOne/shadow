@@ -14,22 +14,22 @@ export const FooterSection = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-gray-300" />
               </div>
               <span className="text-xl font-bold text-white">Shadow AI</span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-xs">
-              The future of AI-powered meetings with intelligent avatars and seamless collaboration.
+              The future of professional meetings with sophisticated AI avatars and enterprise collaboration.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <Twitter className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <Github className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <Linkedin className="w-4 h-4" />
               </Button>
             </div>
@@ -40,17 +40,22 @@ export const FooterSection = () => {
             <h3 className="text-white font-semibold mb-4">Product</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#features" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/product" className="text-gray-400 hover:text-white transition-colors">
+                  Product
+                </Link>
+              </li>
+              <li>
+                <Link href="/features" className="text-gray-400 hover:text-white transition-colors">
                   Features
                 </Link>
               </li>
               <li>
-                <Link href="#demo" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/demo" className="text-gray-400 hover:text-white transition-colors">
                   Demo
                 </Link>
               </li>
               <li>
-                <Link href="#pricing" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
                   Pricing
                 </Link>
               </li>
@@ -67,22 +72,22 @@ export const FooterSection = () => {
             <h3 className="text-white font-semibold mb-4">Company</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/company" className="text-gray-400 hover:text-white transition-colors">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/company/blog" className="text-gray-400 hover:text-white transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/company/careers" className="text-gray-400 hover:text-white transition-colors">
                   Careers
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/company/contact" className="text-gray-400 hover:text-white transition-colors">
                   Contact
                 </Link>
               </li>
@@ -94,22 +99,22 @@ export const FooterSection = () => {
             <h3 className="text-white font-semibold mb-4">Support</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/help" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/support" className="text-gray-400 hover:text-white transition-colors">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/docs" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/support/documentation" className="text-gray-400 hover:text-white transition-colors">
                   Documentation
                 </Link>
               </li>
               <li>
-                <Link href="/api" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/support/api-reference" className="text-gray-400 hover:text-white transition-colors">
                   API Reference
                 </Link>
               </li>
               <li>
-                <Link href="/status" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/support/status" className="text-gray-400 hover:text-white transition-colors">
                   Status
                 </Link>
               </li>
@@ -142,7 +147,7 @@ export const FooterSection = () => {
         <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
           <div className="flex items-center justify-center space-x-2 text-gray-400">
             <Mail className="w-4 h-4" />
-            <span className="text-sm">Contact: magistrtheone@example.com</span>
+            <span className="text-sm">Contact: magistrtheone@gmail.com</span>
           </div>
         </div>
       </div>

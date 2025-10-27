@@ -59,9 +59,9 @@ export const DashboardNavbar = () => {
         
       />
 
-      <nav className="flex items-center gap-x-2 px-4 py-3 border-b bg-background">
+      <nav className="flex items-center gap-x-2 px-4 py-3 border-b border-white/10 bg-black/20 backdrop-blur-xl">
         <Button
-          className="size-9"
+          className="size-9 border-white/20 text-white hover:bg-white/10"
           variant="outline"
           onClick={toggleSidebar}
           aria-label={state === "collapsed" || isMobile ? "Open sidebar" : "Close sidebar"}
@@ -73,7 +73,7 @@ export const DashboardNavbar = () => {
         </Button>
 
         <Button
-          className="h-9 w-[260px] justify-start font-normal text-muted-foreground hover:text-muted-foreground"
+          className="h-9 w-[260px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:bg-white/10"
           variant="outline"
           size="sm"
           onClick={openCommand}
@@ -84,7 +84,7 @@ export const DashboardNavbar = () => {
         >
           <SearchIcon className="mr-2 size-4" />
           Search
-          <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 border border-white/20 bg-black/40 px-1.5 font-mono text-[10px] font-medium text-gray-300">
             <span className="text-xs">⌘</span>K
             <span className="mx-1 opacity-60">/</span>
             Ctrl K

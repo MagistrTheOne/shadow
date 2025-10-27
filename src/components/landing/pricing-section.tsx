@@ -10,7 +10,7 @@ const plans = [
     period: "forever",
     description: "Perfect for individuals and small teams",
     icon: Zap,
-    gradient: "from-gray-500 to-gray-600",
+    color: "text-gray-400",
     features: [
       "Up to 5 meetings per month",
       "Basic AI avatar",
@@ -27,7 +27,7 @@ const plans = [
     period: "per month",
     description: "Best for growing teams and businesses",
     icon: Crown,
-    gradient: "from-blue-500 to-purple-600",
+    color: "text-gray-300",
     features: [
       "Unlimited meetings",
       "Advanced AI avatars",
@@ -46,7 +46,7 @@ const plans = [
     period: "pricing",
     description: "For large organizations with advanced needs",
     icon: Rocket,
-    gradient: "from-purple-500 to-pink-600",
+    color: "text-gray-300",
     features: [
       "Everything in Professional",
       "Custom AI avatar training",
@@ -68,19 +68,19 @@ export const PricingSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-            <Crown className="w-4 h-4 text-yellow-400 mr-2" />
-            <span className="text-sm text-white">Pricing</span>
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+            <Crown className="w-4 h-4 text-gray-400 mr-2" />
+            <span className="text-sm text-gray-300">Pricing</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Choose your{" "}
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent">
               perfect plan
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Start free and scale as you grow. All plans include our core AI avatar technology 
-            and advanced meeting features.
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Start free and scale as you grow. All plans include our enterprise AI avatar technology
+            and premium meeting features.
           </p>
         </div>
 
@@ -91,14 +91,14 @@ export const PricingSection = () => {
               key={index}
               className={`relative p-8 rounded-3xl bg-white/5 backdrop-blur-sm border transition-all duration-300 hover:transform hover:scale-105 ${
                 plan.popular
-                  ? "border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-purple-500/10"
+                  ? "border-white/30 bg-white/10"
                   : "border-white/10 hover:border-white/20"
               }`}
             >
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-1 rounded-full text-sm font-semibold">
                     Most Popular
                   </div>
                 </div>
@@ -106,8 +106,8 @@ export const PricingSection = () => {
 
               {/* Plan Header */}
               <div className="text-center mb-8">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${plan.gradient} mb-4`}>
-                  <plan.icon className="w-8 h-8 text-white" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
+                  <plan.icon className={`w-8 h-8 ${plan.color}`} />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
                 <p className="text-gray-400 mb-4">{plan.description}</p>
@@ -121,7 +121,7 @@ export const PricingSection = () => {
               <div className="space-y-4 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <div key={featureIndex} className="flex items-center space-x-3">
-                    <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <Check className="w-5 h-5 text-gray-400 flex-shrink-0" />
                     <span className="text-gray-300">{feature}</span>
                   </div>
                 ))}
@@ -131,7 +131,7 @@ export const PricingSection = () => {
               <Button
                 className={`w-full py-3 text-lg font-semibold ${
                   plan.popular
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    ? "bg-white/20 hover:bg-white/30 text-white border border-white/30"
                     : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
                 }`}
               >

@@ -9,35 +9,42 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+    <nav className="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-gray-300" />
             </div>
             <span className="text-xl font-bold text-white">Shadow AI</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+            <Link href="/product" className="text-gray-300 hover:text-white transition-colors">
+              Product
+            </Link>
+            <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
               Features
             </Link>
-            <Link href="#demo" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/demo" className="text-gray-300 hover:text-white transition-colors">
               Demo
             </Link>
-            <Link href="#pricing" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">
               Pricing
             </Link>
+          </div>
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link href="/sign-in">
               <Button variant="ghost" className="text-white hover:bg-white/10">
                 Sign In
               </Button>
             </Link>
             <Link href="/sign-up">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+              <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
                 Get Started
               </Button>
             </Link>
@@ -49,7 +56,7 @@ export const Navbar = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white"
+              className="text-white hover:bg-white/10"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </Button>
@@ -59,23 +66,30 @@ export const Navbar = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-black/40 backdrop-blur-xl rounded-lg mt-2">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-black/60 backdrop-blur-xl rounded-lg mt-2 border border-white/10">
               <Link
-                href="#features"
+                href="/product"
+                className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Product
+              </Link>
+              <Link
+                href="/features"
                 className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
-                href="#demo"
+                href="/demo"
                 className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Demo
               </Link>
               <Link
-                href="#pricing"
+                href="/pricing"
                 className="block px-3 py-2 text-gray-300 hover:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -88,7 +102,7 @@ export const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/sign-up" className="block">
-                  <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                  <Button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
                     Get Started
                   </Button>
                 </Link>

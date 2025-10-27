@@ -21,10 +21,13 @@ export const MeetingList = () => {
   if (isError) return <ErrorState title="Error loading meetings" description={error?.message || "Something went wrong."} />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Meetings</h1>
-        <Button asChild>
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">My Meetings</h1>
+          <p className="text-gray-400">Manage your AI-powered meeting sessions</p>
+        </div>
+        <Button asChild className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
           <Link href="/meetings/new">
             <PlusIcon className="w-4 h-4 mr-2" />
             New Meeting
@@ -33,41 +36,45 @@ export const MeetingList = () => {
       </div>
 
       {meetings && meetings.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {meetings.map((meeting) => (
-            <Card key={meeting.id}>
+            <Card key={meeting.id} className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
-                  {meeting.title}
-                  <Badge variant={meeting.status === "scheduled" ? "default" : "secondary"}>
+                  <span className="text-white">{meeting.title}</span>
+                  <Badge className={
+                    meeting.status === "scheduled"
+                      ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                      : "bg-white/20 text-gray-300 border-white/30"
+                  }>
                     {meeting.status}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col gap-2">
-                <p className="text-sm text-muted-foreground">{meeting.description || "No description"}</p>
+              <CardContent className="flex flex-col gap-3">
+                <p className="text-sm text-gray-400">{meeting.description || "No description"}</p>
                 {meeting.scheduledAt && (
-                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
                     <CalendarIcon className="w-4 h-4" />
                     <span>{format(meeting.scheduledAt, 'MMM dd, yyyy HH:mm')}</span>
                   </div>
                 )}
                 {meeting.status === "completed" && meeting.endedAt && (
-                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
                     <ClockIcon className="w-4 h-4" />
                     <span>Ended: {format(meeting.endedAt, 'MMM dd, yyyy HH:mm')}</span>
                   </div>
                 )}
                 <div className="flex justify-end gap-2 mt-4">
                   {meeting.status === "scheduled" && (
-                    <Button asChild size="sm">
+                    <Button asChild size="sm" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
                       <Link href={`/meetings/${meeting.id}/call`}>
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Start Call
                       </Link>
                     </Button>
                   )}
-                  <Button asChild variant="outline" size="sm">
+                  <Button asChild variant="outline" size="sm" className="border-white/20 text-gray-300 hover:bg-white/10">
                     <Link href={`/meetings/${meeting.id}`}>View Details</Link>
                   </Button>
                 </div>
@@ -76,11 +83,13 @@ export const MeetingList = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500">
-          <VideoIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">No meetings found.</p>
-          <p className="text-sm">Start by creating a new meeting.</p>
-          <Button asChild className="mt-4">
+        <div className="text-center py-16">
+          <div className="w-24 h-24 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <VideoIcon className="w-12 h-12 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">No meetings found</h3>
+          <p className="text-gray-400 mb-6 max-w-md mx-auto">Start your journey with AI-powered meetings. Create your first meeting to experience the future of collaboration.</p>
+          <Button asChild className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20">
             <Link href="/meetings/new">
               <PlusIcon className="w-4 h-4 mr-2" />
               Create New Meeting
