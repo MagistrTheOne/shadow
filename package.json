@@ -13,6 +13,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.917.0",
     "@aws-sdk/s3-request-presigner": "3.917.0",
+    "@d-id/client-sdk": "^1.1.14",
     "@deepgram/sdk": "4.11.2",
     "@dicebear/avatars": "^4.10.8",
     "@dicebear/collection": "^9.2.3",
