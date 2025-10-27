@@ -1,4 +1,4 @@
-import { deepgramClient } from '@/lib/deepgram';
+import { createClient, DeepgramClient } from '@deepgram/sdk';
 
 export interface TranscriptResult {
   transcript: string;
@@ -110,3 +110,6 @@ export async function transcribeStream(
     throw new Error(`Streaming transcription failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+// Initialize Deepgram client
+export const deepgramClient: DeepgramClient = createClient(process.env.DEEPGRAM_API_KEY!);

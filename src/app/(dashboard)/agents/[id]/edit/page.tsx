@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { trpc } from "@/trpc/client";
@@ -9,9 +9,9 @@ import { AgentForm } from "@/modules/agents/ui/components/agent-form";
 import { useRouter } from "next/navigation";
 
 interface AgentEditPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const AgentEditView = ({ agentId }: { agentId: string }) => {
@@ -58,9 +58,15 @@ const AgentEditView = ({ agentId }: { agentId: string }) => {
 const AgentEditPage = ({ params }: AgentEditPageProps) => {
   return (
     <Suspense fallback={<LoadingState title="Loading agent..." description="Fetching agent details." />}>
-      <AgentEditView agentId={params.id} />
+      <AgentEditPageContent params={params} />
     </Suspense>
   );
+};
+
+const AgentEditPageContent = ({ params }: AgentEditPageProps) => {
+  const { id } = React.use(params);
+
+  return <AgentEditView agentId={id} />;
 };
 
 export default AgentEditPage;

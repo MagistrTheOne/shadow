@@ -1,23 +1,29 @@
 "use client";
 
+import React, { Suspense } from "react";
 import { VideoCall } from "@/modules/meetings/ui/components/video-call";
-import { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 
 interface MeetingCallPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const MeetingCallPage = ({ params }: MeetingCallPageProps) => {
   return (
     <div className="h-full w-full">
       <Suspense fallback={<LoadingState title="Preparing video call..." description="Connecting to Stream services." />}>
-        <VideoCall callId={params.id} />
+        <MeetingCallPageContent params={params} />
       </Suspense>
     </div>
   );
+};
+
+const MeetingCallPageContent = ({ params }: MeetingCallPageProps) => {
+  const { id } = React.use(params);
+
+  return <VideoCall callId={id} />;
 };
 
 export default MeetingCallPage;

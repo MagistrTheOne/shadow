@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useAuth } from "@/lib/auth-client";
-import { StreamChat, Channel, MessageList, MessageInput } from "stream-chat-react";
+import { authClient } from "@/lib/auth-client";
+import { StreamChat } from "stream-chat";
+import { Chat, Channel, MessageList, MessageInput } from "stream-chat-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ interface MeetingChatProps {
 }
 
 export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
-  const { user } = useAuth();
+  const { data: user } = authClient.useSession();
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -193,7 +194,7 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
           </div>
         </div>
 
-        <StreamChat client={chatClientRef.current}>
+        <Chat client={chatClientRef.current}>
           <Channel channelId={`meeting-${meetingId}`} channelType="messaging">
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-hidden">
@@ -204,7 +205,7 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
               </div>
             </div>
           </Channel>
-        </StreamChat>
+        </Chat>
       </CardContent>
     </Card>
   );

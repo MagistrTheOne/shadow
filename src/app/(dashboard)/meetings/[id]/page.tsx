@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { trpc } from "@/trpc/client";
@@ -15,9 +15,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface MeetingDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
@@ -118,10 +118,16 @@ const MeetingDetailsPage = ({ params }: MeetingDetailsPageProps) => {
   return (
     <div className="py-4 px-4 md:px-8">
       <Suspense fallback={<LoadingState title="Loading meeting details..." description="Fetching meeting information." />}>
-        <MeetingDetailsView meetingId={params.id} />
+        <MeetingDetailsPageContent params={params} />
       </Suspense>
     </div>
   );
+};
+
+const MeetingDetailsPageContent = ({ params }: MeetingDetailsPageProps) => {
+  const { id } = React.use(params);
+
+  return <MeetingDetailsView meetingId={id} />;
 };
 
 export default MeetingDetailsPage;

@@ -89,7 +89,7 @@ const pricingPlans = [
   },
 ];
 
-const PricingView = () => {
+export const PricingView = () => {
   const createSubscriptionMutation = trpc.subscriptions.create.useMutation({
     onSuccess: () => {
       toast.success("Plan upgraded successfully!");

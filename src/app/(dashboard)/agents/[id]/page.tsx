@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import React, { Suspense, useState } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { trpc } from "@/trpc/client";
@@ -14,9 +14,9 @@ import { AgentDeleteDialog } from "@/modules/agents/ui/components/agent-delete-d
 import { AgentEditDialog } from "@/modules/agents/ui/components/agent-edit-dialog";
 
 interface AgentDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const AgentDetailsView = ({ agentId }: { agentId: string }) => {
@@ -86,7 +86,7 @@ const AgentDetailsView = ({ agentId }: { agentId: string }) => {
               </div>
             </div>
 
-            {agent.updatedAt.getTime() !== agent.createdAt.getTime() && (
+            {new Date(agent.updatedAt).getTime() !== new Date(agent.createdAt).getTime() && (
               <div className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5 text-muted-foreground" />
                 <div>
@@ -148,9 +148,15 @@ const AgentDetailsView = ({ agentId }: { agentId: string }) => {
 const AgentDetailsPage = ({ params }: AgentDetailsPageProps) => {
   return (
     <Suspense fallback={<LoadingState title="Loading agent..." description="Fetching agent details." />}>
-      <AgentDetailsView agentId={params.id} />
+      <AgentDetailsPageContent params={params} />
     </Suspense>
   );
+};
+
+const AgentDetailsPageContent = ({ params }: AgentDetailsPageProps) => {
+  const { id } = React.use(params);
+
+  return <AgentDetailsView agentId={id} />;
 };
 
 export default AgentDetailsPage;

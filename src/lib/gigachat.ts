@@ -100,7 +100,7 @@ export async function getAvailableModels() {
 
 export async function generateEmbedding(text: string | string[]) {
   const token = await getGigaChatAccessToken();
-  
+
   try {
     const response = await gigachatAxios.post('https://gigachat.devices.sberbank.ru/api/v1/embeddings', {
       model: 'Embeddings',
@@ -118,3 +118,14 @@ export async function generateEmbedding(text: string | string[]) {
     throw new Error(`GigaChat embeddings error: ${error.response?.status || 'Network error'}`);
   }
 }
+
+// OpenAI-compatible client interface for backward compatibility
+export const gigachatClient = {
+  chat: {
+    completions: {
+      create: async (request: ChatCompletionRequest) => {
+        return await generateChatCompletion(request);
+      }
+    }
+  }
+};

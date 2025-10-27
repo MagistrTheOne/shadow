@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { trpc } from "@/trpc/client";
@@ -9,9 +9,9 @@ import { MeetingEditForm } from "@/modules/meetings/ui/components/meeting-edit-f
 import { useRouter } from "next/navigation";
 
 interface MeetingEditPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const MeetingEditView = ({ meetingId }: { meetingId: string }) => {
@@ -44,7 +44,7 @@ const MeetingEditView = ({ meetingId }: { meetingId: string }) => {
               initialData={{
                 title: meeting.title,
                 description: meeting.description || "",
-                scheduledAt: meeting.scheduledAt,
+                scheduledAt: meeting.scheduledAt ? new Date(meeting.scheduledAt) : undefined,
               }}
               onSuccess={handleSuccess}
               onCancel={handleCancel}
@@ -59,9 +59,15 @@ const MeetingEditView = ({ meetingId }: { meetingId: string }) => {
 const MeetingEditPage = ({ params }: MeetingEditPageProps) => {
   return (
     <Suspense fallback={<LoadingState title="Loading meeting..." description="Fetching meeting details." />}>
-      <MeetingEditView meetingId={params.id} />
+      <MeetingEditPageContent params={params} />
     </Suspense>
   );
+};
+
+const MeetingEditPageContent = ({ params }: MeetingEditPageProps) => {
+  const { id } = React.use(params);
+
+  return <MeetingEditView meetingId={id} />;
 };
 
 export default MeetingEditPage;
