@@ -1,30 +1,32 @@
 "use client"
 
-import { Suspense } from 'react';
-import { useTRPC } from '@/trpc/cleint';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { trpc } from '@/trpc/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CalendarIcon, ClockIcon, UsersIcon, PlusIcon, PlayIcon, ZapIcon, BotIcon, VideoIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { LoadingState } from '@/components/loading-state';
+import type { Meeting, Agent } from '@/trpc/types';
 
 export const HomeView = () => {
-  const trpc = useTRPC();
-  
-  const { data: upcomingMeetings } = useSuspenseQuery(
-    trpc.meetings.getUpcoming.queryOptions()
-  );
-  
-  const { data: recentMeetings } = useSuspenseQuery(
-    trpc.meetings.getHistory.queryOptions({ limit: 5, offset: 0 })
-  );
-  
-  const { data: agents } = useSuspenseQuery(
-    trpc.agents.getMany.queryOptions()
-  );
+  const { data: upcomingMeetings, isLoading: upcomingLoading } = trpc.meetings.getUpcoming.useQuery();
+  const { data: recentMeetings, isLoading: recentLoading } = trpc.meetings.getHistory.useQuery({ limit: 5, offset: 0 });
+  const { data: agents, isLoading: agentsLoading } = trpc.agents.getMany.useQuery();
+
+  // Показываем загрузку если данные еще не загружены
+  if (upcomingLoading || recentLoading || agentsLoading) {
+    return (
+      <div className="py-6 px-4 md:px-8 flex flex-col gap-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-6 px-4 md:px-8 flex flex-col gap-8">
@@ -95,7 +97,7 @@ export const HomeView = () => {
         <CardContent>
           {upcomingMeetings && upcomingMeetings.length > 0 ? (
             <div className="space-y-3">
-              {upcomingMeetings.slice(0, 3).map((meeting) => (
+              {upcomingMeetings.slice(0, 3).map((meeting: Meeting) => (
                 <div key={meeting.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200">
                   <div className="flex-1">
                     <h4 className="font-medium text-white">{meeting.title}</h4>
@@ -140,7 +142,7 @@ export const HomeView = () => {
         <CardContent>
           {recentMeetings && recentMeetings.length > 0 ? (
             <div className="space-y-3">
-              {recentMeetings.slice(0, 3).map((meeting) => (
+              {recentMeetings.slice(0, 3).map((meeting: Meeting) => (
                 <div key={meeting.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200">
                   <div className="flex-1">
                     <h4 className="font-medium text-white">{meeting.title}</h4>

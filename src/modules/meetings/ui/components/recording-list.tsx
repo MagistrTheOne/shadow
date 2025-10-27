@@ -1,7 +1,6 @@
 "use client";
 
-import { useTRPC } from "@/trpc/cleint";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { trpc } from "@/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,18 +10,16 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { useState } from "react";
 import { toast } from "sonner";
+import type { Recording } from "@/trpc/types";
 
 interface RecordingListProps {
   meetingId: string;
 }
 
 export const RecordingList = ({ meetingId }: RecordingListProps) => {
-  const trpc = useTRPC();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   
-  const { data: recordings, isLoading, isError, error } = useSuspenseQuery(
-    trpc.recordings.getByMeeting.queryOptions({ meetingId })
-  );
+  const { data: recordings, isLoading, isError, error } = trpc.recordings.getByMeeting.useQuery({ meetingId });
 
   const handleDelete = async (recordingId: string) => {
     setIsDeleting(recordingId);
@@ -66,7 +63,7 @@ export const RecordingList = ({ meetingId }: RecordingListProps) => {
 
   return (
     <div className="space-y-4">
-      {recordings.map((recording) => (
+      {recordings.map((recording: Recording) => (
         <Card key={recording.id}>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">

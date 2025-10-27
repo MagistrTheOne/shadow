@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
-import { useTRPC } from "@/trpc/cleint";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { trpc } from "@/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, ClockIcon, VideoIcon, BotIcon } from "lucide-react";
@@ -19,12 +18,9 @@ interface MeetingDetailsPageProps {
 }
 
 const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
-  const trpc = useTRPC();
-  const { data: meeting, isLoading, isError, error } = useSuspenseQuery(
-    trpc.meetings.getOne.queryOptions({ id: meetingId })
-  );
+  const { data: meeting, isLoading, isError, error } = trpc.meetings.getOne.useQuery({ id: meetingId });
 
-  if (isLoading) return <LoadingState title="Loading meeting details..." />;
+  if (isLoading) return <LoadingState title="Loading meeting details..." description="Fetching meeting information." />;
   if (isError) return <ErrorState title="Error loading meeting" description={error?.message || "Something went wrong."} />;
   if (!meeting) return <ErrorState title="Meeting not found" description="The requested meeting could not be found." />;
 
@@ -88,7 +84,7 @@ const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
             <CardTitle>Recordings</CardTitle>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<LoadingState title="Loading recordings..." />}>
+            <Suspense fallback={<LoadingState title="Loading recordings..." description="Fetching meeting recordings." />}>
               <RecordingList meetingId={meetingId} />
             </Suspense>
           </CardContent>
@@ -102,7 +98,7 @@ const MeetingDetailsView = ({ meetingId }: { meetingId: string }) => {
             <CardTitle>Transcript & AI Q&A</CardTitle>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<LoadingState title="Loading transcript..." />}>
+            <Suspense fallback={<LoadingState title="Loading transcript..." description="Fetching meeting transcript." />}>
               <TranscriptViewer meetingId={meetingId} />
             </Suspense>
           </CardContent>

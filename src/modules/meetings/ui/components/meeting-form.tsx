@@ -19,7 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useTRPC } from "@/trpc/cleint";
+import { trpc } from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -38,8 +38,20 @@ interface MeetingFormProps {
 
 export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
   const router = useRouter();
-  const trpc = useTRPC();
   const [isPending, setIsPending] = useState(false);
+
+  const createMeetingMutation = trpc.meetings.create.useMutation({
+    onSuccess: () => {
+      toast.success("Meeting created successfully!");
+      router.push("/meetings");
+      onSuccess?.();
+    },
+    onError: (error) => {
+      toast.error("Failed to create meeting", {
+        description: error.message,
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,7 +66,7 @@ export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      await trpc.meetings.create.mutate(values);
+      await createMeetingMutation.mutateAsync(values);
       toast.success("Meeting created successfully!");
       onSuccess?.();
       router.push("/meetings");

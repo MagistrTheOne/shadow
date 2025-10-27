@@ -1,7 +1,6 @@
 "use client";
 
-import { useTRPC } from "@/trpc/cleint";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { trpc } from "@/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,31 +9,41 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { useState } from "react";
 import { toast } from "sonner";
+import type { Transcript } from "@/trpc/types";
 
 interface TranscriptViewerProps {
   meetingId: string;
 }
 
 export const TranscriptViewer = ({ meetingId }: TranscriptViewerProps) => {
-  const trpc = useTRPC();
   const [searchQuery, setSearchQuery] = useState("");
   const [question, setQuestion] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [isAsking, setIsAsking] = useState(false);
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
 
-  const { data: transcript, isLoading, isError, error } = useSuspenseQuery(
-    trpc.transcripts.getByMeeting.queryOptions({ meetingId })
-  );
+  const { data: transcript, isLoading, isError, error } = trpc.transcripts.getByMeeting.useQuery({ meetingId });
+  
+  const askQuestionMutation = trpc.transcripts.askQuestion.useMutation({
+    onSuccess: (response) => {
+      setAiAnswer(response.answer);
+    },
+    onError: (error) => {
+      toast.error("Failed to get AI answer", {
+        description: error.message || "An unexpected error occurred.",
+      });
+    },
+  });
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
     try {
-      const results = await trpc.transcripts.search.query({ meetingId, query: searchQuery });
-      setSearchResults(results);
+      // Используем прямой вызов клиента для поиска
+      const client = trpc.useUtils();
+      const results = await client.transcripts.search.fetch({ query: searchQuery });
+      setSearchResults(results.map((r: any) => r.transcript.content));
     } catch (error: any) {
       toast.error("Search failed", {
         description: error.message || "An unexpected error occurred.",
@@ -45,19 +54,12 @@ export const TranscriptViewer = ({ meetingId }: TranscriptViewerProps) => {
   };
 
   const handleAskQuestion = async () => {
-    if (!question.trim()) return;
+    if (!question.trim() || !transcript) return;
     
-    setIsAsking(true);
-    try {
-      const response = await trpc.transcripts.askQuestion.mutate({ meetingId, question });
-      setAiAnswer(response.answer);
-    } catch (error: any) {
-      toast.error("Failed to get AI answer", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    } finally {
-      setIsAsking(false);
-    }
+    askQuestionMutation.mutate({ 
+      transcriptId: transcript.id, 
+      question 
+    });
   };
 
   if (isLoading) return <LoadingState title="Loading transcript..." description="Fetching meeting transcript." />;
@@ -122,7 +124,7 @@ export const TranscriptViewer = ({ meetingId }: TranscriptViewerProps) => {
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAskQuestion()}
               />
-              <Button onClick={handleAskQuestion} disabled={isAsking}>
+              <Button onClick={handleAskQuestion} disabled={askQuestionMutation.isPending}>
                 Ask AI
               </Button>
             </div>

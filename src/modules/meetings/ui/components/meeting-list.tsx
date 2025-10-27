@@ -1,7 +1,6 @@
 "use client";
 
-import { useTRPC } from "@/trpc/cleint";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { trpc } from "@/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +9,10 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import type { Meeting } from "@/trpc/types";
 
 export const MeetingList = () => {
-  const trpc = useTRPC();
-  const { data: meetings, isLoading, isError, error } = useSuspenseQuery(
-    trpc.meetings.getMany.queryOptions()
-  );
+  const { data: meetings, isLoading, isError, error } = trpc.meetings.getMany.useQuery({});
 
   if (isLoading) return <LoadingState title="Loading meetings..." description="Fetching your scheduled and past meetings." />;
   if (isError) return <ErrorState title="Error loading meetings" description={error?.message || "Something went wrong."} />;
@@ -37,7 +34,7 @@ export const MeetingList = () => {
 
       {meetings && meetings.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {meetings.map((meeting) => (
+          {meetings.map((meeting: Meeting) => (
             <Card key={meeting.id} className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
