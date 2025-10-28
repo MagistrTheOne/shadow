@@ -42,7 +42,7 @@ export const Navbar = ({ session }: NavbarProps) => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-white hover:bg-white/10" asChild>
+            <Button variant="ghost" className="text-white hover:bg-white" asChild>
               <Link href="/sign-in">
                 Sign In
               </Link>
@@ -53,7 +53,7 @@ export const Navbar = ({ session }: NavbarProps) => {
               </Link>
             </Button>
             <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
-              <Link href="/dashboard">
+              <Link href={session ? "/dashboard" : "/sign-in"}>
                 Dashboard
               </Link>
             </Button>
@@ -116,7 +116,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                   </Link>
                 </Button>
                 <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
-                  <Link href="/dashboard">
+                  <Link href={session ? "/dashboard" : "/sign-in"}>
                     Dashboard
                   </Link>
                 </Button>

@@ -173,6 +173,7 @@ const DashboardContent = () => {
 };
 
 const Page = () => {
+  // Middleware уже обрабатывает аутентификацию
   return (
     <Suspense fallback={<LoadingState title="Loading dashboard..." description="Fetching your data" />}>
       <DashboardContent />
