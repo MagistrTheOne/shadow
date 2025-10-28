@@ -23,14 +23,35 @@ export const FooterSection = () => {
               The future of professional meetings with sophisticated AI avatars and enterprise collaboration.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
-                <Twitter className="w-4 h-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-white/10"
+                asChild
+              >
+                <a href="https://twitter.com/MagistrTheOne" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="w-4 h-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
-                <Github className="w-4 h-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-white/10"
+                asChild
+              >
+                <a href="https://github.com/MagistrTheOne" target="_blank" rel="noopener noreferrer">
+                  <Github className="w-4 h-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
-                <Linkedin className="w-4 h-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-white/10"
+                asChild
+              >
+                <a href="https://linkedin.com/in/MagistrTheOne" target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="w-4 h-4" />
+                </a>
               </Button>
             </div>
           </div>
@@ -145,9 +166,27 @@ export const FooterSection = () => {
 
         {/* Contact Info */}
         <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl">
-          <div className="flex items-center justify-center space-x-2 text-gray-400">
-            <Mail className="w-4 h-4" />
-            <span className="text-sm">Contact: magistrtheone@gmail.com</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-gray-400">
+            <div className="flex items-center space-x-2">
+              <Mail className="w-4 h-4" />
+              <a 
+                href="mailto:magistrtheone@gmail.com" 
+                className="text-sm hover:text-white transition-colors"
+              >
+                magistrtheone@gmail.com
+              </a>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">Created by</span>
+              <a 
+                href="https://github.com/MagistrTheOne" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white font-semibold hover:text-gray-300 transition-colors"
+              >
+                @MagistrTheOne
+              </a>
+            </div>
           </div>
         </div>
       </div>

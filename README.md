@@ -2,6 +2,8 @@
 
 A modern AI-powered video meeting platform with intelligent avatars, real-time collaboration, and enterprise-grade features.
 
+**Created by [@MagistrTheOne](https://github.com/MagistrTheOne)**
+
 ## 🚀 Features
 
 - **AI-Powered Meetings**: Custom AI agents for intelligent meeting assistance
@@ -34,8 +36,8 @@ A modern AI-powered video meeting platform with intelligent avatars, real-time c
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd shadow
+   git clone https://github.com/MagistrTheOne/shadow-ai.git
+   cd shadow-ai
    ```
 
 2. **Install dependencies**
@@ -139,4 +141,7 @@ This project is private and proprietary.
 
 ## 🆘 Support
 
-For support, please contact the development team.
+For support, please contact:
+- **Email**: magistrtheone@gmail.com
+- **GitHub**: [@MagistrTheOne](https://github.com/MagistrTheOne)
+- **Twitter**: [@MagistrTheOne](https://twitter.com/MagistrTheOne)

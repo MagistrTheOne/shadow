@@ -2,6 +2,13 @@
   "name": "shadow",
   "version": "0.1.0",
   "private": true,
+  "author": "MagistrTheOne <magistrtheone@gmail.com>",
+  "description": "The future of professional meetings with sophisticated AI avatars and enterprise collaboration",
+  "homepage": "https://github.com/MagistrTheOne/shadow-ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MagistrTheOne/shadow-ai.git"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
