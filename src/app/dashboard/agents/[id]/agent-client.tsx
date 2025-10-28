@@ -70,6 +70,18 @@ export function AgentClient({ id }: AgentClientProps) {
 
   const { data: agent, isLoading, isError, refetch } = trpc.agents.getOne.useQuery({ id });
 
+  const testAgent = trpc.agents.testAgent.useMutation({
+    onSuccess: (data) => {
+      setTestResponse(data.response);
+      setIsTestLoading(false);
+      toast.success("Agent test completed!");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to test agent");
+      setIsTestLoading(false);
+    },
+  });
+
   const deleteAgent = trpc.agents.delete.useMutation({
     onSuccess: () => {
       toast.success("Agent deleted successfully!");
@@ -100,19 +112,20 @@ export function AgentClient({ id }: AgentClientProps) {
     }
   };
 
-  const handleTest = () => {
+  const handleTestAgent = () => {
     if (!testMessage.trim()) {
       toast.error("Please enter a test message");
       return;
     }
-    setIsTesting(true);
+    
+    setIsTestLoading(true);
     setTestResponse("");
     testAgent.mutate({ 
-      id, 
-      message: testMessage,
-      model: agent?.model || "GigaChat"
+      agentId: id, 
+      message: testMessage 
     });
   };
+
 
   if (isLoading) {
     return <LoadingState title="Loading agent..." description="Fetching agent details" />;
@@ -332,11 +345,11 @@ export function AgentClient({ id }: AgentClientProps) {
                     />
                   </div>
                   <Button 
-                    onClick={handleTest} 
-                    disabled={isTesting || !testMessage.trim()}
+                    onClick={handleTestAgent} 
+                    disabled={isTestLoading || !testMessage.trim()}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    {isTesting ? (
+                    {isTestLoading ? (
                       <>
                         <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
                         Testing...

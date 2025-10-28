@@ -140,14 +140,18 @@ export const aiService = new AIService();
 // Предустановленные модели для каждого провайдера
 export const PRESET_MODELS: Record<AIProvider, string[]> = {
   sber: [
-    'GigaChat:latest',
-    'GigaChat:gpt-4',
-    'GigaChat:gpt-3.5-turbo',
+    'GigaChat',
+    'GigaChat-Pro',
+    'GigaChat-Plus',
+    'GigaChat-2',
+    'GigaChat-2-Pro',
+    'GigaChat-2-Max',
+    'GigaChat-Max',
   ],
   openai: [
-    'gpt-4',
+    'gpt-4o',
+    'gpt-4o-mini',
     'gpt-4-turbo',
     'gpt-3.5-turbo',
-    'gpt-3.5-turbo-16k',
   ],
 };

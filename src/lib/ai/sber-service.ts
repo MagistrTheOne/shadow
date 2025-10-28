@@ -2,6 +2,9 @@ interface SberConfig {
   clientId: string;
   clientSecret: string;
   scope: string;
+  authorizationKey: string;
+  oauthUrl: string;
+  apiUrl: string;
 }
 
 interface SberTokenResponse {
@@ -53,16 +56,15 @@ export class SberGigaChatService {
     }
 
     const rqUid = crypto.randomUUID();
-    const authKey = btoa(`${this.config.clientId}:${this.config.clientSecret}`);
 
     try {
-      const response = await fetch('https://ngw.devices.sberbank.ru:9443/api/v2/oauth', {
+      const response = await fetch(this.config.oauthUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
           'RqUID': rqUid,
-          'Authorization': `Basic ${authKey}`,
+          'Authorization': `Basic ${this.config.authorizationKey}`,
         },
         body: new URLSearchParams({
           scope: this.config.scope,
@@ -70,7 +72,8 @@ export class SberGigaChatService {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to get access token: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to get access token: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data: SberTokenResponse = await response.json();
@@ -88,7 +91,7 @@ export class SberGigaChatService {
     const token = await this.getAccessToken();
 
     try {
-      const response = await fetch('https://gigachat.devices.sberbank.ru/api/v1/chat/completions', {
+      const response = await fetch(`${this.config.apiUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +123,7 @@ export class SberGigaChatService {
     const token = await this.getAccessToken();
 
     try {
-      const response = await fetch('https://gigachat.devices.sberbank.ru/api/v1/models', {
+      const response = await fetch(`${this.config.apiUrl}/models`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -129,7 +132,8 @@ export class SberGigaChatService {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to get models: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to get models: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -146,4 +150,7 @@ export const sberService = new SberGigaChatService({
   clientId: process.env.SBER_CLIENT_ID || '',
   clientSecret: process.env.SBER_CLIENT_SECRET || '',
   scope: process.env.SBER_SCOPE || 'GIGACHAT_API_PERS',
+  authorizationKey: process.env.SBER_AUTHORIZATION_KEY || '',
+  oauthUrl: process.env.SBER_OAUTH_URL || 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
+  apiUrl: process.env.SBER_API_URL || 'https://gigachat.devices.sberbank.ru/api/v1',
 });

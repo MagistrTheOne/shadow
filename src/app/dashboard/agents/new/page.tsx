@@ -55,6 +55,10 @@ const SBER_MODELS = [
   { value: "GigaChat", label: "GigaChat (Latest - Production)" },
   { value: "GigaChat-Pro", label: "GigaChat Pro (Advanced capabilities)" },
   { value: "GigaChat-Plus", label: "GigaChat Plus (Enhanced performance)" },
+  { value: "GigaChat-2", label: "GigaChat-2 (Next generation)" },
+  { value: "GigaChat-2-Pro", label: "GigaChat-2 Pro (Advanced next-gen)" },
+  { value: "GigaChat-2-Max", label: "GigaChat-2 Max (Maximum capabilities)" },
+  { value: "GigaChat-Max", label: "GigaChat Max (Maximum performance)" },
 ];
 
 const OPENAI_MODELS = [
