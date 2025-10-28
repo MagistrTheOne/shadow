@@ -8,6 +8,7 @@ import {
   HomeIcon,
   PlusIcon,
   MessageSquareIcon,
+  UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ const firstSection = [
   { icon: VideoIcon, label: "Meetings", href: "/dashboard/meetings" },
   { icon: BotIcon, label: "Agents", href: "/dashboard/agents" },
   { icon: MessageSquareIcon, label: "Chats", href: "/dashboard/chats" },
+  { icon: UsersIcon, label: "Friends", href: "/dashboard/friends" },
 ];
 
 const secondSection = [

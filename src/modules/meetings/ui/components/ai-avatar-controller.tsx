@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BotIcon, MicIcon, MicOffIcon, Volume2Icon, VolumeXIcon } from "lucide-react";
+import { trpc } from "@/trpc/client";
 
 // Type declarations for Web Speech API
 declare global {
@@ -48,6 +49,23 @@ export const AIAvatarController = ({
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
+  // AI integration
+  const testAgentMutation = trpc.agents.testAgent.useMutation({
+    onSuccess: (data) => {
+      setLastResponse(data.response);
+      setAvatarState("speaking");
+      
+      // Speak response if audio is enabled
+      if (isAudioEnabled && synthRef.current) {
+        speakResponse(data.response);
+      }
+    },
+    onError: (error) => {
+      console.error("AI processing error:", error);
+      setAvatarState("idle");
+    },
+  });
+
   useEffect(() => {
     // Initialize speech recognition
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
@@ -67,13 +85,20 @@ export const AIAvatarController = ({
 
         // Process with AI
         try {
-          const response = await processWithAI(speechResult);
-          setLastResponse(response);
-          setAvatarState("speaking");
-
-          // Speak response if audio is enabled
-          if (isAudioEnabled && synthRef.current) {
-            speakResponse(response);
+          if (agentId) {
+            testAgentMutation.mutate({
+              agentId,
+              message: speechResult,
+            });
+          } else {
+            // Fallback to default response
+            const response = "Я получил ваше сообщение: " + speechResult;
+            setLastResponse(response);
+            setAvatarState("speaking");
+            
+            if (isAudioEnabled && synthRef.current) {
+              speakResponse(response);
+            }
           }
         } catch (error) {
           console.error("AI processing error:", error);

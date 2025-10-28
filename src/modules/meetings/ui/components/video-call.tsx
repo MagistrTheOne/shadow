@@ -9,6 +9,7 @@ import {
   StreamTheme,
   useCallStateHooks,
   CallingState,
+  useCall,
 } from "@stream-io/video-react-sdk";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -17,6 +18,7 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { MeetingChat, MeetingParticipants } from "./meeting-chat";
 import { AIAvatarController } from "./ai-avatar-controller";
+import { trpc } from "@/trpc/client";
 
 interface VideoCallProps {
   callId: string;
@@ -68,12 +70,41 @@ export const VideoCall = ({ callId }: VideoCallProps) => {
 const CallUI = ({ callId }: { callId: string }) => {
   const [showChat, setShowChat] = useState(false);
   const [aiAvatarVisible, setAiAvatarVisible] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Получаем данные митинга
+  const { data: meeting } = trpc.meetings.getById.useQuery({ id: callId });
+
+  // Получаем call объект для управления записью
+  const call = useCall();
 
   // Моковые данные участников
   const participants = [
     { id: '1', name: 'John Smith', isOnline: true },
     { id: '2', name: 'AI Assistant', isOnline: true },
   ];
+
+  const handleStartRecording = async () => {
+    if (call) {
+      try {
+        await call.startRecording();
+        setIsRecording(true);
+      } catch (error) {
+        console.error("Failed to start recording:", error);
+      }
+    }
+  };
+
+  const handleStopRecording = async () => {
+    if (call) {
+      try {
+        await call.stopRecording();
+        setIsRecording(false);
+      } catch (error) {
+        console.error("Failed to stop recording:", error);
+      }
+    }
+  };
 
   return (
     <div className="h-full w-full flex">
@@ -88,6 +119,17 @@ const CallUI = ({ callId }: { callId: string }) => {
           <CallControls />
           
           <div className="flex items-center space-x-2">
+            <button
+              onClick={isRecording ? handleStopRecording : handleStartRecording}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                isRecording
+                  ? 'bg-red-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </button>
+
             <button
               onClick={() => setAiAvatarVisible(!aiAvatarVisible)}
               className={`px-4 py-2 rounded-lg transition-colors ${
@@ -135,7 +177,7 @@ const CallUI = ({ callId }: { callId: string }) => {
         meetingId={callId}
         isVisible={aiAvatarVisible}
         onToggle={() => setAiAvatarVisible(!aiAvatarVisible)}
-        agentId="default-agent" // TODO: Get from meeting data
+        agentId={meeting?.agentId || undefined}
       />
     </div>
   );

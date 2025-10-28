@@ -6,6 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Users,
   UserPlus,
@@ -92,6 +95,8 @@ const getBadgeColor = (badge: string) => {
 export default function FriendsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [isUserSearchOpen, setIsUserSearchOpen] = useState(false);
 
   const {
     data: friends,
@@ -143,6 +148,20 @@ export default function FriendsPage() {
       refetchBlocked();
     },
     onError: (error: any) => toast.error(error.message || "Failed to unblock"),
+  });
+
+  const { data: searchResults } = trpc.chats.searchUsers.useQuery(
+    { query: userSearchQuery },
+    { enabled: userSearchQuery.length > 0 }
+  );
+
+  const sendFriendRequest = trpc.friends.sendRequest.useMutation({
+    onSuccess: () => {
+      toast.success("Friend request sent");
+      setIsUserSearchOpen(false);
+      setUserSearchQuery("");
+    },
+    onError: (error: any) => toast.error(error.message || "Failed to send request"),
   });
 
   const handleAcceptRequest = (friendshipId: string) =>
@@ -202,10 +221,54 @@ export default function FriendsPage() {
             <h1 className="text-3xl font-bold text-white mb-1">Friends</h1>
             <p className="text-gray-400">Manage your connections</p>
           </div>
-          <Button className="bg-cyan-500/80 hover:bg-cyan-400 text-white shadow-[0_0_12px_-3px_rgba(56,189,248,0.5)]">
-            <UserPlus className="w-4 h-4 mr-2" />
-            Add Friend
-          </Button>
+          <Dialog open={isUserSearchOpen} onOpenChange={setIsUserSearchOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-cyan-500/80 hover:bg-cyan-400 text-white shadow-[0_0_12px_-3px_rgba(56,189,248,0.5)]">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Friend
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add a friend</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="user-search">Search by name, email, or ID</Label>
+                  <Input
+                    id="user-search"
+                    placeholder="Enter name, email, or ID..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                  />
+                </div>
+                {searchResults && searchResults.length > 0 && (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {searchResults.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                        onClick={() => {
+                          sendFriendRequest.mutate({ receiverId: user.id });
+                        }}
+                      >
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={user.avatarUrl || undefined} />
+                          <AvatarFallback>
+                            {user.name?.charAt(0).toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="relative max-w-md mb-6">

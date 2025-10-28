@@ -608,35 +608,6 @@ export const chat = pgTable(
   })
 );
 
-/** FRIENDSHIPS - Friend relationships between users */
-export const friendship = pgTable(
-  "friendship",
-  {
-    id: text("id").primaryKey().$defaultFn(() => nanoid()),
-    senderId: text("sender_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    receiverId: text("receiver_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    status: text("status", { enum: ["pending", "accepted", "rejected", "blocked"] })
-      .notNull()
-      .default("pending"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-      .notNull()
-      .defaultNow(),
-  },
-  (t) => ({
-    friendshipSenderIdx: index("friendship_sender_id_idx").on(t.senderId),
-    friendshipReceiverIdx: index("friendship_receiver_id_idx").on(t.receiverId),
-    friendshipStatusIdx: index("friendship_status_idx").on(t.status),
-    friendshipUnique: uniqueIndex("friendship_sender_receiver_uniq").on(t.senderId, t.receiverId),
-  })
-);
-
 /** CHAT_MESSAGE - Messages in chats */
 export const chatMessage = pgTable(
   "chat_message",

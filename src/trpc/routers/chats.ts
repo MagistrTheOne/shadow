@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, createTRPCRouter } from "../init";
-import { chat, chatMessage, agent, user, friendship } from "@/db/schema";
+import { chat, chatMessage, agent, user, friendships } from "@/db/schema";
 import { eq, and, desc, asc, or, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { aiService } from "@/lib/ai/ai-service";
@@ -476,15 +476,15 @@ export const chatsRouter = createTRPCRouter({
         name: user.name,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        friendshipId: friendship.id,
-        friendshipStatus: friendship.status,
+        friendshipId: friendships.id,
+        friendshipStatus: friendships.status,
       })
-      .from(friendship)
-      .leftJoin(user, eq(friendship.receiverId, user.id))
+      .from(friendships)
+      .leftJoin(user, eq(friendships.receiverId, user.id))
       .where(
         and(
-          eq(friendship.senderId, ctx.auth.user.id),
-          eq(friendship.status, "accepted")
+          eq(friendships.senderId, ctx.auth.user.id),
+          eq(friendships.status, "accepted")
         )
       );
 
@@ -508,11 +508,11 @@ export const chatsRouter = createTRPCRouter({
       // Проверяем, существует ли уже запрос
       const existingRequest = await db
         .select()
-        .from(friendship)
+        .from(friendships)
         .where(
           and(
-            eq(friendship.senderId, ctx.auth.user.id),
-            eq(friendship.receiverId, receiverId)
+            eq(friendships.senderId, ctx.auth.user.id),
+            eq(friendships.receiverId, receiverId)
           )
         )
         .limit(1);
@@ -526,7 +526,7 @@ export const chatsRouter = createTRPCRouter({
 
       // Создаем запрос в друзья
       const newRequest = await db
-        .insert(friendship)
+        .insert(friendships)
         .values({
           id: nanoid(),
           senderId: ctx.auth.user.id,
