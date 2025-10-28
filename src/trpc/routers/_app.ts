@@ -4,6 +4,9 @@ import { meetingAgentsRouter } from './meeting-agents';
 import { sessionsRouter } from './sessions';
 import { sessionMessagesRouter } from './session-messages';
 import { sessionParticipantsRouter } from './session-participants';
+import { usersRouter } from './users';
+import { friendsRouter } from './friends';
+import { notificationsRouter } from './notifications';
 import { meetingsRouter } from '@/modules/meetings/server/procedures';
 import { recordingsRouter } from '@/modules/recordings/server/procedures';
 import { transcriptsRouter } from '@/modules/transcripts/server/procedures';
@@ -16,6 +19,9 @@ export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
   sessionMessages: sessionMessagesRouter,
   sessionParticipants: sessionParticipantsRouter,
+  users: usersRouter,
+  friends: friendsRouter,
+  notifications: notificationsRouter,
   meetings: meetingsRouter,
   recordings: recordingsRouter,
   transcripts: transcriptsRouter,

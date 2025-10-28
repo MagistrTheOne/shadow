@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { meetings, meetingParticipants, sessions, meetingSessions } from "@/db/schema";
+import { meetings, meetingParticipants, sessions, meetingSessions, notifications } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { z } from "zod";
@@ -12,6 +12,7 @@ const meetingCreateSchema = z.object({
   duration: z.number().optional(),
   isRecurring: z.boolean().optional(),
   recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
+  invitedFriends: z.array(z.string()).optional(),
 });
 
 const meetingUpdateSchema = z.object({
@@ -82,6 +83,22 @@ export const meetingsRouter = createTRPCRouter({
           meetingId: createdMeeting.id,
           sessionId: session.id,
         });
+
+      // Send notifications to invited friends
+      if (input.invitedFriends && input.invitedFriends.length > 0) {
+        const notificationsToCreate = input.invitedFriends.map(friendId => ({
+          userId: friendId,
+          type: "meeting_invite" as const,
+          fromUserId: ctx.auth.user.id,
+          metadata: {
+            meetingId: createdMeeting.id,
+            meetingTitle: createdMeeting.title,
+            sessionCode: sessionCode,
+          },
+        }));
+
+        await db.insert(notifications).values(notificationsToCreate);
+      }
 
       return createdMeeting;
     }),

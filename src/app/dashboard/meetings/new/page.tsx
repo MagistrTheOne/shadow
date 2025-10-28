@@ -13,12 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, CalendarIcon, Clock, Bot, Users, Video, Save } from "lucide-react";
+import { ArrowLeft, CalendarIcon, Clock, Bot, Users, Video, Save, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const meetingSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
@@ -28,6 +30,7 @@ const meetingSchema = z.object({
   duration: z.number().min(15, "Duration must be at least 15 minutes").max(480, "Duration must be less than 8 hours"),
   isRecurring: z.boolean(),
   recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
+  invitedFriends: z.array(z.string()).optional(),
 });
 
 type MeetingFormData = z.infer<typeof meetingSchema>;
@@ -63,6 +66,8 @@ function CreateMeetingContent() {
   const searchParams = useSearchParams();
   const [isCreating, setIsCreating] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [invitedFriends, setInvitedFriends] = useState<string[]>([]);
+  const [showFriendSelector, setShowFriendSelector] = useState(false);
 
   const {
     register,
@@ -79,6 +84,7 @@ function CreateMeetingContent() {
   });
 
   const { data: agents } = trpc.agents.getMany.useQuery();
+  const { data: friends } = trpc.friends.getFriends.useQuery();
 
   const createMeeting = trpc.meetings.create.useMutation({
     onSuccess: () => {
@@ -98,11 +104,24 @@ function CreateMeetingContent() {
     }
   }, [searchParams, setValue]);
 
+  const handleFriendToggle = (friendId: string) => {
+    setInvitedFriends(prev => 
+      prev.includes(friendId) 
+        ? prev.filter(id => id !== friendId)
+        : [...prev, friendId]
+    );
+  };
+
+  const removeInvitedFriend = (friendId: string) => {
+    setInvitedFriends(prev => prev.filter(id => id !== friendId));
+  };
+
   const onSubmit = async (data: MeetingFormData) => {
     setIsCreating(true);
     createMeeting.mutate({
       ...data,
       scheduledAt: selectedDate,
+      invitedFriends: invitedFriends,
     });
   };
 
@@ -281,6 +300,104 @@ function CreateMeetingContent() {
             </CardContent>
           </Card>
 
+          {/* Invite Friends */}
+          {friends && friends.length > 0 && (
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <UserPlus className="w-5 h-5 text-green-400" />
+                  Invite Friends
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Selected Friends */}
+                {invitedFriends.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">Invited Friends</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {invitedFriends.map(friendId => {
+                        const friend = friends.find(f => f.id === friendId);
+                        if (!friend) return null;
+                        return (
+                          <Badge key={friendId} variant="outline" className="bg-green-500/20 text-green-400 border-green-400/30">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded-full overflow-hidden bg-gray-700">
+                                {friend.avatarUrl ? (
+                                  <img src={friend.avatarUrl} alt={friend.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Users className="w-2 h-2 text-gray-400" />
+                                  </div>
+                                )}
+                              </div>
+                              <span>{friend.displayName || friend.name}</span>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => removeInvitedFriend(friendId)}
+                                className="h-4 w-4 p-0 text-green-400 hover:text-red-400"
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Friend Selector */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-white text-sm">Select Friends</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowFriendSelector(!showFriendSelector)}
+                      className="border-white/20 text-gray-300 hover:bg-white/10"
+                    >
+                      {showFriendSelector ? "Hide" : "Show"} Friends
+                    </Button>
+                  </div>
+                  
+                  {showFriendSelector && (
+                    <div className="grid gap-2 max-h-40 overflow-y-auto">
+                      {friends.map(friend => (
+                        <div key={friend.id} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg hover:bg-white/10">
+                          <Checkbox
+                            id={`friend-${friend.id}`}
+                            checked={invitedFriends.includes(friend.id)}
+                            onCheckedChange={() => handleFriendToggle(friend.id)}
+                          />
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-700">
+                            {friend.avatarUrl ? (
+                              <img src={friend.avatarUrl} alt={friend.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Users className="w-3 h-3 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-white text-sm font-medium">{friend.displayName || friend.name}</p>
+                            {friend.customStatus && (
+                              <p className="text-gray-400 text-xs">{friend.customStatus}</p>
+                            )}
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {friend.status || "offline"}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Meeting Preview */}
           <Card className="bg-white/5 backdrop-blur-sm border-white/10">
             <CardHeader>
@@ -319,7 +436,31 @@ function CreateMeetingContent() {
                       <span>{format(selectedDate, "MMM dd, yyyy 'at' HH:mm")}</span>
                     </div>
                   )}
+                  
+                  {invitedFriends.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <UserPlus className="w-4 h-4" />
+                      <span>{invitedFriends.length} friend{invitedFriends.length > 1 ? 's' : ''} invited</span>
+                    </div>
+                  )}
                 </div>
+                
+                {invitedFriends.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-gray-400 text-sm mb-2">Invited Friends:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {invitedFriends.map(friendId => {
+                        const friend = friends?.find(f => f.id === friendId);
+                        if (!friend) return null;
+                        return (
+                          <Badge key={friendId} variant="outline" className="text-xs bg-green-500/20 text-green-400 border-green-400/30">
+                            {friend.displayName || friend.name}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

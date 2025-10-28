@@ -13,6 +13,17 @@ export const user = pgTable(
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").$defaultFn(() => false).notNull(),
     image: text("image"),
+    // Profile & Social fields
+    username: text("username").unique(), // unique handle for search/sharing
+    displayName: text("display_name"), // custom display name
+    avatarUrl: text("avatar_url"), // CDN URL from Uploadthing
+    bio: text("bio"), // max 500 chars
+    status: text("status", { enum: ["online", "dnd", "away", "offline", "invisible"] }).default("offline"),
+    customStatus: text("custom_status"), // emoji + custom text
+    bannerUrl: text("banner_url"), // CDN URL from Uploadthing
+    richPresence: jsonb("rich_presence"), // current activity details
+    badges: text("badges").array().default([]), // array of badge names (founder, beta, etc.)
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: "date" }),
     // DB-сторона, тип Date в TS
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
@@ -23,6 +34,9 @@ export const user = pgTable(
   },
   (t) => ({
     emailIdx: uniqueIndex("user_email_uniq").on(t.email),
+    userUsernameIdx: index("user_username_idx").on(t.username),
+    userStatusIdx: index("user_status_idx").on(t.status),
+    userLastSeenIdx: index("user_last_seen_idx").on(t.lastSeenAt),
   })
 );
 
@@ -495,5 +509,67 @@ export const meetingSessions = pgTable(
     meetingSessionsMeetingIdx: index("meeting_sessions_meeting_id_idx").on(t.meetingId),
     meetingSessionsSessionIdx: index("meeting_sessions_session_id_idx").on(t.sessionId),
     meetingSessionsUnique: uniqueIndex("meeting_sessions_unique").on(t.meetingId, t.sessionId),
+  })
+);
+
+/** FRIENDSHIPS - Friend relationships between users */
+export const friendships = pgTable(
+  "friendships",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    receiverId: text("receiver_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: text("status", { enum: ["pending", "accepted", "rejected", "blocked"] })
+      .notNull()
+      .default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    friendshipsSenderIdx: index("friendships_sender_id_idx").on(t.senderId),
+    friendshipsReceiverIdx: index("friendships_receiver_id_idx").on(t.receiverId),
+    friendshipsStatusIdx: index("friendships_status_idx").on(t.status),
+    friendshipsUnique: uniqueIndex("friendships_unique").on(t.senderId, t.receiverId),
+  })
+);
+
+/** NOTIFICATIONS - User notifications */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: text("type", { 
+      enum: [
+        "friend_request", "friend_accepted", "friend_removed", 
+        "blocked_by_other", "unblocked_by_other",
+        "meeting_invite", "meeting_started", "meeting_cancelled",
+        "friend_online"
+      ] 
+    }).notNull(),
+    fromUserId: text("from_user_id")
+      .references(() => user.id, { onDelete: "cascade" }),
+    metadata: jsonb("metadata"), // additional data (meetingId, etc.)
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    notificationsUserIdx: index("notifications_user_id_idx").on(t.userId),
+    notificationsFromUserIdx: index("notifications_from_user_id_idx").on(t.fromUserId),
+    notificationsTypeIdx: index("notifications_type_idx").on(t.type),
+    notificationsUnreadIdx: index("notifications_unread_idx").on(t.isRead),
+    notificationsCreatedAtIdx: index("notifications_created_at_idx").on(t.createdAt),
   })
 );

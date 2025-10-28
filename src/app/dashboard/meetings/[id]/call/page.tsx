@@ -29,6 +29,7 @@ import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { usePresence } from "@/hooks/use-presence";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,6 +63,9 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
   const [newMessage, setNewMessage] = useState("");
   const [copiedCode, setCopiedCode] = useState(false);
   const [isBackfilling, setIsBackfilling] = useState(false);
+
+  // Initialize presence system
+  const { updateRichPresence } = usePresence();
 
   const endMeeting = trpc.meetings.end.useMutation({
     onSuccess: () => {
@@ -122,6 +126,24 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
       }
     };
   }, []);
+
+  // Update rich presence when joining/leaving meeting
+  useEffect(() => {
+    if (meeting) {
+      // Set rich presence to "in meeting"
+      updateRichPresence({
+        type: "meeting",
+        meetingId: meeting.id,
+        meetingTitle: meeting.title,
+        sessionCode: session?.code,
+      });
+    }
+
+    return () => {
+      // Clear rich presence when leaving
+      updateRichPresence(null);
+    };
+  }, [meeting, session, updateRichPresence]);
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
