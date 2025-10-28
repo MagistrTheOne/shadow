@@ -2,44 +2,10 @@
 
 import Link from "next/link";
 import { ChevronRight, Home } from "lucide-react";
-import { usePathname } from "next/navigation";
-
-interface BreadcrumbItem {
-  label: string;
-  href: string;
-}
+import { usePageState } from "@/stores/dashboard-store";
 
 export const Breadcrumbs = () => {
-  const pathname = usePathname();
-
-  const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    const segments = pathname.split('/').filter(Boolean);
-    const breadcrumbs: BreadcrumbItem[] = [
-      { label: 'Dashboard', href: '/dashboard' }
-    ];
-
-    let currentPath = '';
-    segments.forEach((segment, index) => {
-      currentPath += `/${segment}`;
-      
-      // Skip dashboard segment as it's already added
-      if (segment === 'dashboard') return;
-      
-      const label = segment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      
-      breadcrumbs.push({
-        label,
-        href: currentPath
-      });
-    });
-
-    return breadcrumbs;
-  };
-
-  const breadcrumbs = generateBreadcrumbs();
+  const { breadcrumbs } = usePageState();
 
   if (breadcrumbs.length <= 1) return null;
 
@@ -53,17 +19,21 @@ export const Breadcrumbs = () => {
       </Link>
       
       {breadcrumbs.slice(1).map((breadcrumb, index) => (
-        <div key={breadcrumb.href} className="flex items-center space-x-1">
+        <div key={breadcrumb.href || index} className="flex items-center space-x-1">
           <ChevronRight className="w-3 h-3 text-gray-500" />
           {index === breadcrumbs.length - 2 ? (
             <span className="text-white font-medium">{breadcrumb.label}</span>
           ) : (
-            <Link 
-              href={breadcrumb.href}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              {breadcrumb.label}
-            </Link>
+            breadcrumb.href ? (
+              <Link 
+                href={breadcrumb.href}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                {breadcrumb.label}
+              </Link>
+            ) : (
+              <span className="text-white font-medium">{breadcrumb.label}</span>
+            )
           )}
         </div>
       ))}

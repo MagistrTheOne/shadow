@@ -55,6 +55,12 @@ export function TRPCReactProvider({
       links: [
         httpBatchLink({
           url: getUrl(),
+          headers() {
+            return {
+              authorization: typeof window !== 'undefined' ? 
+                `Bearer ${localStorage.getItem('auth-token')}` : '',
+            };
+          },
         }),
       ],
     }),

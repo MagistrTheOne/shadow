@@ -111,6 +111,45 @@ export const agents = pgTable(
   })
 );
 
+/** AGENT */
+export const agent = pgTable(
+  "agent",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    name: text("name").notNull(),
+    description: text("description"),
+    avatar: text("avatar"),
+    voice: text("voice").notNull().default("alloy"),
+    instructions: text("instructions").notNull(),
+    personality: jsonb("personality").$type<{
+      tone: "professional" | "casual" | "friendly" | "formal";
+      expertise: string[];
+      communication_style: string;
+    }>(),
+    capabilities: jsonb("capabilities").$type<{
+      can_schedule: boolean;
+      can_take_notes: boolean;
+      can_record: boolean;
+      can_translate: boolean;
+      languages: string[];
+    }>(),
+    isActive: boolean("is_active").$defaultFn(() => true).notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    agentUserIdx: index("agent_user_id_idx").on(t.userId),
+    agentActiveIdx: index("agent_active_idx").on(t.isActive),
+  })
+);
+
 /** MEETINGS */
 export const meetings = pgTable(
   "meetings",
@@ -122,7 +161,7 @@ export const meetings = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     agentId: text("agent_id")
-      .references(() => agents.id, { onDelete: "set null" }),
+      .references(() => agent.id, { onDelete: "set null" }),
     status: text("status", { enum: ["scheduled", "active", "completed", "cancelled"] })
       .notNull()
       .default("scheduled"),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { PanelLeftCloseIcon, PanelLeftIcon, SearchIcon, Settings } from "lucide-react";
@@ -8,6 +8,7 @@ import { DashboardCommand } from "./dashboard-command";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SystemStatus } from "./system-status";
 import { Notifications } from "./dashboard-notifications";
+import { useCommandState } from "@/stores/dashboard-store";
 
 function isEditingTarget(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
@@ -26,10 +27,10 @@ function isOpenCommandCombo(e: KeyboardEvent) {
 
 export const DashboardNavbar = () => {
   const { state, toggleSidebar, isMobile } = useSidebar();
-  const [commandOpen, setCommandOpen] = useState(false);
+  const { commandOpen, setCommandOpen, toggleCommand } = useCommandState();
 
-  const openCommand = useCallback(() => setCommandOpen(true), []);
-  const closeCommand = useCallback(() => setCommandOpen(false), []);
+  const openCommand = useCallback(() => setCommandOpen(true), [setCommandOpen]);
+  const closeCommand = useCallback(() => setCommandOpen(false), [setCommandOpen]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +40,7 @@ export const DashboardNavbar = () => {
       // Открыть: Cmd/Ctrl+K или Alt+K
       if (isOpenCommandCombo(e)) {
         e.preventDefault();            
-        if (!commandOpen) setCommandOpen(true);
+        if (!commandOpen) toggleCommand();
         return;
       }
 
@@ -58,7 +59,13 @@ export const DashboardNavbar = () => {
     <>
       <DashboardCommand
         open={commandOpen}
-        setOpen={setCommandOpen}
+        setOpen={(value) => {
+          if (typeof value === 'function') {
+            setCommandOpen(value(commandOpen));
+          } else {
+            setCommandOpen(value);
+          }
+        }}
         
       />
 

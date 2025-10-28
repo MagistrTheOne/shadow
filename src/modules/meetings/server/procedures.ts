@@ -9,6 +9,9 @@ const meetingCreateSchema = z.object({
   description: z.string().optional(),
   agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
+  duration: z.number().optional(),
+  isRecurring: z.boolean().optional(),
+  recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
 });
 
 const meetingUpdateSchema = z.object({
@@ -17,6 +20,9 @@ const meetingUpdateSchema = z.object({
   description: z.string().optional(),
   agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
+  duration: z.number().optional(),
+  isRecurring: z.boolean().optional(),
+  recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
   status: z.enum(["scheduled", "active", "completed", "cancelled"]).optional(),
 });
 

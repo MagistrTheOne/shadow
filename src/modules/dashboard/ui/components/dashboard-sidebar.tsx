@@ -14,6 +14,7 @@ import { DashboardUserButton } from "./dashboard-user-button";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
+import { useSidebarState } from "@/stores/dashboard-store";
 
 
 const firstSection = [
@@ -41,6 +42,7 @@ const SecondSection = [
 export const DashboardSidebar = () => {
     const pathname = usePathname();
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+    const { sidebarOpen, setSidebarOpen } = useSidebarState();
     
     // Fetch data for counters
     const { data: meetings, isLoading: meetingsLoading } = trpc.meetings.getMany.useQuery({});
