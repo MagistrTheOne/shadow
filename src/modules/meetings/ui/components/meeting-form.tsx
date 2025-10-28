@@ -169,7 +169,7 @@ export const MeetingForm = ({ onSuccess, initialValues }: MeetingFormProps) => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">No agent</SelectItem>
+                  <SelectItem value="none">No agent</SelectItem>
                   {agents?.map((agent) => (
                     <SelectItem key={agent.id} value={agent.id}>
                       {agent.name}

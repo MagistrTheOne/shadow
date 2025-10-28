@@ -81,7 +81,7 @@ export default function MeetingsPage() {
 
   const getMeetingStatus = (meeting: any) => {
     if (meeting.status === "active") return { text: "Live", color: "bg-red-500/20 text-red-400 border-red-400/30" };
-    if (meeting.status === "completed") return { text: "Completed", color: "bg-green-500/20 text-green-400 border-green-400/30" };
+    if (meeting.status === "completed") return { text: "Completed", color: "bg-blue-500/20 text-blue-400 border-blue-400/30" };
     if (meeting.status === "cancelled") return { text: "Cancelled", color: "bg-gray-500/20 text-gray-400 border-gray-400/30" };
     return { text: "Scheduled", color: "bg-blue-500/20 text-blue-400 border-blue-400/30" };
   };
@@ -311,7 +311,7 @@ export default function MeetingsPage() {
                               {meeting.status === "scheduled" && (
                                 <Button 
                                   size="sm" 
-                                  className={`flex-1 bg-green-600 hover:bg-green-700 text-white ${animations.buttonHover}`}
+                                  className={`flex-1 bg-blue-600 hover:bg-blue-700 text-white ${animations.buttonHover}`}
                                   onClick={() => handleStartMeeting(meeting.id)}
                                 >
                                   <Play className="w-4 h-4 mr-2" />

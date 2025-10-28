@@ -1,9 +1,20 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { useCallback, useMemo } from 'react';
 
 interface BreadcrumbItem {
   label: string;
   href?: string;
+}
+
+interface UserPresence {
+  status: 'online' | 'offline' | 'away' | 'dnd' | 'invisible';
+  customStatus?: string;
+  richPresence?: {
+    type: 'meeting' | 'call' | 'idle';
+    meetingTitle?: string;
+  };
+  lastSeenAt?: Date;
 }
 
 interface DashboardState {
@@ -41,6 +52,13 @@ interface DashboardState {
   // Error state
   error: string | null;
   setError: (error: string | null) => void;
+  
+  // User presence state
+  userPresence: UserPresence;
+  setUserStatus: (status: UserPresence['status']) => void;
+  setCustomStatus: (customStatus: string) => void;
+  setRichPresence: (richPresence: UserPresence['richPresence']) => void;
+  updateLastSeen: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>()(
@@ -80,6 +98,26 @@ export const useDashboardStore = create<DashboardState>()(
       // Error state
       error: null,
       setError: (error) => set({ error }),
+      
+      // User presence state
+      userPresence: {
+        status: 'online',
+        customStatus: '',
+        richPresence: { type: 'idle' },
+        lastSeenAt: new Date(),
+      },
+      setUserStatus: (status) => set((state) => ({ 
+        userPresence: { ...state.userPresence, status } 
+      })),
+      setCustomStatus: (customStatus) => set((state) => ({ 
+        userPresence: { ...state.userPresence, customStatus } 
+      })),
+      setRichPresence: (richPresence) => set((state) => ({ 
+        userPresence: { ...state.userPresence, richPresence } 
+      })),
+      updateLastSeen: () => set((state) => ({ 
+        userPresence: { ...state.userPresence, lastSeenAt: new Date() } 
+      })),
     }),
     {
       name: 'dashboard-store',
@@ -87,40 +125,93 @@ export const useDashboardStore = create<DashboardState>()(
   )
 );
 
-// Selectors for better performance
-export const useSidebarState = () => useDashboardStore((state) => ({
-  sidebarOpen: state.sidebarOpen,
-  setSidebarOpen: state.setSidebarOpen,
-  toggleSidebar: state.toggleSidebar,
-}));
+// Selectors for better performance - using stable references
+export const useSidebarState = () => {
+  const sidebarOpen = useDashboardStore((state) => state.sidebarOpen);
+  const setSidebarOpen = useDashboardStore((state) => state.setSidebarOpen);
+  const toggleSidebar = useDashboardStore((state) => state.toggleSidebar);
+  
+  return useMemo(() => ({
+    sidebarOpen,
+    setSidebarOpen,
+    toggleSidebar,
+  }), [sidebarOpen, setSidebarOpen, toggleSidebar]);
+};
 
-export const useCommandState = () => useDashboardStore((state) => ({
-  commandOpen: state.commandOpen,
-  setCommandOpen: state.setCommandOpen,
-  toggleCommand: state.toggleCommand,
-}));
+export const useCommandState = () => {
+  const commandOpen = useDashboardStore((state) => state.commandOpen);
+  const setCommandOpen = useDashboardStore((state) => state.setCommandOpen);
+  const toggleCommand = useDashboardStore((state) => state.toggleCommand);
+  
+  return useMemo(() => ({
+    commandOpen,
+    setCommandOpen,
+    toggleCommand,
+  }), [commandOpen, setCommandOpen, toggleCommand]);
+};
 
-export const useNotificationsState = () => useDashboardStore((state) => ({
-  notificationsOpen: state.notificationsOpen,
-  setNotificationsOpen: state.setNotificationsOpen,
-  toggleNotifications: state.toggleNotifications,
-}));
+export const useNotificationsState = () => {
+  const notificationsOpen = useDashboardStore((state) => state.notificationsOpen);
+  const setNotificationsOpen = useDashboardStore((state) => state.setNotificationsOpen);
+  const toggleNotifications = useDashboardStore((state) => state.toggleNotifications);
+  
+  return useMemo(() => ({
+    notificationsOpen,
+    setNotificationsOpen,
+    toggleNotifications,
+  }), [notificationsOpen, setNotificationsOpen, toggleNotifications]);
+};
 
-export const useSystemState = () => useDashboardStore((state) => ({
-  systemStatus: state.systemStatus,
-  setSystemStatus: state.setSystemStatus,
-}));
+export const useSystemState = () => {
+  const systemStatus = useDashboardStore((state) => state.systemStatus);
+  const setSystemStatus = useDashboardStore((state) => state.setSystemStatus);
+  
+  return useMemo(() => ({
+    systemStatus,
+    setSystemStatus,
+  }), [systemStatus, setSystemStatus]);
+};
 
-export const usePageState = () => useDashboardStore((state) => ({
-  currentPage: state.currentPage,
-  setCurrentPage: state.setCurrentPage,
-  breadcrumbs: state.breadcrumbs,
-  setBreadcrumbs: state.setBreadcrumbs,
-}));
+export const usePageState = () => {
+  const currentPage = useDashboardStore((state) => state.currentPage);
+  const setCurrentPage = useDashboardStore((state) => state.setCurrentPage);
+  const breadcrumbs = useDashboardStore((state) => state.breadcrumbs);
+  const setBreadcrumbs = useDashboardStore((state) => state.setBreadcrumbs);
+  
+  return useMemo(() => ({
+    currentPage,
+    setCurrentPage,
+    breadcrumbs,
+    setBreadcrumbs,
+  }), [currentPage, setCurrentPage, breadcrumbs, setBreadcrumbs]);
+};
 
-export const useLoadingState = () => useDashboardStore((state) => ({
-  isLoading: state.isLoading,
-  setIsLoading: state.setIsLoading,
-  error: state.error,
-  setError: state.setError,
-}));
+export const useLoadingState = () => {
+  const isLoading = useDashboardStore((state) => state.isLoading);
+  const setIsLoading = useDashboardStore((state) => state.setIsLoading);
+  const error = useDashboardStore((state) => state.error);
+  const setError = useDashboardStore((state) => state.setError);
+  
+  return useMemo(() => ({
+    isLoading,
+    setIsLoading,
+    error,
+    setError,
+  }), [isLoading, setIsLoading, error, setError]);
+};
+
+export const useUserPresence = () => {
+  const userPresence = useDashboardStore((state) => state.userPresence);
+  const setUserStatus = useDashboardStore((state) => state.setUserStatus);
+  const setCustomStatus = useDashboardStore((state) => state.setCustomStatus);
+  const setRichPresence = useDashboardStore((state) => state.setRichPresence);
+  const updateLastSeen = useDashboardStore((state) => state.updateLastSeen);
+  
+  return useMemo(() => ({
+    userPresence,
+    setUserStatus,
+    setCustomStatus,
+    setRichPresence,
+    updateLastSeen,
+  }), [userPresence, setUserStatus, setCustomStatus, setRichPresence, updateLastSeen]);
+};

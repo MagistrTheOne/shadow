@@ -40,7 +40,7 @@ A modern AI-powered video meeting platform with intelligent avatars, real-time c
    cd shadow-ai
    ```
 
-2. **Install dependencies**
+2. **Install dependencies**ы
    ```bash
    npm install
    ```

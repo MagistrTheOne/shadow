@@ -240,12 +240,12 @@ function CreateMeetingContent() {
 
                 <div>
                   <Label htmlFor="agentId" className="text-gray-300">AI Agent (Optional)</Label>
-                  <Select onValueChange={(value) => setValue("agentId", value)}>
+                  <Select onValueChange={(value) => setValue("agentId", value === "none" ? undefined : value)}>
                     <SelectTrigger className="bg-white/10 border-white/20 text-white">
                       <SelectValue placeholder="Select an agent" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-900 border-gray-700">
-                      <SelectItem value="" className="text-white">No Agent</SelectItem>
+                      <SelectItem value="none" className="text-white">No Agent</SelectItem>
                       {agents?.map((agent: any) => (
                         <SelectItem key={agent.id} value={agent.id} className="text-white">
                           {agent.name}

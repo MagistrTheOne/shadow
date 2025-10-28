@@ -3,7 +3,12 @@
 import { useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { PanelLeftCloseIcon, PanelLeftIcon, SearchIcon, Settings } from "lucide-react";
+import {
+  PanelLeftCloseIcon,
+  PanelLeftIcon,
+  SearchIcon,
+  Settings,
+} from "lucide-react";
 import { DashboardCommand } from "./dashboard-command";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SystemStatus } from "./system-status";
@@ -16,13 +21,10 @@ function isEditingTarget(el: EventTarget | null) {
   return tag === "input" || tag === "textarea" || el.isContentEditable;
 }
 
-// Комбо: Cmd/Ctrl+K ИЛИ Alt+K
 function isOpenCommandCombo(e: KeyboardEvent) {
   const isK = e.code === "KeyK" || e.key.toLowerCase() === "k";
   if (!isK) return false;
-  if (e.altKey) return true;                    // Alt+K
-  if (e.metaKey || e.ctrlKey) return true;      // Cmd/Ctrl+K
-  return false;
+  return e.altKey || e.metaKey || e.ctrlKey;
 }
 
 export const DashboardNavbar = () => {
@@ -34,53 +36,54 @@ export const DashboardNavbar = () => {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat) return;                  
-      if (isEditingTarget(e.target)) return;
+      if (e.repeat || isEditingTarget(e.target)) return;
 
-      // Открыть: Cmd/Ctrl+K или Alt+K
       if (isOpenCommandCombo(e)) {
-        e.preventDefault();            
-        if (!commandOpen) toggleCommand();
+        e.preventDefault();
+        toggleCommand();
         return;
       }
 
-      // Закрыть: Esc
       if (e.key === "Escape" && commandOpen) {
         e.preventDefault();
         closeCommand();
       }
     };
 
-    document.addEventListener("keydown", onKeyDown, { capture: false });
-    return () => document.removeEventListener("keydown", onKeyDown, { capture: false } as any);
-  }, [commandOpen, closeCommand]);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [commandOpen, closeCommand, toggleCommand]);
 
   return (
     <>
       <DashboardCommand
         open={commandOpen}
-        setOpen={(value) => {
-          if (typeof value === 'function') {
-            setCommandOpen(value(commandOpen));
-          } else {
-            setCommandOpen(value);
-          }
-        }}
-        
+        setOpen={(value) =>
+          typeof value === "function"
+            ? setCommandOpen(value(commandOpen))
+            : setCommandOpen(value)
+        }
       />
 
-      <nav className="flex items-center gap-x-3 px-4 py-2 border-b border-white/10 bg-black/30 backdrop-blur-xl">
+      <nav className="flex items-center gap-x-3 px-4 py-2 border-b border-white/10 bg-black/40 backdrop-blur-2xl shadow-[0_0_25px_-10px_rgba(56,189,248,0.3)] transition-all">
+        {/* Sidebar toggle */}
         <Button
-          className="size-8 border-white/20 text-white hover:bg-white/10"
+          className="size-8 border-white/20 text-white hover:bg-cyan-400/10 hover:border-cyan-400/20 transition-all"
           variant="outline"
           size="sm"
           onClick={toggleSidebar}
-          aria-label={state === "collapsed" || isMobile ? "Open sidebar" : "Close sidebar"}
-          title={state === "collapsed" || isMobile ? "Open sidebar" : "Close sidebar"}
+          aria-label={
+            state === "collapsed" || isMobile ? "Open sidebar" : "Close sidebar"
+          }
+          title={
+            state === "collapsed" || isMobile ? "Open sidebar" : "Close sidebar"
+          }
         >
-          {(state === "collapsed" || isMobile)
-            ? <PanelLeftIcon className="size-4" />
-            : <PanelLeftCloseIcon className="size-4" />}
+          {state === "collapsed" || isMobile ? (
+            <PanelLeftIcon className="size-4" />
+          ) : (
+            <PanelLeftCloseIcon className="size-4" />
+          )}
         </Button>
 
         {/* Breadcrumbs */}
@@ -88,22 +91,23 @@ export const DashboardNavbar = () => {
           <Breadcrumbs />
         </div>
 
-        {/* Right side items - compact */}
+        {/* Right controls */}
         <div className="flex items-center gap-x-1">
           <SystemStatus />
           <Notifications />
           <Button
             variant="ghost"
             size="sm"
-            className="size-8 p-0 text-gray-400 hover:text-white hover:bg-white/10"
+            className="size-8 p-0 text-gray-400 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all"
             title="Settings"
           >
             <Settings className="w-4 h-4" />
           </Button>
         </div>
 
+        {/* Command palette */}
         <Button
-          className="h-8 w-[200px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:bg-white/10 text-sm"
+          className="h-8 w-[200px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:border-cyan-400/20 hover:bg-cyan-400/10 text-sm transition-all"
           variant="outline"
           size="sm"
           onClick={openCommand}

@@ -47,6 +47,19 @@ const VOICE_OPTIONS = [
   { value: "shimmer", label: "Shimmer - Soft and gentle" },
 ];
 
+const SBER_MODELS = [
+  { value: "GigaChat", label: "GigaChat (Latest - Production)" },
+  { value: "GigaChat-Pro", label: "GigaChat Pro (Advanced capabilities)" },
+  { value: "GigaChat-Plus", label: "GigaChat Plus (Enhanced performance)" },
+];
+
+const OPENAI_MODELS = [
+  { value: "gpt-4o", label: "GPT-4o (Latest)" },
+  { value: "gpt-4o-mini", label: "GPT-4o Mini (Fast & Cost-effective)" },
+  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+  { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+];
+
 const TONE_OPTIONS = [
   { value: "professional", label: "Professional" },
   { value: "casual", label: "Casual" },

@@ -50,16 +50,16 @@ export const agentsRouter = createTRPCRouter({
         provider: z.enum(["sber", "openai"]).default("sber"),
         model: z.string().min(1, "Model is required"),
         personality: z.object({
-          tone: z.enum(["professional", "casual", "friendly", "formal"]).default("professional"),
-          expertise: z.array(z.string()).default([]),
-          communication_style: z.string().default("Clear and concise"),
+          tone: z.enum(["professional", "casual", "friendly", "formal"]).optional(),
+          expertise: z.array(z.string()).optional(),
+          communication_style: z.string().optional(),
         }).optional(),
         capabilities: z.object({
-          can_schedule: z.boolean().default(false),
-          can_take_notes: z.boolean().default(true),
-          can_record: z.boolean().default(true),
-          can_translate: z.boolean().default(false),
-          languages: z.array(z.string()).default(["en"]),
+          can_schedule: z.boolean().optional(),
+          can_take_notes: z.boolean().optional(),
+          can_record: z.boolean().optional(),
+          can_translate: z.boolean().optional(),
+          languages: z.array(z.string()).optional(),
         }).optional(),
       })
     )
@@ -69,18 +69,8 @@ export const agentsRouter = createTRPCRouter({
         .values({
           ...input,
           userId: ctx.auth.user.id,
-          personality: input.personality || {
-            tone: "professional",
-            expertise: [],
-            communication_style: "Clear and concise",
-          },
-          capabilities: input.capabilities || {
-            can_schedule: false,
-            can_take_notes: true,
-            can_record: true,
-            can_translate: false,
-            languages: ["en"],
-          },
+          personality: input.personality || null,
+          capabilities: input.capabilities || null,
         })
         .returning();
 

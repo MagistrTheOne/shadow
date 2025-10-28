@@ -8,185 +8,144 @@ export const FooterSection = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative py-16">
+    <footer className="relative py-14 mt-20 bg-gradient-to-t from-black via-gray-900/80 to-transparent border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="md:col-span-1">
+          <div>
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-gray-300" />
+              <div className="w-9 h-9 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)] border border-cyan-400/30">
+                <Zap className="w-5 h-5 text-cyan-300" />
               </div>
               <span className="text-xl font-bold text-white">Shadow AI</span>
             </Link>
-            <p className="text-gray-400 mb-6 max-w-xs">
-              The future of professional meetings with sophisticated AI avatars and enterprise collaboration.
+
+            <p className="text-gray-400 text-sm mb-6 max-w-xs">
+              The future of professional meetings with intelligent AI avatars
+              and seamless collaboration.
             </p>
-            <div className="flex space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-white hover:bg-white/10"
-                asChild
-              >
-                <a href="https://twitter.com/MagistrTheOne" target="_blank" rel="noopener noreferrer">
-                  <Twitter className="w-4 h-4" />
-                </a>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-white hover:bg-white/10"
-                asChild
-              >
-                <a href="https://github.com/MagistrTheOne" target="_blank" rel="noopener noreferrer">
-                  <Github className="w-4 h-4" />
-                </a>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-white hover:bg-white/10"
-                asChild
-              >
-                <a href="https://linkedin.com/in/MagistrTheOne" target="_blank" rel="noopener noreferrer">
-                  <Linkedin className="w-4 h-4" />
-                </a>
-              </Button>
+
+            <div className="flex space-x-3">
+              {[ 
+                { icon: Twitter, href: "https://twitter.com/MagistrTheOne" },
+                { icon: Github, href: "https://github.com/MagistrTheOne" },
+                { icon: Linkedin, href: "https://linkedin.com/in/MagistrTheOne" }
+              ].map(({ icon: Icon, href }, i) => (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  size="icon"
+                  asChild
+                  className="text-gray-400 hover:text-cyan-300 hover:bg-cyan-400/10 transition"
+                >
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    <Icon className="w-4 h-4" />
+                  </a>
+                </Button>
+              ))}
             </div>
           </div>
 
           {/* Product */}
           <div>
             <h3 className="text-white font-semibold mb-4">Product</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/product" className="text-gray-400 hover:text-white transition-colors">
-                  Product
-                </Link>
-              </li>
-              <li>
-                <Link href="/features" className="text-gray-400 hover:text-white transition-colors">
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/demo" className="text-gray-400 hover:text-white transition-colors">
-                  Demo
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link href="/sign-up" className="text-gray-400 hover:text-white transition-colors">
-                  Get Started
-                </Link>
-              </li>
+            <ul className="space-y-2 text-sm">
+              {["Product", "Features", "Demo", "Pricing", "Get Started"].map(
+                (item, i) => (
+                  <li key={i}>
+                    <Link
+                      href={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="text-gray-400 hover:text-cyan-300 transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </div>
 
           {/* Company */}
           <div>
             <h3 className="text-white font-semibold mb-4">Company</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/company" className="text-gray-400 hover:text-white transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/company/blog" className="text-gray-400 hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/company/careers" className="text-gray-400 hover:text-white transition-colors">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link href="/company/contact" className="text-gray-400 hover:text-white transition-colors">
-                  Contact
-                </Link>
-              </li>
+            <ul className="space-y-2 text-sm">
+              {["About", "Blog", "Careers", "Contact"].map((item, i) => (
+                <li key={i}>
+                  <Link
+                    href={`/company/${item.toLowerCase()}`}
+                    className="text-gray-400 hover:text-cyan-300 transition-colors"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Support */}
           <div>
             <h3 className="text-white font-semibold mb-4">Support</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/support" className="text-gray-400 hover:text-white transition-colors">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/support/documentation" className="text-gray-400 hover:text-white transition-colors">
-                  Documentation
-                </Link>
-              </li>
-              <li>
-                <Link href="/support/api-reference" className="text-gray-400 hover:text-white transition-colors">
-                  API Reference
-                </Link>
-              </li>
-              <li>
-                <Link href="/support/status" className="text-gray-400 hover:text-white transition-colors">
-                  Status
-                </Link>
-              </li>
+            <ul className="space-y-2 text-sm">
+              {[
+                "Help Center",
+                "Documentation",
+                "API Reference",
+                "Status",
+              ].map((item, i) => (
+                <li key={i}>
+                  <Link
+                    href={`/support/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="text-gray-400 hover:text-cyan-300 transition-colors"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {currentYear} Shadow AI. All rights reserved. Created by{" "}
-              <span className="text-white font-semibold">@MagistrTheOne</span>
-            </div>
-            <div className="flex space-x-6 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
-                Privacy Policy
+        {/* Divider */}
+        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+          <div className="mb-4 md:mb-0">
+            © {currentYear} Shadow AI. All rights reserved. 
+            <span className="text-white font-semibold">@MagistrTheOne</span>
+          </div>
+          <div className="flex space-x-6">
+            {["Privacy", "Terms", "Cookies"].map((link, i) => (
+              <Link
+                key={i}
+                href={`/${link.toLowerCase()}`}
+                className="hover:text-cyan-300 transition-colors"
+              >
+                {link}
               </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
-                Cookie Policy
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl">
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-gray-400">
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" />
-              <a 
-                href="mailto:magistrtheone@gmail.com" 
-                className="text-sm hover:text-white transition-colors"
-              >
-                magistrtheone@gmail.com
-              </a>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm">Created by</span>
-              <a 
-                href="https://github.com/MagistrTheOne" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white font-semibold hover:text-gray-300 transition-colors"
-              >
-                @MagistrTheOne
-              </a>
-            </div>
+        {/* Contact */}
+        <div className="mt-10 p-5 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 flex flex-col sm:flex-row justify-center sm:justify-between items-center gap-3 text-sm text-gray-400">
+          <div className="flex items-center space-x-2">
+            <Mail className="w-4 h-4" />
+            <a
+              href="mailto:magistrtheone@gmail.com"
+              className="hover:text-cyan-300 transition-colors"
+            >
+              magistrtheone@gmail.com
+            </a>
+          </div>
+          <div className="text-center sm:text-right">
+            Created by{" "}
+            <a
+              href="https://github.com/MagistrTheOne"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white font-semibold hover:text-cyan-300 transition-colors"
+            >
+              @MagistrTheOne
+            </a>
           </div>
         </div>
       </div>

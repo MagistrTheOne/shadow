@@ -51,6 +51,19 @@ const VOICE_OPTIONS = [
   { value: "shimmer", label: "Shimmer - Soft and gentle" },
 ];
 
+const SBER_MODELS = [
+  { value: "GigaChat", label: "GigaChat (Latest - Production)" },
+  { value: "GigaChat-Pro", label: "GigaChat Pro (Advanced capabilities)" },
+  { value: "GigaChat-Plus", label: "GigaChat Plus (Enhanced performance)" },
+];
+
+const OPENAI_MODELS = [
+  { value: "gpt-4o", label: "GPT-4o (Latest)" },
+  { value: "gpt-4o-mini", label: "GPT-4o Mini (Fast & Cost-effective)" },
+  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
+  { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+];
+
 const TONE_OPTIONS = [
   { value: "professional", label: "Professional" },
   { value: "casual", label: "Casual" },
@@ -92,7 +105,7 @@ export default function CreateAgentPage() {
     defaultValues: {
       voice: "alloy",
       provider: "sber",
-      model: "GigaChat:latest",
+      model: "GigaChat",
       personality: {
         tone: "professional",
         expertise: [],
@@ -110,9 +123,8 @@ export default function CreateAgentPage() {
 
   // Получаем доступные провайдеры и модели
   const { data: providers = [] } = trpc.agents.getProviders.useQuery();
-  const { data: models = [] } = trpc.agents.getModels.useQuery({ 
-    provider: watch("provider") 
-  });
+  const currentProvider = watch("provider");
+  const models = currentProvider === "sber" ? SBER_MODELS : OPENAI_MODELS;
 
   const createAgent = trpc.agents.create.useMutation({
     onSuccess: () => {
@@ -203,7 +215,9 @@ export default function CreateAgentPage() {
                 <Label htmlFor="provider" className="text-gray-300">AI Provider</Label>
                 <Select onValueChange={(value) => {
                   setValue("provider", value as "sber" | "openai");
-                  setValue("model", ""); // Сбрасываем модель при смене провайдера
+                  // Reset model when provider changes
+                  const newModels = value === "sber" ? SBER_MODELS : OPENAI_MODELS;
+                  setValue("model", newModels[0].value);
                 }} defaultValue="sber">
                   <SelectTrigger className="bg-white/10 border-white/20 text-white">
                     <SelectValue placeholder="Select AI provider" />
@@ -223,8 +237,8 @@ export default function CreateAgentPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-gray-700">
                     {models.map((model) => (
-                      <SelectItem key={model.id} value={model.id} className="text-white">
-                        {model.name}
+                      <SelectItem key={model.value} value={model.value} className="text-white">
+                        {model.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

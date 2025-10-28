@@ -81,8 +81,8 @@ const DashboardContent = () => {
                  </CardTitle>
                </CardHeader>
                <CardContent>
-                 <div className="grid gap-4 md:grid-cols-3">
-                   <Button asChild className={`bg-green-600 hover:bg-green-700 text-white h-20 flex-col gap-2 ${animations.buttonHover}`}>
+                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                   <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white h-20 flex-col gap-2 ${animations.buttonHover}`}>
                      <Link href="/dashboard/sessions/new?type=call">
                        <PhoneIcon className="w-6 h-6" />
                        <span>Start Video Call</span>
@@ -107,7 +107,7 @@ const DashboardContent = () => {
              </Card>
 
       {/* Quick Stats */}
-      <div className={`grid gap-6 md:grid-cols-3 ${animations.fadeInUp} ${animations.stagger2}`}>
+      <div className={`grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${animations.fadeInUp} ${animations.stagger2}`}>
         <Card className={`bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200 ${animations.cardHover}`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">Upcoming Meetings</CardTitle>
@@ -163,7 +163,7 @@ const DashboardContent = () => {
                    </div>
                  </CardHeader>
                  <CardContent>
-                   <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                   <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {friends
                         .filter((friend: any) => friend.status === "online")
                         .slice(0, 6)
@@ -183,7 +183,7 @@ const DashboardContent = () => {
                                  </div>
                                )}
                              </div>
-                             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-black" />
+                             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-black" />
                            </div>
                            <div className="flex-1 min-w-0">
                              <p className="text-white text-sm font-medium truncate">
@@ -293,7 +293,7 @@ const DashboardContent = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-400/30">
+                    <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full border border-blue-400/30">
                       {meeting.status}
                     </span>
                     <Button asChild variant="outline" size="sm" className={`border-white/20 text-gray-300 hover:bg-white/10 ${animations.buttonHover}`}>
