@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { animations } from "@/lib/animations";
 
 export default function AgentsPage() {
   const router = useRouter();
@@ -93,14 +94,14 @@ export default function AgentsPage() {
   }
 
   return (
-    <div className="py-6 px-4 md:px-8">
+    <div className={`py-6 px-4 md:px-8 ${animations.pageEnter}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className={`flex items-center justify-between mb-8 ${animations.fadeInUp}`}>
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">AI Agents</h1>
           <p className="text-gray-400">Manage your intelligent meeting assistants</p>
         </div>
-        <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white ${animations.buttonHover}`}>
           <Link href="/dashboard/agents/new">
             <Plus className="w-4 h-4 mr-2" />
             Create Agent
@@ -109,20 +110,20 @@ export default function AgentsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+      <div className={`grid gap-6 md:grid-cols-3 mb-8 ${animations.fadeInUp} ${animations.stagger2}`}>
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-400">Total Agents</p>
                 <p className="text-2xl font-bold text-white">{agents?.length || 0}</p>
               </div>
-              <Bot className="h-8 w-8 text-blue-400" />
+              <Bot className={`h-8 w-8 text-blue-400 ${animations.iconBounce}`} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -131,12 +132,12 @@ export default function AgentsPage() {
                   {agents?.filter((agent: any) => agent.isActive).length || 0}
                 </p>
               </div>
-              <Play className="h-8 w-8 text-green-400" />
+              <Play className={`h-8 w-8 text-green-400 ${animations.iconPulse}`} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -145,7 +146,7 @@ export default function AgentsPage() {
                   {agents?.filter((agent: any) => !agent.isActive).length || 0}
                 </p>
               </div>
-              <Pause className="h-8 w-8 text-gray-400" />
+              <Pause className={`h-8 w-8 text-gray-400 ${animations.iconSpin}`} />
             </div>
           </CardContent>
         </Card>
@@ -153,9 +154,9 @@ export default function AgentsPage() {
 
       {/* Agents Grid */}
       {agents && agents.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {agents.map((agent: any) => (
-            <Card key={agent.id} className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200">
+        <div className={`grid gap-6 md:grid-cols-2 lg:grid-cols-3 ${animations.fadeInUp} ${animations.stagger3}`}>
+          {agents.map((agent: any, index: number) => (
+            <Card key={agent.id} className={`bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200 ${animations.cardHover} ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -259,7 +260,7 @@ export default function AgentsPage() {
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>Created {format(new Date(agent.createdAt), "MMM dd, yyyy")}</span>
-                    <Button asChild size="sm" variant="outline" className="border-white/20 text-gray-300 hover:bg-white/10">
+                    <Button asChild size="sm" variant="outline" className={`border-white/20 text-gray-300 hover:bg-white/10 ${animations.buttonHover}`}>
                       <Link href={`/dashboard/agents/${agent.id}`}>
                         View Details
                       </Link>
@@ -271,12 +272,12 @@ export default function AgentsPage() {
           ))}
         </div>
       ) : (
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.fadeIn}`}>
           <CardContent className="p-12 text-center">
-            <Bot className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <Bot className={`w-16 h-16 text-gray-400 mx-auto mb-4 ${animations.iconBounce}`} />
             <h3 className="text-xl font-semibold text-white mb-2">No agents yet</h3>
             <p className="text-gray-400 mb-6">Create your first AI agent to get started with intelligent meeting assistance.</p>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white ${animations.buttonHover}`}>
               <Link href="/dashboard/agents/new">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Agent

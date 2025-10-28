@@ -16,6 +16,8 @@ import { ArrowLeft, Bot, Save, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
+import { animations } from "@/lib/animations";
+import { formAnimations } from "@/lib/form-animations";
 
 const agentSchema = z.object({
   name: z.string().min(1, "Name is required").max(50, "Name must be less than 50 characters"),
@@ -122,28 +124,28 @@ export default function CreateAgentPage() {
   const watchedCapabilities = watch("capabilities");
 
   return (
-    <div className="min-h-screen bg-black py-8 px-4 md:px-8">
+    <div className={`min-h-screen bg-black py-8 px-4 md:px-8 ${animations.pageEnter}`}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="sm" asChild>
+        <div className={`flex items-center gap-4 mb-8 ${animations.fadeInUp}`}>
+          <Button variant="ghost" size="sm" asChild className={animations.buttonHover}>
             <Link href="/dashboard/agents">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Agents
             </Link>
           </Button>
           <div className="flex items-center gap-2">
-            <Bot className="w-6 h-6 text-blue-400" />
+            <Bot className={`w-6 h-6 text-blue-400 ${animations.iconBounce}`} />
             <h1 className="text-2xl font-bold text-white">Create New Agent</h1>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit)} className={`space-y-8 ${animations.fadeInUp} ${animations.stagger2}`}>
           {/* Basic Information */}
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+          <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" />
+                <Sparkles className={`w-5 h-5 text-purple-400 ${animations.iconPulse}`} />
                 Basic Information
               </CardTitle>
             </CardHeader>
@@ -153,7 +155,7 @@ export default function CreateAgentPage() {
                 <Input
                   id="name"
                   placeholder="e.g., Sarah - Sales Assistant"
-                  className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                  className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 ${formAnimations.fieldFocus} ${formAnimations.inputHover}`}
                   {...register("name")}
                 />
                 {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
@@ -352,11 +354,11 @@ export default function CreateAgentPage() {
             <Button 
               type="submit" 
               disabled={isCreating}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className={`bg-blue-600 hover:bg-blue-700 text-white ${formAnimations.buttonHover} ${formAnimations.submitPress} ${isCreating ? formAnimations.submitLoading : ''}`}
             >
               {isCreating ? (
                 <>
-                  <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className={`w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full ${formAnimations.loadingSpinner}`} />
                   Creating...
                 </>
               ) : (

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
+import { animations } from "@/lib/animations";
 
 export default function MeetingsPage() {
   const router = useRouter();
@@ -149,14 +150,14 @@ export default function MeetingsPage() {
   const groupedMeetings = groupMeetingsByDate(meetings || []);
 
   return (
-    <div className="py-6 px-4 md:px-8">
+    <div className={`py-6 px-4 md:px-8 ${animations.pageEnter}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className={`flex items-center justify-between mb-8 ${animations.fadeInUp}`}>
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Meetings</h1>
           <p className="text-gray-400">Manage your AI-powered meetings</p>
         </div>
-        <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white ${animations.buttonHover}`}>
           <Link href="/dashboard/meetings/new">
             <Plus className="w-4 h-4 mr-2" />
             Schedule Meeting
@@ -165,20 +166,20 @@ export default function MeetingsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-6 md:grid-cols-4 mb-8">
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+      <div className={`grid gap-6 md:grid-cols-4 mb-8 ${animations.fadeInUp} ${animations.stagger2}`}>
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-400">Total Meetings</p>
                 <p className="text-2xl font-bold text-white">{meetings?.length || 0}</p>
               </div>
-              <Video className="h-8 w-8 text-blue-400" />
+              <Video className={`h-8 w-8 text-blue-400 ${animations.iconPulse}`} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -187,12 +188,12 @@ export default function MeetingsPage() {
                   {meetings?.filter((m: any) => m.status === "active").length || 0}
                 </p>
               </div>
-              <Play className="h-8 w-8 text-red-400" />
+              <Play className={`h-8 w-8 text-red-400 ${animations.iconBounce}`} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -201,12 +202,12 @@ export default function MeetingsPage() {
                   {meetings?.filter((m: any) => m.status === "scheduled").length || 0}
                 </p>
               </div>
-              <Calendar className="h-8 w-8 text-green-400" />
+              <Calendar className={`h-8 w-8 text-green-400 ${animations.iconSpin}`} />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.cardHover}`}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -215,7 +216,7 @@ export default function MeetingsPage() {
                   {meetings?.filter((m: any) => m.status === "completed").length || 0}
                 </p>
               </div>
-              <Clock className="h-8 w-8 text-purple-400" />
+              <Clock className={`h-8 w-8 text-purple-400 ${animations.iconPulse}`} />
             </div>
           </CardContent>
         </Card>
@@ -228,13 +229,13 @@ export default function MeetingsPage() {
             if (groupMeetings.length === 0) return null;
             
             return (
-              <div key={groupName}>
+              <div key={groupName} className={`${animations.fadeInUp} ${animations.stagger3}`}>
                 <h2 className="text-xl font-semibold text-white mb-4">{groupName}</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {groupMeetings.map((meeting: any) => {
+                  {groupMeetings.map((meeting: any, index: number) => {
                     const status = getMeetingStatus(meeting);
                     return (
-                      <Card key={meeting.id} className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200">
+                      <Card key={meeting.id} className={`bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200 ${animations.cardHover} ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-3">
@@ -310,7 +311,7 @@ export default function MeetingsPage() {
                               {meeting.status === "scheduled" && (
                                 <Button 
                                   size="sm" 
-                                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                  className={`flex-1 bg-green-600 hover:bg-green-700 text-white ${animations.buttonHover}`}
                                   onClick={() => handleStartMeeting(meeting.id)}
                                 >
                                   <Play className="w-4 h-4 mr-2" />
@@ -320,7 +321,7 @@ export default function MeetingsPage() {
                               {meeting.status === "active" && (
                                 <Button 
                                   size="sm" 
-                                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                                  className={`flex-1 bg-red-600 hover:bg-red-700 text-white ${animations.buttonHover}`}
                                   asChild
                                 >
                                   <Link href={`/dashboard/meetings/${meeting.id}/call`}>
@@ -329,7 +330,7 @@ export default function MeetingsPage() {
                                   </Link>
                                 </Button>
                               )}
-                              <Button asChild size="sm" variant="outline" className="border-white/20 text-gray-300 hover:bg-white/10">
+                              <Button asChild size="sm" variant="outline" className={`border-white/20 text-gray-300 hover:bg-white/10 ${animations.buttonHover}`}>
                                 <Link href={`/dashboard/meetings/${meeting.id}`}>
                                   View
                                 </Link>
@@ -346,12 +347,12 @@ export default function MeetingsPage() {
           })}
         </div>
       ) : (
-        <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+        <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.fadeIn}`}>
           <CardContent className="p-12 text-center">
-            <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <Video className={`w-16 h-16 text-gray-400 mx-auto mb-4 ${animations.iconBounce}`} />
             <h3 className="text-xl font-semibold text-white mb-2">No meetings yet</h3>
             <p className="text-gray-400 mb-6">Schedule your first AI-powered meeting to get started.</p>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white ${animations.buttonHover}`}>
               <Link href="/dashboard/meetings/new">
                 <Plus className="w-4 h-4 mr-2" />
                 Schedule Your First Meeting
