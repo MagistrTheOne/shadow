@@ -11,7 +11,7 @@ const Layout = async ({ children}: Props) => {
     return ( 
         <SidebarProvider>
             <DashboardSidebar/>
-            <main className="flex flex-col h-screen w-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+                <main className="flex flex-col h-screen w-screen bg-black">
                 <DashboardNavbar/>
                 <div className="flex-1 overflow-auto">
                     {children}

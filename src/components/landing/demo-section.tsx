@@ -54,13 +54,13 @@ export const DemoSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-6">
             <Play className="w-4 h-4 text-gray-400 mr-2" />
             <span className="text-sm text-white">Interactive </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Посмотрите{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent">
               AI Аватары
             </span>{" "}
             в действии
@@ -73,17 +73,17 @@ export const DemoSection = () => {
         {/* Demo Container */}
         <div className="relative">
           {/* Meeting Header */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-t-2xl p-4">
+          <div className="bg-white/5 backdrop-blur-md rounded-t-2xl p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-blue-500/80 backdrop-blur-sm flex items-center justify-center">
                     <Users className="w-4 h-4 text-white" />
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-purple-500/80 backdrop-blur-sm border border-purple-400/30 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-blue-500/80 backdrop-blur-sm flex items-center justify-center">
                     <Users className="w-4 h-4 text-white" />
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-green-500/80 backdrop-blur-sm border border-green-400/30 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-green-500/80 backdrop-blur-sm flex items-center justify-center">
                     <Users className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export const DemoSection = () => {
                 <Button
                   size="sm"
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="bg-red-500/80 backdrop-blur-sm border border-red-400/30 hover:bg-red-600/80 text-white"
+                  className="bg-red-500/80 backdrop-blur-sm hover:bg-red-600/80 text-white"
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </Button>
@@ -109,11 +109,11 @@ export const DemoSection = () => {
           </div>
 
           {/* Main Demo Area */}
-          <div className="bg-white/5 backdrop-blur-md border-x border-white/10">
+          <div className="bg-white/5 backdrop-blur-md">
             <div className="grid grid-cols-2 gap-4 p-6">
               {/* John Smith */}
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[400px]">
-                <div className="w-24 h-24 rounded-full bg-blue-500/80 backdrop-blur-sm border border-blue-400/30 flex items-center justify-center mb-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 flex flex-col items-center justify-center min-h-[400px]">
+                <div className="w-24 h-24 rounded-full bg-blue-500/80 backdrop-blur-sm flex items-center justify-center mb-4">
                   <Users className="w-12 h-12 text-white" />
                 </div>
                 <h4 className="text-white font-semibold text-lg">John Smith</h4>
@@ -125,14 +125,14 @@ export const DemoSection = () => {
               </div>
 
               {/* AI Assistant */}
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[400px]">
-                <div className="w-24 h-24 rounded-full bg-purple-500/80 backdrop-blur-sm border border-purple-400/30 flex items-center justify-center mb-4">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 flex flex-col items-center justify-center min-h-[400px]">
+                <div className="w-24 h-24 rounded-full bg-blue-500/80 backdrop-blur-sm flex items-center justify-center mb-4">
                   <Users className="w-12 h-12 text-white" />
                 </div>
                 <h4 className="text-white font-semibold text-lg">AI Assistant</h4>
                 <p className="text-gray-400 text-sm">Enterprise AI</p>
                 <div className="mt-4">
-                  <Button size="sm" className="bg-purple-500/80 backdrop-blur-sm border border-purple-400/30 hover:bg-purple-600/80 text-white">
+                  <Button size="sm" className="bg-blue-500/80 backdrop-blur-sm hover:bg-blue-600/80 text-white">
                     Active
                   </Button>
                 </div>
@@ -140,7 +140,7 @@ export const DemoSection = () => {
             </div>
 
             {/* Live Chat */}
-            <div className="bg-white/5 backdrop-blur-md border-t border-white/10 rounded-b-2xl p-6">
+            <div className="bg-white/5 backdrop-blur-md rounded-b-2xl p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <MessageSquare className="w-5 h-5 text-gray-400" />
                 <h4 className="text-white font-semibold">Live Chat</h4>
@@ -150,17 +150,17 @@ export const DemoSection = () => {
                 </div>
               </div>
               
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 max-h-48 overflow-y-auto">
+              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 max-h-48 overflow-y-auto">
                 {chatMessages.map((msg) => (
                   <div key={msg.id} className={`mb-3 ${msg.sender === "AI Assistant" ? "text-right" : "text-left"}`}>
                     <div className={`inline-block max-w-xs p-3 rounded-lg backdrop-blur-sm ${
                       msg.sender === "AI Assistant" 
-                        ? "bg-purple-500/20 border border-purple-400/30" 
-                        : "bg-blue-500/20 border border-blue-400/30"
+                        ? "bg-blue-500/20" 
+                        : "bg-blue-500/20"
                     }`}>
                       <div className="flex items-center space-x-2 mb-1">
-                        <div className={`w-6 h-6 rounded-full backdrop-blur-sm border flex items-center justify-center ${
-                          msg.sender === "AI Assistant" ? "bg-purple-500/80 border-purple-400/30" : "bg-blue-500/80 border-blue-400/30"
+                        <div className={`w-6 h-6 rounded-full backdrop-blur-sm flex items-center justify-center ${
+                          msg.sender === "AI Assistant" ? "bg-blue-500/80" : "bg-blue-500/80"
                         }`}>
                           <Users className="w-3 h-3 text-white" />
                         </div>
@@ -181,7 +181,7 @@ export const DemoSection = () => {
           <Button
             asChild
             size="lg"
-            className=" text-white  text-lg px-8 py-4"
+            className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 text-lg px-8 py-4"
           >
             <Link href="#demo">
               Получить доступ

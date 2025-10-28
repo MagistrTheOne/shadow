@@ -8,13 +8,13 @@ export const FooterSection = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative py-16 border-t border-white/10">
+    <footer className="relative py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-gray-300" />
               </div>
               <span className="text-xl font-bold text-white">Shadow AI</span>
@@ -123,7 +123,7 @@ export const FooterSection = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-white/10 mt-12 pt-8">
+        <div className="mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
               © {currentYear} Shadow AI. All rights reserved. Created by{" "}
@@ -144,7 +144,7 @@ export const FooterSection = () => {
         </div>
 
         {/* Contact Info */}
-        <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+        <div className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl">
           <div className="flex items-center justify-center space-x-2 text-gray-400">
             <Mail className="w-4 h-4" />
             <span className="text-sm">Contact: magistrtheone@gmail.com</span>

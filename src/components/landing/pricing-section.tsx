@@ -68,7 +68,7 @@ export const PricingSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-6">
             <Crown className="w-4 h-4 text-gray-400 mr-2" />
             <span className="text-sm text-gray-300">Pricing</span>
           </div>
@@ -89,16 +89,16 @@ export const PricingSection = () => {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`relative p-8 rounded-3xl bg-white/5 backdrop-blur-sm border transition-all duration-300 hover:transform hover:scale-105 ${
+              className={`relative p-8 rounded-3xl bg-white/5 backdrop-blur-sm transition-all duration-300 hover:transform hover:scale-105 ${
                 plan.popular
-                  ? "border-white/30 bg-white/10"
-                  : "border-white/10 hover:border-white/20"
+                  ? "bg-white/10"
+                  : ""
               }`}
             >
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  <div className="bg-white/20 backdrop-blur-sm text-white px-4 py-1 rounded-full text-sm font-semibold">
                     Most Popular
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export const PricingSection = () => {
 
               {/* Plan Header */}
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-4">
                   <plan.icon className={`w-8 h-8 ${plan.color}`} />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
@@ -131,8 +131,8 @@ export const PricingSection = () => {
               <Button
                 className={`w-full py-3 text-lg font-semibold ${
                   plan.popular
-                    ? "bg-white/20 hover:bg-white/30 text-white border border-white/30"
-                    : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                    ? "bg-white/20 hover:bg-white/30 text-white"
+                    : "bg-white/10 hover:bg-white/20 text-white"
                 }`}
               >
                 {plan.cta}

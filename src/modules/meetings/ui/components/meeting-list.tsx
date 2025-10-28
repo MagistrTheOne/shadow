@@ -57,7 +57,7 @@ export const MeetingList = () => {
                       onDuplicate={async (meetingId) => {
                         // Handle duplicate - simplified
                         console.log('Duplicate meeting:', meetingId);
-                        window.location.reload();
+                          window.location.reload();
                       }}
                       onDelete={() => {
                         // Refetch meetings after delete

@@ -44,7 +44,7 @@ export const AgentsView = () => {
               onDuplicate={async (agentId) => {
                 // Handle duplicate - simplified
                 console.log('Duplicate agent:', agentId);
-                window.location.reload();
+                  window.location.reload();
               }}
               onDelete={() => {
                 window.location.reload();

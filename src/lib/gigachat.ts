@@ -100,7 +100,7 @@ export async function getAvailableModels() {
 
 export async function generateEmbedding(text: string | string[]) {
   const token = await getGigaChatAccessToken();
-
+  
   try {
     const response = await gigachatAxios.post('https://gigachat.devices.sberbank.ru/api/v1/embeddings', {
       model: 'Embeddings',

@@ -195,8 +195,8 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
         </div>
 
         <Chat client={chatClientRef.current}>
-          <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-hidden">
+            <div className="flex flex-col h-full">
+              <div className="flex-1 overflow-hidden">
               <div className="p-4 text-center text-gray-400">
                 Chat functionality will be implemented
               </div>
