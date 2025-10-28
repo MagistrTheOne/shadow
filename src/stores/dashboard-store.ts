@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
 interface DashboardState {
   // Sidebar state
   sidebarOpen: boolean;

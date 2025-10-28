@@ -11,7 +11,7 @@ export const BreadcrumbManager = () => {
   useEffect(() => {
     const generateBreadcrumbs = () => {
       const segments = pathname.split('/').filter(Boolean);
-      const breadcrumbs = [{ label: 'Dashboard', href: '/dashboard' }];
+      const breadcrumbs: Array<{ label: string; href?: string }> = [{ label: 'Dashboard', href: '/dashboard' }];
 
       if (segments.length === 1 && segments[0] === 'dashboard') {
         setCurrentPage('Dashboard');

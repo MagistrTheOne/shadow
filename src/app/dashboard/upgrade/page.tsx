@@ -91,7 +91,7 @@ const PLANS = [
 
 export default function UpgradePage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessingPlan, setIsProcessing] = useState(false);
 
   const { data: subscription, isLoading, isError } = trpc.subscriptions.getCurrent.useQuery();
 
@@ -192,7 +192,7 @@ export default function UpgradePage() {
         <div className="grid gap-8 md:grid-cols-3">
           {PLANS.map((plan) => {
             const isCurrentPlan = plan.name.toLowerCase() === currentPlan;
-            const isProcessing = selectedPlan === plan.name && isProcessing;
+            const isProcessingPlanPlan = selectedPlan === plan.name && isProcessingPlan;
             
             return (
               <Card 
@@ -261,10 +261,10 @@ export default function UpgradePage() {
                         : "border-white/20 text-gray-300 hover:bg-white/10"
                     }`}
                     variant={plan.buttonVariant}
-                    disabled={plan.disabled || isCurrentPlan || isProcessing}
+                    disabled={plan.disabled || isCurrentPlan || isProcessingPlan}
                     onClick={() => handleUpgrade(plan.name)}
                   >
-                    {isProcessing ? (
+                    {isProcessingPlan ? (
                       <>
                         <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Processing...

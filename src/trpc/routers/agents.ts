@@ -24,7 +24,7 @@ export const agentsRouter = createTRPCRouter({
       const agentData = await db
         .select()
         .from(agent)
-        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
+        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)))
         .limit(1);
 
       if (!agentData.length) {
@@ -65,7 +65,7 @@ export const agentsRouter = createTRPCRouter({
         .insert(agent)
         .values({
           ...input,
-          userId: ctx.userId,
+          userId: ctx.auth.user.id,
           personality: input.personality || {
             tone: "professional",
             expertise: [],
@@ -117,7 +117,7 @@ export const agentsRouter = createTRPCRouter({
           ...updateData,
           updatedAt: new Date(),
         })
-        .where(and(eq(agent.id, id), eq(agent.userId, ctx.userId)))
+        .where(and(eq(agent.id, id), eq(agent.userId, ctx.auth.user.id)))
         .returning();
 
       if (!updatedAgent.length) {
@@ -136,7 +136,7 @@ export const agentsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const deletedAgent = await db
         .delete(agent)
-        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
+        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)))
         .returning();
 
       if (!deletedAgent.length) {
@@ -156,7 +156,7 @@ export const agentsRouter = createTRPCRouter({
       const agentData = await db
         .select({ isActive: agent.isActive })
         .from(agent)
-        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
+        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)))
         .limit(1);
 
       if (!agentData.length) {
@@ -172,7 +172,7 @@ export const agentsRouter = createTRPCRouter({
           isActive: !agentData[0].isActive,
           updatedAt: new Date(),
         })
-        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
+        .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)))
         .returning();
 
       return updatedAgent[0];

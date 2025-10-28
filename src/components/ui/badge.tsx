@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-
 interface BadgeProps {
   variant?: "default" | "secondary" | "destructive" | "outline";
   className?: string;
