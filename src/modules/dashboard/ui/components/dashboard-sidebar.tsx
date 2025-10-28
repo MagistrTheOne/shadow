@@ -9,6 +9,7 @@ import {
   PlusIcon,
   MessageSquareIcon,
   UsersIcon,
+  SparklesIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ const firstSection = [
   { icon: BotIcon, label: "Agents", href: "/dashboard/agents" },
   { icon: MessageSquareIcon, label: "Chats", href: "/dashboard/chats" },
   { icon: UsersIcon, label: "Friends", href: "/dashboard/friends" },
+  { icon: SparklesIcon, label: "ANNA", href: "/anna", special: true },
 ];
 
 const secondSection = [
@@ -131,7 +133,10 @@ export const DashboardSidebar = () => {
                     className={cn(
                       "h-10 flex items-center gap-2 border border-transparent hover:border-blue-400/30 text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group rounded-lg",
                       pathname === item.href &&
-                        "bg-blue-500/20 border-blue-400/30 text-white"
+                        "bg-blue-500/20 border-blue-400/30 text-white",
+                      (item as any).special && "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 hover:border-purple-400/50",
+                      (item as any).special && pathname === item.href &&
+                        "bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-400/50 text-white"
                     )}
                     onMouseEnter={() => setHoveredItem(item.href)}
                     onMouseLeave={() => setHoveredItem(null)}

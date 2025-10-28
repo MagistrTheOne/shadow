@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { HeroSection } from "@/components/landing/hero-section";
+import { AnnaHero } from "@/components/landing/anna-hero";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -18,7 +18,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <Navbar session={session} />
       <main>
-        <HeroSection session={session} />
+        <AnnaHero />
         <FeaturesSection />
         <PricingSection />
         <FooterSection />
