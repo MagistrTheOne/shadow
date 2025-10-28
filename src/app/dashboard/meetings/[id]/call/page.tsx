@@ -10,7 +10,6 @@ import {
   MicOff, 
   Video, 
   VideoOff, 
-  Phone, 
   PhoneOff,
   Users,
   Settings,
@@ -47,10 +46,11 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+
+  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id });
+  const { data: meetingAgents } = trpc.meetingAgents.getByMeeting.useQuery({ meetingId: id });
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
-
-  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: id });
 
   const endMeeting = trpc.meetings.end.useMutation({
     onSuccess: () => {
@@ -64,14 +64,12 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
   });
 
   useEffect(() => {
-    // Initialize camera and microphone
     const initMedia = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
         });
-        
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -83,7 +81,6 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
 
     initMedia();
 
-    // Cleanup on unmount
     return () => {
       if (videoRef.current?.srcObject) {
         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
@@ -94,19 +91,17 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
-    // Here you would implement actual mute/unmute logic
     toast.success(isMuted ? "Microphone enabled" : "Microphone muted");
   };
 
   const toggleVideo = () => {
     setIsVideoOff(!isVideoOff);
-    // Here you would implement actual video on/off logic
     toast.success(isVideoOff ? "Camera enabled" : "Camera disabled");
   };
 
   const handleLeaveMeeting = () => {
     setIsLeaving(true);
-    endMeeting.mutate({ id: id });
+    endMeeting.mutate({ id });
   };
 
   const toggleFullscreen = () => {
@@ -169,13 +164,12 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
             Live
           </Badge>
         </div>
-        
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowParticipants(!showParticipants)}
-            className="text-gray-300 hover:text-white hover:bg-white/10"
+            className="text-gray-300 hover:text-white hover:bg:white/10"
           >
             <Users className="w-4 h-4 mr-2" />
             Participants
@@ -184,7 +178,7 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
             variant="ghost"
             size="sm"
             onClick={() => setShowChat(!showChat)}
-            className="text-gray-300 hover:text-white hover:bg-white/10"
+            className="text-gray-300 hover:text:white hover:bg:white/10"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Chat
@@ -228,19 +222,14 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
         {/* Video Area */}
         <div className="flex-1 relative">
           <div className="absolute inset-0 bg-gray-900">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted={isMuted}
-              className="w-full h-full object-cover"
-            />
-            
+            <video ref={videoRef} autoPlay muted={isMuted} className="w-full h-full object-cover" />
+
             {/* AI Agent Overlay */}
-            {meeting.agentId && (
+            {meetingAgents && meetingAgents.length > 0 && (
               <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items:center gap-2">
                   <Bot className="w-4 h-4 text-blue-400" />
-                  <span className="text-white text-sm">AI Agent Active</span>
+                  <span className="text-white text-sm">{meetingAgents.length} AI Agent{meetingAgents.length > 1 ? 's' : ''} Active</span>
                 </div>
               </div>
             )}
@@ -269,23 +258,26 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
                 <h3 className="text-white font-semibold mb-4">Participants</h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 p-2 bg-white/5 rounded">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items:center justify-center">
                       <span className="text-white text-sm font-medium">Y</span>
                     </div>
                     <span className="text-white text-sm">You</span>
-                    <Badge className="bg-green-500/20 text-green-400 border-green-400/30 text-xs">
-                      Host
-                    </Badge>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-400/30 text-xs">Host</Badge>
                   </div>
-                  {meeting.agentId && (
-                    <div className="flex items-center gap-2 p-2 bg-white/5 rounded">
-                      <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                        <Bot className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="text-white text-sm">AI Agent</span>
-                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-400/30 text-xs">
-                        AI
-                      </Badge>
+                  {meetingAgents && meetingAgents.length > 0 && (
+                    <div className="space-y-2">
+                      {meetingAgents.map((ma) => (
+                        <div key={ma.id} className="flex items-center gap-2 p-2 bg-white/5 rounded">
+                          <div className="w-8 h-8 bg-purple-500 rounded-full flex items:center justify-center">
+                            <Bot className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="text-white text-sm">{ma.agent.name}</span>
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-400/30 text-xs">{ma.role}</Badge>
+                          <Badge className={ma.isActive ? "bg-green-500/20 text-green-400 border-green-400/30 text-xs" : "bg-red-500/20 text-red-400 border-red-400/30 text-xs"}>
+                            {ma.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -311,9 +303,7 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
                     placeholder="Type a message..."
                     className="flex-1 bg-white/10 border border-white/20 rounded px-3 py-2 text-white placeholder:text-gray-400 text-sm"
                   />
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Send
-                  </Button>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">Send</Button>
                 </div>
               </div>
             )}
