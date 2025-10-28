@@ -18,6 +18,22 @@ interface AgentEditDialogProps {
   initialData: {
     name: string;
     instructions: string;
+    provider: "sber" | "openai";
+    model: string;
+    description?: string;
+    voice?: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+    personality?: {
+      tone?: "professional" | "casual" | "friendly" | "formal";
+      expertise?: string[];
+      communication_style?: string;
+    };
+    capabilities?: {
+      can_schedule?: boolean;
+      can_take_notes?: boolean;
+      can_record?: boolean;
+      can_translate?: boolean;
+      languages?: string[];
+    };
   };
 }
 

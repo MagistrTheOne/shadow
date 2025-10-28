@@ -24,6 +24,8 @@ const agentSchema = z.object({
   description: z.string().max(200, "Description must be less than 200 characters").optional(),
   voice: z.enum(["alloy", "echo", "fable", "onyx", "nova", "shimmer"]),
   instructions: z.string().min(10, "Instructions must be at least 10 characters").max(2000, "Instructions must be less than 2000 characters"),
+  provider: z.enum(["sber", "openai"]),
+  model: z.string().min(1, "Model is required"),
   personality: z.object({
     tone: z.enum(["professional", "casual", "friendly", "formal"]),
     expertise: z.array(z.string()),
@@ -89,6 +91,8 @@ export default function CreateAgentPage() {
     resolver: zodResolver(agentSchema),
     defaultValues: {
       voice: "alloy",
+      provider: "sber",
+      model: "GigaChat:latest",
       personality: {
         tone: "professional",
         expertise: [],
@@ -102,6 +106,12 @@ export default function CreateAgentPage() {
         languages: ["en"],
       },
     },
+  });
+
+  // Получаем доступные провайдеры и модели
+  const { data: providers = [] } = trpc.agents.getProviders.useQuery();
+  const { data: models = [] } = trpc.agents.getModels.useQuery({ 
+    provider: watch("provider") 
   });
 
   const createAgent = trpc.agents.create.useMutation({
@@ -183,6 +193,38 @@ export default function CreateAgentPage() {
                     {VOICE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value} className="text-white">
                         {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="provider" className="text-gray-300">AI Provider</Label>
+                <Select onValueChange={(value) => {
+                  setValue("provider", value as "sber" | "openai");
+                  setValue("model", ""); // Сбрасываем модель при смене провайдера
+                }} defaultValue="sber">
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectValue placeholder="Select AI provider" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-700">
+                    <SelectItem value="sber" className="text-white">Sber GigaChat</SelectItem>
+                    <SelectItem value="openai" className="text-white">OpenAI</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="model" className="text-gray-300">AI Model</Label>
+                <Select onValueChange={(value) => setValue("model", value)} value={watch("model")}>
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectValue placeholder="Select AI model" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-700">
+                    {models.map((model) => (
+                      <SelectItem key={model.id} value={model.id} className="text-white">
+                        {model.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

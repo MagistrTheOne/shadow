@@ -121,17 +121,19 @@ export const agent = pgTable(
     avatar: text("avatar"),
     voice: text("voice").notNull().default("alloy"),
     instructions: text("instructions").notNull(),
+    provider: text("provider", { enum: ["sber", "openai"] }).notNull().default("sber"),
+    model: text("model").notNull().default("GigaChat:latest"),
     personality: jsonb("personality").$type<{
-      tone: "professional" | "casual" | "friendly" | "formal";
-      expertise: string[];
-      communication_style: string;
+      tone?: "professional" | "casual" | "friendly" | "formal";
+      expertise?: string[];
+      communication_style?: string;
     }>(),
     capabilities: jsonb("capabilities").$type<{
-      can_schedule: boolean;
-      can_take_notes: boolean;
-      can_record: boolean;
-      can_translate: boolean;
-      languages: string[];
+      can_schedule?: boolean;
+      can_take_notes?: boolean;
+      can_record?: boolean;
+      can_translate?: boolean;
+      languages?: string[];
     }>(),
     isActive: boolean("is_active").$defaultFn(() => true).notNull(),
     userId: text("user_id")
@@ -147,6 +149,7 @@ export const agent = pgTable(
   (t) => ({
     agentUserIdx: index("agent_user_id_idx").on(t.userId),
     agentActiveIdx: index("agent_active_idx").on(t.isActive),
+    agentProviderIdx: index("agent_provider_idx").on(t.provider),
   })
 );
 
@@ -160,8 +163,6 @@ export const meetings = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    agentId: text("agent_id")
-      .references(() => agent.id, { onDelete: "set null" }),
     status: text("status", { enum: ["scheduled", "active", "completed", "cancelled"] })
       .notNull()
       .default("scheduled"),
@@ -175,7 +176,6 @@ export const meetings = pgTable(
   },
   (t) => ({
     meetingsUserIdx: index("meetings_user_id_idx").on(t.userId),
-    meetingsAgentIdx: index("meetings_agent_id_idx").on(t.agentId),
     meetingsStatusIdx: index("meetings_status_idx").on(t.status),
     meetingsScheduledIdx: index("meetings_scheduled_at_idx").on(t.scheduledAt),
   })
@@ -200,6 +200,32 @@ export const meetingParticipants = pgTable(
   (t) => ({
     participantsMeetingIdx: index("participants_meeting_id_idx").on(t.meetingId),
     participantsUserIdx: index("participants_user_id_idx").on(t.userId),
+  })
+);
+
+/** MEETING AGENTS - Many-to-many relationship */
+export const meetingAgents = pgTable(
+  "meeting_agents",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    meetingId: text("meeting_id")
+      .notNull()
+      .references(() => meetings.id, { onDelete: "cascade" }),
+    agentId: text("agent_id")
+      .notNull()
+      .references(() => agent.id, { onDelete: "cascade" }),
+    isActive: boolean("is_active").default(true).notNull(),
+    role: text("role", { enum: ["moderator", "participant", "observer"] }).default("participant"),
+    joinedAt: timestamp("joined_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    leftAt: timestamp("left_at", { withTimezone: true, mode: "date" }),
+  },
+  (t) => ({
+    meetingAgentsMeetingIdx: index("meeting_agents_meeting_id_idx").on(t.meetingId),
+    meetingAgentsAgentIdx: index("meeting_agents_agent_id_idx").on(t.agentId),
+    meetingAgentsActiveIdx: index("meeting_agents_active_idx").on(t.isActive),
+    meetingAgentsUnique: uniqueIndex("meeting_agents_unique").on(t.meetingId, t.agentId),
   })
 );
 

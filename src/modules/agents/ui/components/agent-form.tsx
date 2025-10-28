@@ -61,6 +61,8 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues, agentId }: Agent
     defaultValues: initialValues || {
       name: "",
       instructions: "",
+      provider: "sber",
+      model: "GigaChat:latest",
     },
   });
 

@@ -19,7 +19,10 @@ import {
   Share,
   MessageSquare,
   FileText,
-  Download
+  Download,
+  Plus,
+  Settings,
+  UserMinus
 } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
@@ -36,8 +39,11 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
   const { id } = await params;
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAddAgents, setShowAddAgents] = useState(false);
 
   const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: id });
+  const { data: meetingAgents, refetch: refetchAgents } = trpc.meetingAgents.getByMeeting.useQuery({ meetingId: id });
+  const { data: availableAgents } = trpc.meetingAgents.getAvailableAgents.useQuery({ meetingId: id });
 
   const deleteMeeting = trpc.meetings.delete.useMutation({
     onSuccess: () => {
@@ -47,6 +53,43 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
     onError: (error: any) => {
       toast.error(error.message || "Failed to delete meeting");
       setIsDeleting(false);
+    },
+  });
+
+  const addAgentToMeeting = trpc.meetingAgents.addToMeeting.useMutation({
+    onSuccess: () => {
+      toast.success("Agent added to meeting!");
+      refetchAgents();
+      setShowAddAgents(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to add agent", {
+        description: error.message,
+      });
+    },
+  });
+
+  const removeAgentFromMeeting = trpc.meetingAgents.removeFromMeeting.useMutation({
+    onSuccess: () => {
+      toast.success("Agent removed from meeting!");
+      refetchAgents();
+    },
+    onError: (error) => {
+      toast.error("Failed to remove agent", {
+        description: error.message,
+      });
+    },
+  });
+
+  const toggleAgentActive = trpc.meetingAgents.toggleActive.useMutation({
+    onSuccess: () => {
+      toast.success("Agent status updated!");
+      refetchAgents();
+    },
+    onError: (error) => {
+      toast.error("Failed to update agent status", {
+        description: error.message,
+      });
     },
   });
 
@@ -65,6 +108,18 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
       setIsDeleting(true);
       deleteMeeting.mutate({ id: id });
     }
+  };
+
+  const handleAddAgent = (agentId: string, role: "moderator" | "participant" | "observer" = "participant") => {
+    addAgentToMeeting.mutate({ meetingId: id, agentId, role });
+  };
+
+  const handleRemoveAgent = (agentId: string) => {
+    removeAgentFromMeeting.mutate({ meetingId: id, agentId });
+  };
+
+  const handleToggleAgentActive = (agentId: string, isActive: boolean) => {
+    toggleAgentActive.mutate({ meetingId: id, agentId, isActive });
   };
 
   const handleStartMeeting = () => {
@@ -213,10 +268,10 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
                   </div>
                 </div>
                 
-                {meeting.agentId && (
+                {meetingAgents && meetingAgents.length > 0 && (
                   <div className="flex items-center gap-2 text-gray-300">
                     <Bot className="w-4 h-4 text-purple-400" />
-                    <span>AI Agent will be present</span>
+                    <span>{meetingAgents.length} AI Agent{meetingAgents.length > 1 ? 's' : ''} will be present</span>
                   </div>
                 )}
 
@@ -224,6 +279,138 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
                   <div className="flex items-center gap-2 text-gray-300">
                     <Calendar className="w-4 h-4 text-orange-400" />
                     <span>Recurring meeting</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* AI Agents Section */}
+            <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-purple-400" />
+                    AI Agents ({meetingAgents?.length || 0})
+                  </CardTitle>
+                  <Button
+                    onClick={() => setShowAddAgents(!showAddAgents)}
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Agent
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Available Agents to Add */}
+                {showAddAgents && availableAgents && availableAgents.length > 0 && (
+                  <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                    <h4 className="text-white font-medium mb-3">Available Agents</h4>
+                    <div className="grid gap-2">
+                      {availableAgents.map((agent) => (
+                        <div key={agent.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Bot className="w-4 h-4 text-purple-400" />
+                            <div>
+                              <p className="text-white font-medium">{agent.name}</p>
+                              <p className="text-gray-400 text-sm">{agent.provider} - {agent.model}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddAgent(agent.id, "participant")}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              Add as Participant
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddAgent(agent.id, "moderator")}
+                              className="bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                              Add as Moderator
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Meeting Agents */}
+                {meetingAgents && meetingAgents.length > 0 ? (
+                  <div className="space-y-3">
+                    {meetingAgents.map((meetingAgent) => (
+                      <div key={meetingAgent.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-3">
+                          <Bot className="w-5 h-5 text-purple-400" />
+                          <div>
+                            <p className="text-white font-medium">{meetingAgent.agent.name}</p>
+                            <div className="flex items-center gap-2 text-sm text-gray-400">
+                              <span>{meetingAgent.agent.provider} - {meetingAgent.agent.model}</span>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  meetingAgent.role === 'moderator' 
+                                    ? 'border-purple-400/30 text-purple-400' 
+                                    : meetingAgent.role === 'participant'
+                                    ? 'border-blue-400/30 text-blue-400'
+                                    : 'border-gray-400/30 text-gray-400'
+                                }`}
+                              >
+                                {meetingAgent.role}
+                              </Badge>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  meetingAgent.isActive 
+                                    ? 'border-green-400/30 text-green-400' 
+                                    : 'border-red-400/30 text-red-400'
+                                }`}
+                              >
+                                {meetingAgent.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleToggleAgentActive(meetingAgent.agentId, !meetingAgent.isActive)}
+                            variant={meetingAgent.isActive ? "outline" : "default"}
+                            className={
+                              meetingAgent.isActive 
+                                ? "border-red-400/30 text-red-400 hover:bg-red-400/10" 
+                                : "bg-green-600 hover:bg-green-700 text-white"
+                            }
+                          >
+                            {meetingAgent.isActive ? 'Deactivate' : 'Activate'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleRemoveAgent(meetingAgent.agentId)}
+                            variant="outline"
+                            className="border-red-400/30 text-red-400 hover:bg-red-400/10"
+                          >
+                            <UserMinus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Bot className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-4">No AI agents added to this meeting</p>
+                    <Button
+                      onClick={() => setShowAddAgents(true)}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add First Agent
+                    </Button>
                   </div>
                 )}
               </CardContent>

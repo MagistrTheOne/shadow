@@ -5,19 +5,20 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Bot, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Play, 
-  Pause, 
+import {
+  Bot,
+  Plus,
+  Edit,
+  Trash2,
+  Play,
+  Pause,
   MoreVertical,
   Settings,
   MessageSquare,
   Calendar,
   Mic,
-  Languages
+  Languages,
+  TestTube
 } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
@@ -37,6 +38,8 @@ import { animations } from "@/lib/animations";
 export default function AgentsPage() {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [testingAgentId, setTestingAgentId] = useState<string | null>(null);
+  const [testMessage, setTestMessage] = useState("");
 
   const { data: agents, isLoading, isError, refetch } = trpc.agents.getMany.useQuery();
 
@@ -62,6 +65,22 @@ export default function AgentsPage() {
     },
   });
 
+  const testAgent = trpc.agents.testAgent.useMutation({
+    onSuccess: (result) => {
+      toast.success("Agent test successful!", {
+        description: result.response,
+      });
+      setTestingAgentId(null);
+      setTestMessage("");
+    },
+    onError: (error: any) => {
+      toast.error("Agent test failed", {
+        description: error.message || "An unexpected error occurred.",
+      });
+      setTestingAgentId(null);
+    },
+  });
+
   const handleDelete = (id: string) => {
     setDeletingId(id);
     deleteAgent.mutate({ id });
@@ -69,6 +88,20 @@ export default function AgentsPage() {
 
   const handleToggleActive = (id: string) => {
     toggleActive.mutate({ id });
+  };
+
+  const handleTestAgent = (id: string) => {
+    setTestingAgentId(id);
+    setTestMessage("");
+  };
+
+  const handleTestSubmit = () => {
+    if (testingAgentId && testMessage.trim()) {
+      testAgent.mutate({
+        agentId: testingAgentId,
+        message: testMessage.trim(),
+      });
+    }
   };
 
   if (isLoading) {
@@ -180,37 +213,44 @@ export default function AgentsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-gray-900 border-gray-700">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/agents/${agent.id}/edit`} className="text-white">
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleToggleActive(agent.id)}
-                        className="text-white"
-                      >
-                        {agent.isActive ? (
-                          <>
-                            <Pause className="w-4 h-4 mr-2" />
-                            Deactivate
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-2" />
-                            Activate
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-gray-700" />
-                      <DropdownMenuItem 
-                        onClick={() => handleDelete(agent.id)}
-                        className="text-red-400"
-                        disabled={deletingId === agent.id}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        {deletingId === agent.id ? "Deleting..." : "Delete"}
-                      </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/agents/${agent.id}/edit`} className="text-white">
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleTestAgent(agent.id)}
+                              className="text-white"
+                            >
+                              <TestTube className="w-4 h-4 mr-2" />
+                              Test Agent
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleToggleActive(agent.id)}
+                              className="text-white"
+                            >
+                              {agent.isActive ? (
+                                <>
+                                  <Pause className="w-4 h-4 mr-2" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Activate
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-gray-700" />
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(agent.id)}
+                              className="text-red-400"
+                              disabled={deletingId === agent.id}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              {deletingId === agent.id ? "Deleting..." : "Delete"}
+                            </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -225,6 +265,11 @@ export default function AgentsPage() {
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Settings className="w-4 h-4" />
                     <span className="capitalize">{agent.voice} voice</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <Bot className="w-4 h-4" />
+                    <span className="capitalize">{agent.provider} - {agent.model}</span>
                   </div>
                   
                   {agent.capabilities && (
@@ -285,6 +330,48 @@ export default function AgentsPage() {
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Test Agent Modal */}
+      {testingAgentId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Test Agent</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Test Message
+                </label>
+                <textarea
+                  value={testMessage}
+                  onChange={(e) => setTestMessage(e.target.value)}
+                  placeholder="Enter a test message for the agent..."
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setTestingAgentId(null);
+                    setTestMessage("");
+                  }}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleTestSubmit}
+                  disabled={!testMessage.trim() || testAgent.isPending}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {testAgent.isPending ? "Testing..." : "Test Agent"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
