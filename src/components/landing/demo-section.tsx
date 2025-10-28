@@ -181,7 +181,7 @@ export const DemoSection = () => {
           <Button
             asChild
             size="lg"
-            className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 text-lg px-8 py-4"
+            className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4"
           >
             <Link href="#demo">
               Получить доступ

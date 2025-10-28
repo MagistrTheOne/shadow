@@ -3,8 +3,11 @@
 import { useEffect, useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { PanelLeftCloseIcon, PanelLeftIcon, SearchIcon } from "lucide-react";
+import { PanelLeftCloseIcon, PanelLeftIcon, SearchIcon, Settings } from "lucide-react";
 import { DashboardCommand } from "./dashboard-command";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { SystemStatus } from "./system-status";
+import { Notifications } from "./dashboard-notifications";
 
 function isEditingTarget(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
@@ -71,6 +74,25 @@ export const DashboardNavbar = () => {
             ? <PanelLeftIcon className="size-4" />
             : <PanelLeftCloseIcon className="size-4" />}
         </Button>
+
+        {/* Breadcrumbs */}
+        <div className="flex-1">
+          <Breadcrumbs />
+        </div>
+
+        {/* Right side items */}
+        <div className="flex items-center gap-x-2">
+          <SystemStatus />
+          <Notifications />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-white hover:bg-white/10"
+            title="Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        </div>
 
         <Button
           className="h-9 w-[260px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:bg-white/10"

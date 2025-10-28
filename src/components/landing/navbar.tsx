@@ -47,12 +47,12 @@ export const Navbar = ({ session }: NavbarProps) => {
                 Sign In
               </Link>
             </Button>
-            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20" asChild>
+            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
               <Link href="/sign-up">
                 Get Started
               </Link>
             </Button>
-            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20" asChild>
+            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
               <Link href="/dashboard">
                 Dashboard
               </Link>
@@ -110,12 +110,12 @@ export const Navbar = ({ session }: NavbarProps) => {
                     Sign In
                   </Link>
                 </Button>
-                <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20" asChild>
+                <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
                   <Link href="/sign-up">
                     Get Started
                   </Link>
                 </Button>
-                <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20" asChild>
+                <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
                   <Link href="/dashboard">
                     Dashboard
                   </Link>

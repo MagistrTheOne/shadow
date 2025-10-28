@@ -132,7 +132,7 @@ export const PricingSection = () => {
                 className={`w-full py-3 text-lg font-semibold ${
                   plan.popular
                     ? "bg-white/20 hover:bg-white/30 text-white"
-                    : "bg-white/10 hover:bg-white/20 text-white"
+                    : "bg-white/10 hover:bg-white/30 text-white"
                 }`}
               >
                 {plan.cta}
