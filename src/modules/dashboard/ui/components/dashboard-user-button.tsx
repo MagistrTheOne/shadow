@@ -84,7 +84,7 @@ export const DashboardUserButton = () => {
                     <DrawerFooter>
                         <Button
                         variant="outline"
-                        onClick={() =>{}}
+                        onClick={() => router.push("/upgrade")}
                         className="border-white/20 text-gray-300 hover:bg-white/10"
                         >
                         <CreditCardIcon className="size-4"/>
@@ -163,7 +163,10 @@ export const DashboardUserButton = () => {
                 <DropdownMenuSeparator className="my-1 bg-white/10" />
 
                 {/* Billing */}
-                <DropdownMenuItem className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white rounded-md cursor-pointer transition-colors">
+                <DropdownMenuItem 
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white rounded-md cursor-pointer transition-colors"
+                    onClick={() => router.push("/upgrade")}
+                >
                     <CreditCardIcon className="size-4 text-gray-400" />
                     <span className="flex-1">Billing</span>
                 </DropdownMenuItem>

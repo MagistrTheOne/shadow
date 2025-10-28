@@ -48,11 +48,6 @@ export const Navbar = ({ session }: NavbarProps) => {
               </Link>
             </Button>
             <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
-              <Link href="/sign-up">
-                Get Started
-              </Link>
-            </Button>
-            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
               <Link href={session ? "/dashboard" : "/sign-in"}>
                 Dashboard
               </Link>
@@ -108,11 +103,6 @@ export const Navbar = ({ session }: NavbarProps) => {
                 <Button variant="ghost" className="w-full text-white hover:bg-white/10" asChild>
                   <Link href="/sign-in">
                     Sign In
-                  </Link>
-                </Button>
-                <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>
-                  <Link href="/sign-up">
-                    Get Started
                   </Link>
                 </Button>
                 <Button className="w-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/30" asChild>

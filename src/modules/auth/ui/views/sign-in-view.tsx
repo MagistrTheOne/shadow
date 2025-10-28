@@ -87,15 +87,7 @@ export const SignInView =() => {
                 },
             );
         };
-
-
-
-
-
-
-
-
-
+ 
     return (
         <div className="flex flex-col gap-6">
         <Card className=" overflow-hidden p-0">
@@ -210,8 +202,7 @@ export const SignInView =() => {
         <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[]:underline *:[]:underline-offset-4">
                 By clicking continue you agre to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
         </div>
-
-
+ 
         </div>
     );
 };

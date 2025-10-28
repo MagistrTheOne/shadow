@@ -20,12 +20,12 @@ const firstSection = [
     {
         icon:VideoIcon,
         label:"Meetings",
-        href:"/meetings",
+        href:"/dashboard/meetings",
     },
     {
         icon:BotIcon,
         label:"Agents",
-        href:"/agents",
+        href:"/dashboard/agents",
     }
 ];
 
@@ -33,7 +33,7 @@ const SecondSection = [
     {
         icon:StarIcon,
         label: "Upgrade",
-        href: "/upgrade",
+        href: "/dashboard/upgrade",
     },
  
 ];
@@ -43,17 +43,18 @@ export const DashboardSidebar = () => {
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
     
     // Fetch data for counters
-    const { data: meetings } = trpc.meetings.getMany.useQuery({});
-    const { data: agents } = trpc.agents.getMany.useQuery(undefined);
-    const { data: subscription } = trpc.subscriptions.getCurrent.useQuery();
+    const { data: meetings, isLoading: meetingsLoading } = trpc.meetings.getMany.useQuery({});
+    const { data: agents, isLoading: agentsLoading } = trpc.agents.getMany.useQuery(undefined);
+    const { data: subscription, isLoading: subscriptionLoading } = trpc.subscriptions.getCurrent.useQuery();
 
     const getCount = (type: 'meetings' | 'agents') => {
-        if (type === 'meetings') return meetings?.length || 0;
-        if (type === 'agents') return agents?.length || 0;
+        if (type === 'meetings') return meetingsLoading ? '...' : (meetings?.length || 0);
+        if (type === 'agents') return agentsLoading ? '...' : (agents?.length || 0);
         return 0;
     };
 
     const getSubscriptionBadge = () => {
+        if (subscriptionLoading) return { text: 'Loading...', color: 'text-gray-400' };
         if (!subscription) return { text: 'Free', color: 'text-gray-400' };
         return {
             text: subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1),
@@ -134,7 +135,7 @@ export const DashboardSidebar = () => {
                                     className="w-full justify-start text-gray-400 hover:text-white hover:bg-white/10"
                                     asChild
                                 >
-                                    <Link href="/meetings/new">
+                                    <Link href="/dashboard/meetings/new">
                                         <PlusIcon className="w-4 h-4 mr-2" />
                                         New Meeting
                                     </Link>
@@ -145,7 +146,7 @@ export const DashboardSidebar = () => {
                                     className="w-full justify-start text-gray-400 hover:text-white hover:bg-white/10"
                                     asChild
                                 >
-                                    <Link href="/agents/new">
+                                    <Link href="/dashboard/agents/new">
                                         <PlusIcon className="w-4 h-4 mr-2" />
                                         New Agent
                                     </Link>

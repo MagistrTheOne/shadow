@@ -39,12 +39,6 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button size="lg" className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4" asChild>
-            <Link href="/sign-up">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              </Button>
-            <Button size="lg" className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4" asChild>
               <Link href={session ? "/dashboard" : "/sign-in"}>
                 Go to Dashboard
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -54,8 +48,11 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
               variant="outline"
               size="lg"
               className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4"
+              asChild
             >
+              <Link href="/demo">
               View Enterprise Demo
+              </Link>
             </Button>
           </div>
 
