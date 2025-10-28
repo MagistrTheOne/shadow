@@ -135,7 +135,7 @@ export const agent = pgTable(
     avatar: text("avatar"),
     voice: text("voice").notNull().default("alloy"),
     instructions: text("instructions").notNull(),
-    provider: text("provider", { enum: ["sber", "openai", "heygen"] }).notNull().default("sber"),
+    provider: text("provider", { enum: ["sber", "openai"] }).notNull().default("sber"),
     model: text("model").notNull().default("GigaChat-Plus"),
     personality: jsonb("personality").$type<{
       tone?: "professional" | "casual" | "friendly" | "formal";
@@ -150,8 +150,6 @@ export const agent = pgTable(
       languages?: string[];
     }>(),
     isActive: boolean("is_active").$defaultFn(() => true).notNull(),
-    isSystem: boolean("is_system").notNull().default(false), // Для системных агентов как ANNA
-    heygenAvatarId: text("heygen_avatar_id"), // ID аватара в HeyGen
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
