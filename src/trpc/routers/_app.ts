@@ -1,5 +1,6 @@
 //agents Router
 import { agentsRouter } from './agents';
+import { chatsRouter } from './chats';
 import { meetingAgentsRouter } from './meeting-agents';
 import { sessionsRouter } from './sessions';
 import { sessionMessagesRouter } from './session-messages';
@@ -15,6 +16,7 @@ import { subscriptionsRouter } from '@/modules/subscriptions/server/procedures';
 import {  createTRPCRouter } from '../init';
 export const appRouter = createTRPCRouter({
   agents: agentsRouter,
+  chats: chatsRouter,
   meetingAgents: meetingAgentsRouter,
   sessions: sessionsRouter,
   sessionMessages: sessionMessagesRouter,

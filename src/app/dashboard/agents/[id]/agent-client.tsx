@@ -24,7 +24,8 @@ import {
   Zap,
   Brain,
   Code,
-  TestTube
+  TestTube,
+  MessageCircle
 } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
@@ -344,23 +345,34 @@ export function AgentClient({ id }: AgentClientProps) {
                       className="bg-white/10 border-white/20 text-white placeholder-gray-400"
                     />
                   </div>
-                  <Button 
-                    onClick={handleTestAgent} 
-                    disabled={isTestLoading || !testMessage.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {isTestLoading ? (
-                      <>
-                        <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Testing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 mr-2" />
-                        Test Agent
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button 
+                      onClick={handleTestAgent} 
+                      disabled={isTestLoading || !testMessage.trim()}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {isTestLoading ? (
+                        <>
+                          <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Testing...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-2" />
+                          Test Agent
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      asChild
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Link href={`/dashboard/chats?agentId=${id}`}>
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Start Chat
+                      </Link>
+                    </Button>
+                  </div>
                   {testResponse && (
                     <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
                       <Label className="text-gray-400">Response</Label>

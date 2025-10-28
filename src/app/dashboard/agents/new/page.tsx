@@ -109,7 +109,7 @@ export default function CreateAgentPage() {
     defaultValues: {
       voice: "alloy",
       provider: "sber",
-      model: "GigaChat",
+      model: "GigaChat-Plus",
       personality: {
         tone: "professional",
         expertise: [],

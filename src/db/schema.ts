@@ -136,7 +136,7 @@ export const agent = pgTable(
     voice: text("voice").notNull().default("alloy"),
     instructions: text("instructions").notNull(),
     provider: text("provider", { enum: ["sber", "openai"] }).notNull().default("sber"),
-    model: text("model").notNull().default("GigaChat:latest"),
+    model: text("model").notNull().default("GigaChat-Plus"),
     personality: jsonb("personality").$type<{
       tone?: "professional" | "casual" | "friendly" | "formal";
       expertise?: string[];
@@ -571,5 +571,103 @@ export const notifications = pgTable(
     notificationsTypeIdx: index("notifications_type_idx").on(t.type),
     notificationsUnreadIdx: index("notifications_unread_idx").on(t.isRead),
     notificationsCreatedAtIdx: index("notifications_created_at_idx").on(t.createdAt),
+  })
+);
+
+/** CHAT - Direct chats between users and agents */
+export const chat = pgTable(
+  "chat",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    agentId: text("agent_id")
+      .references(() => agent.id, { onDelete: "cascade" }),
+    participantId: text("participant_id")
+      .references(() => user.id, { onDelete: "cascade" }),
+    chatType: text("chat_type", { enum: ["agent", "user"] })
+      .notNull()
+      .default("agent"),
+    title: text("title").notNull(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true, mode: "date" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    chatUserIdx: index("chat_user_id_idx").on(t.userId),
+    chatAgentIdx: index("chat_agent_id_idx").on(t.agentId),
+    chatParticipantIdx: index("chat_participant_id_idx").on(t.participantId),
+    chatLastMessageIdx: index("chat_last_message_at_idx").on(t.lastMessageAt),
+    chatUserAgentUnique: uniqueIndex("chat_user_id_agent_id_uniq").on(t.userId, t.agentId),
+    chatUserParticipantUnique: uniqueIndex("chat_user_id_participant_id_uniq").on(t.userId, t.participantId),
+  })
+);
+
+/** FRIENDSHIPS - Friend relationships between users */
+export const friendship = pgTable(
+  "friendship",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    receiverId: text("receiver_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: text("status", { enum: ["pending", "accepted", "rejected", "blocked"] })
+      .notNull()
+      .default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    friendshipSenderIdx: index("friendship_sender_id_idx").on(t.senderId),
+    friendshipReceiverIdx: index("friendship_receiver_id_idx").on(t.receiverId),
+    friendshipStatusIdx: index("friendship_status_idx").on(t.status),
+    friendshipUnique: uniqueIndex("friendship_sender_receiver_uniq").on(t.senderId, t.receiverId),
+  })
+);
+
+/** CHAT_MESSAGE - Messages in chats */
+export const chatMessage = pgTable(
+  "chat_message",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    chatId: text("chat_id")
+      .notNull()
+      .references(() => chat.id, { onDelete: "cascade" }),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    messageType: text("message_type", { enum: ["text", "image", "file", "system"] })
+      .notNull()
+      .default("text"),
+    metadata: jsonb("metadata").$type<{
+      fileUrl?: string;
+      fileName?: string;
+      fileSize?: number;
+      imageUrl?: string;
+      imageWidth?: number;
+      imageHeight?: number;
+    }>(),
+    isRead: boolean("is_read").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    chatMessageChatIdx: index("chat_message_chat_id_idx").on(t.chatId),
+    chatMessageSenderIdx: index("chat_message_sender_id_idx").on(t.senderId),
+    chatMessageCreatedAtIdx: index("chat_message_created_at_idx").on(t.createdAt),
   })
 );

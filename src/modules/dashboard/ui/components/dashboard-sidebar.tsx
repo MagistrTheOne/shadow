@@ -7,6 +7,7 @@ import {
   ZapIcon,
   HomeIcon,
   PlusIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import { useSidebarState } from "@/stores/dashboard-store";
 const firstSection = [
   { icon: VideoIcon, label: "Meetings", href: "/dashboard/meetings" },
   { icon: BotIcon, label: "Agents", href: "/dashboard/agents" },
+  { icon: MessageSquareIcon, label: "Chats", href: "/dashboard/chats" },
 ];
 
 const secondSection = [
