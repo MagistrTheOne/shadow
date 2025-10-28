@@ -20,7 +20,10 @@ import {
   Calendar,
   Clock,
   Maximize,
-  Minimize
+  Minimize,
+  Copy,
+  Check,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
@@ -49,8 +52,16 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
 
   const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id });
   const { data: meetingAgents } = trpc.meetingAgents.getByMeeting.useQuery({ meetingId: id });
+  const { data: session, isLoading: sessionLoading } = trpc.sessions.getByMeetingId.useQuery({ meetingId: id });
+  const { data: messages, refetch: refetchMessages } = trpc.sessionMessages.list.useQuery(
+    { sessionId: session?.id || "" },
+    { enabled: !!session?.id }
+  );
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [isBackfilling, setIsBackfilling] = useState(false);
 
   const endMeeting = trpc.meetings.end.useMutation({
     onSuccess: () => {
@@ -60,6 +71,29 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
     onError: (error: any) => {
       toast.error(error.message || "Failed to end meeting");
       setIsLeaving(false);
+    },
+  });
+
+  const sendMessage = trpc.sessionMessages.send.useMutation({
+    onSuccess: () => {
+      setNewMessage("");
+      refetchMessages();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send message");
+    },
+  });
+
+  const backfillSessions = trpc.sessions.backfillForMeetings.useMutation({
+    onSuccess: (result) => {
+      toast.success(`Created ${result.created} sessions for existing meetings`);
+      setIsBackfilling(false);
+      // Refetch session data
+      window.location.reload();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to backfill sessions");
+      setIsBackfilling(false);
     },
   });
 
@@ -126,6 +160,34 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
     }
   };
 
+  const copySessionCode = async () => {
+    if (session?.code) {
+      try {
+        await navigator.clipboard.writeText(session.code);
+        setCopiedCode(true);
+        toast.success("Session code copied to clipboard");
+        setTimeout(() => setCopiedCode(false), 2000);
+      } catch (error) {
+        toast.error("Failed to copy session code");
+      }
+    }
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newMessage.trim() && session?.id) {
+      sendMessage.mutate({
+        sessionId: session.id,
+        content: newMessage.trim(),
+      });
+    }
+  };
+
+  const handleBackfill = () => {
+    setIsBackfilling(true);
+    backfillSessions.mutate();
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen bg-black flex items-center justify-center">
@@ -163,6 +225,40 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
           <Badge className="bg-red-500/20 text-red-400 border-red-400/30">
             Live
           </Badge>
+          {session && (
+            <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-1">
+              <span className="text-white text-sm font-mono">{session.code}</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={copySessionCode}
+                className="h-6 w-6 p-0 text-gray-300 hover:text-white"
+              >
+                {copiedCode ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
+            </div>
+          )}
+          {!session && !sessionLoading && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleBackfill}
+              disabled={isBackfilling}
+              className="border-white/20 text-gray-300 hover:bg-white/10"
+            >
+              {isBackfilling ? (
+                <>
+                  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Create Session
+                </>
+              )}
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -285,26 +381,51 @@ export default async function MeetingCallPage({ params }: MeetingCallPageProps) 
             )}
 
             {showChat && (
-              <div className="flex-1 p-4">
+              <div className="flex-1 p-4 flex flex-col">
                 <h3 className="text-white font-semibold mb-4">Chat</h3>
-                <div className="flex-1 bg-white/5 rounded-lg p-3 mb-4">
+                <div className="flex-1 bg-white/5 rounded-lg p-3 mb-4 overflow-y-auto max-h-64">
                   <div className="space-y-3">
-                    <div className="text-gray-400 text-sm">
-                      <span className="text-blue-400">AI Agent:</span> Welcome to the meeting! I'm here to help with note-taking and transcription.
-                    </div>
-                    <div className="text-gray-400 text-sm">
-                      <span className="text-green-400">You:</span> Thanks! Let's get started.
-                    </div>
+                    {messages?.messages && messages.messages.length > 0 ? (
+                      messages.messages.map((msg) => (
+                        <div key={msg.id} className="text-gray-400 text-sm">
+                          <span className={msg.sender?.type === "user" ? "text-green-400" : "text-blue-400"}>
+                            {msg.sender?.type === "user" ? "You" : msg.sender?.name || "System"}:
+                          </span>{" "}
+                          {msg.content}
+                          <div className="text-xs text-gray-500 mt-1">
+                            {format(new Date(msg.createdAt), "HH:mm")}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-gray-500 text-sm text-center py-4">
+                        No messages yet. Start the conversation!
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <form onSubmit={handleSendMessage} className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     className="flex-1 bg-white/10 border border-white/20 rounded px-3 py-2 text-white placeholder:text-gray-400 text-sm"
+                    disabled={!session || sendMessage.isPending}
                   />
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">Send</Button>
-                </div>
+                  <Button 
+                    type="submit" 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={!session || !newMessage.trim() || sendMessage.isPending}
+                  >
+                    {sendMessage.isPending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      "Send"
+                    )}
+                  </Button>
+                </form>
               </div>
             )}
           </div>

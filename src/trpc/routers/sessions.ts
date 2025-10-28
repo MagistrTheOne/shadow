@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, createTRPCRouter } from "../init";
-import { sessions, sessionParticipants, user, agent } from "@/db/schema";
+import { sessions, sessionParticipants, user, agent, meetingSessions, meetings } from "@/db/schema";
 import { eq, and, desc, or, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { generateSessionCode, isValidSessionCode } from "@/lib/session-code";
@@ -163,13 +163,22 @@ export const sessionsRouter = createTRPCRouter({
         return { session, joined: false };
       }
 
-      // Add user as participant
+      // Restrict access: only host or pre-invited participants may join
+      const isHost = session.hostUserId === ctx.auth.user.id;
+      if (!isHost) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not invited to this session",
+        });
+      }
+
+      // Host joining first time: add as participant
       await db
         .insert(sessionParticipants)
         .values({
           sessionId: session.id,
           userId: ctx.auth.user.id,
-          role: "participant",
+          role: "host",
         });
 
       return { session, joined: true };
@@ -275,6 +284,22 @@ export const sessionsRouter = createTRPCRouter({
       }
 
       return session;
+    }),
+
+  // Get session by meetingId
+  getByMeetingId: protectedProcedure
+    .input(z.object({ meetingId: z.string() }))
+    .query(async ({ input }) => {
+      const rows = await db
+        .select({ s: sessions })
+        .from(meetingSessions)
+        .innerJoin(sessions, eq(meetingSessions.sessionId, sessions.id))
+        .where(eq(meetingSessions.meetingId, input.meetingId))
+        .limit(1);
+      if (rows.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Session for meeting not found" });
+      }
+      return rows[0].s;
     }),
 
   // Get session by ID
@@ -429,5 +454,43 @@ export const sessionsRouter = createTRPCRouter({
       }
 
       return { invited: newParticipants.length };
+    }),
+
+  // Backfill sessions for existing meetings without sessions (current user)
+  backfillForMeetings: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      // Find meetings owned by user that have no linked session
+      const withoutSession = await db
+        .select({ m: meetings })
+        .from(meetings)
+        .leftJoin(meetingSessions, eq(meetingSessions.meetingId, meetings.id))
+        .where(and(
+          eq(meetings.userId, ctx.auth.user.id),
+          isNull(meetingSessions.sessionId as any)
+        ));
+
+      let created = 0;
+      for (const row of withoutSession) {
+        const meeting = row.m;
+        // create unique code
+        let code: string; let attempts = 0;
+        do {
+          code = generateSessionCode();
+          attempts++;
+          const existing = await db.select().from(sessions).where(eq(sessions.code, code)).limit(1);
+          if (existing.length === 0) break;
+        } while (attempts < 10);
+
+        const [s] = await db.insert(sessions).values({
+          code,
+          type: "meeting",
+          hostUserId: meeting.userId,
+        }).returning();
+
+        await db.insert(meetingSessions).values({ meetingId: meeting.id, sessionId: s.id });
+        await db.insert(sessionParticipants).values({ sessionId: s.id, userId: meeting.userId, role: "host" });
+        created++;
+      }
+      return { created };
     }),
 });
