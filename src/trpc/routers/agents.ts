@@ -1,16 +1,17 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../init";
+import { protectedProcedure, createTRPCRouter } from "../init";
 import { agent } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { db } from "@/db";
 
-export const agentsRouter = router({
+export const agentsRouter = createTRPCRouter({
   // Получить всех агентов пользователя
   getMany: protectedProcedure.query(async ({ ctx }) => {
-    const agents = await ctx.db
+    const agents = await db
       .select()
       .from(agent)
-      .where(eq(agent.userId, ctx.userId))
+      .where(eq(agent.userId, ctx.auth.user.id))
       .orderBy(desc(agent.createdAt));
 
     return agents;
@@ -20,7 +21,7 @@ export const agentsRouter = router({
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const agentData = await ctx.db
+      const agentData = await db
         .select()
         .from(agent)
         .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
@@ -60,7 +61,7 @@ export const agentsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const newAgent = await ctx.db
+      const newAgent = await db
         .insert(agent)
         .values({
           ...input,
@@ -110,7 +111,7 @@ export const agentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { id, ...updateData } = input;
 
-      const updatedAgent = await ctx.db
+      const updatedAgent = await db
         .update(agent)
         .set({
           ...updateData,
@@ -133,7 +134,7 @@ export const agentsRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const deletedAgent = await ctx.db
+      const deletedAgent = await db
         .delete(agent)
         .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
         .returning();
@@ -152,7 +153,7 @@ export const agentsRouter = router({
   toggleActive: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const agentData = await ctx.db
+      const agentData = await db
         .select({ isActive: agent.isActive })
         .from(agent)
         .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.userId)))
@@ -165,7 +166,7 @@ export const agentsRouter = router({
         });
       }
 
-      const updatedAgent = await ctx.db
+      const updatedAgent = await db
         .update(agent)
         .set({
           isActive: !agentData[0].isActive,

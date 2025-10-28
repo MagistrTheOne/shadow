@@ -26,7 +26,7 @@ const meetingSchema = z.object({
   agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
   duration: z.number().min(15, "Duration must be at least 15 minutes").max(480, "Duration must be less than 8 hours"),
-  isRecurring: z.boolean().default(false),
+  isRecurring: z.boolean(),
   recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
 });
 
@@ -51,10 +51,11 @@ const RECURRING_OPTIONS = [
 ];
 
 interface EditMeetingPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function EditMeetingPage({ params }: EditMeetingPageProps) {
+export default async function EditMeetingPage({ params }: EditMeetingPageProps) {
+  const { id } = await params;
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -71,7 +72,7 @@ export default function EditMeetingPage({ params }: EditMeetingPageProps) {
     resolver: zodResolver(meetingSchema),
   });
 
-  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: params.id });
+  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: id });
   const { data: agents } = trpc.agents.getMany.useQuery();
 
   const updateMeeting = trpc.meetings.update.useMutation({
@@ -103,8 +104,8 @@ export default function EditMeetingPage({ params }: EditMeetingPageProps) {
         description: meeting.description || "",
         agentId: meeting.agentId || "",
         duration: meeting.duration || 60,
-        isRecurring: meeting.isRecurring || false,
-        recurringType: meeting.recurringType || undefined,
+        isRecurring: false,
+        recurringType: undefined,
       });
       
       if (meeting.scheduledAt) {
@@ -116,7 +117,7 @@ export default function EditMeetingPage({ params }: EditMeetingPageProps) {
   const onSubmit = async (data: MeetingFormData) => {
     setIsUpdating(true);
     updateMeeting.mutate({ 
-      id: params.id, 
+      id: id, 
       ...data,
       scheduledAt: selectedDate,
     });
@@ -125,7 +126,7 @@ export default function EditMeetingPage({ params }: EditMeetingPageProps) {
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this meeting? This action cannot be undone.")) {
       setIsDeleting(true);
-      deleteMeeting.mutate({ id: params.id });
+      deleteMeeting.mutate({ id: id });
     }
   };
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { 
   Bot, 
   Edit, 
@@ -28,14 +29,15 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 
 interface AgentDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function AgentDetailPage({ params }: AgentDetailPageProps) {
+export default async function AgentDetailPage({ params }: AgentDetailPageProps) {
+  const { id } = await params;
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data: agent, isLoading, isError } = trpc.agents.getOne.useQuery({ id: params.id });
+  const { data: agent, isLoading, isError } = trpc.agents.getOne.useQuery({ id: id });
 
   const deleteAgent = trpc.agents.delete.useMutation({
     onSuccess: () => {
@@ -62,12 +64,12 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this agent? This action cannot be undone.")) {
       setIsDeleting(true);
-      deleteAgent.mutate({ id: params.id });
+      deleteAgent.mutate({ id: id });
     }
   };
 
   const handleToggleActive = () => {
-    toggleActive.mutate({ id: params.id });
+    toggleActive.mutate({ id: id });
   };
 
   if (isLoading) {

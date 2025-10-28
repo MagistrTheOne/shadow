@@ -26,7 +26,7 @@ const meetingSchema = z.object({
   agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
   duration: z.number().min(15, "Duration must be at least 15 minutes").max(480, "Duration must be less than 8 hours"),
-  isRecurring: z.boolean().default(false),
+  isRecurring: z.boolean(),
   recurringType: z.enum(["daily", "weekly", "monthly"]).optional(),
 });
 

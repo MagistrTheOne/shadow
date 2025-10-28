@@ -36,10 +36,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface MeetingCallPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function MeetingCallPage({ params }: MeetingCallPageProps) {
+export default async function MeetingCallPage({ params }: MeetingCallPageProps) {
+  const { id } = await params;
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -49,7 +50,7 @@ export default function MeetingCallPage({ params }: MeetingCallPageProps) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
 
-  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: params.id });
+  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: id });
 
   const endMeeting = trpc.meetings.end.useMutation({
     onSuccess: () => {
@@ -105,7 +106,7 @@ export default function MeetingCallPage({ params }: MeetingCallPageProps) {
 
   const handleLeaveMeeting = () => {
     setIsLeaving(true);
-    endMeeting.mutate({ id: params.id });
+    endMeeting.mutate({ id: id });
   };
 
   const toggleFullscreen = () => {

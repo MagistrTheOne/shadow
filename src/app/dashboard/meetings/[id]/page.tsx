@@ -29,14 +29,15 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 
 interface MeetingDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
+export default async function MeetingDetailPage({ params }: MeetingDetailPageProps) {
+  const { id } = await params;
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: params.id });
+  const { data: meeting, isLoading, isError } = trpc.meetings.getOne.useQuery({ id: id });
 
   const deleteMeeting = trpc.meetings.delete.useMutation({
     onSuccess: () => {
@@ -52,7 +53,7 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   const startMeeting = trpc.meetings.start.useMutation({
     onSuccess: () => {
       toast.success("Meeting started!");
-      router.push(`/dashboard/meetings/${params.id}/call`);
+      router.push(`/dashboard/meetings/${id}/call`);
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to start meeting");
@@ -62,16 +63,16 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this meeting? This action cannot be undone.")) {
       setIsDeleting(true);
-      deleteMeeting.mutate({ id: params.id });
+      deleteMeeting.mutate({ id: id });
     }
   };
 
   const handleStartMeeting = () => {
-    startMeeting.mutate({ id: params.id });
+    startMeeting.mutate({ id: id });
   };
 
   const copyMeetingLink = () => {
-    const link = `${window.location.origin}/dashboard/meetings/${params.id}/call`;
+    const link = `${window.location.origin}/dashboard/meetings/${id}/call`;
     navigator.clipboard.writeText(link);
     toast.success("Meeting link copied to clipboard!");
   };
@@ -219,10 +220,10 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
                   </div>
                 )}
 
-                {meeting.isRecurring && (
+                {false && (
                   <div className="flex items-center gap-2 text-gray-300">
                     <Calendar className="w-4 h-4 text-orange-400" />
-                    <span>Recurring meeting ({meeting.recurringType})</span>
+                    <span>Recurring meeting</span>
                   </div>
                 )}
               </CardContent>

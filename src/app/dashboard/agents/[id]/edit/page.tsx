@@ -74,10 +74,11 @@ const EXPERTISE_OPTIONS = [
 ];
 
 interface EditAgentPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function EditAgentPage({ params }: EditAgentPageProps) {
+export default async function EditAgentPage({ params }: EditAgentPageProps) {
+  const { id } = await params;
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -93,7 +94,7 @@ export default function EditAgentPage({ params }: EditAgentPageProps) {
     resolver: zodResolver(agentSchema),
   });
 
-  const { data: agent, isLoading, isError } = trpc.agents.getOne.useQuery({ id: params.id });
+  const { data: agent, isLoading, isError } = trpc.agents.getOne.useQuery({ id: id });
 
   const updateAgent = trpc.agents.update.useMutation({
     onSuccess: () => {
@@ -122,7 +123,7 @@ export default function EditAgentPage({ params }: EditAgentPageProps) {
       reset({
         name: agent.name,
         description: agent.description || "",
-        voice: agent.voice,
+        voice: agent.voice as "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer",
         instructions: agent.instructions,
         personality: agent.personality || {
           tone: "professional",
@@ -142,13 +143,13 @@ export default function EditAgentPage({ params }: EditAgentPageProps) {
 
   const onSubmit = async (data: AgentFormData) => {
     setIsUpdating(true);
-    updateAgent.mutate({ id: params.id, ...data });
+    updateAgent.mutate({ id: id, ...data });
   };
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this agent? This action cannot be undone.")) {
       setIsDeleting(true);
-      deleteAgent.mutate({ id: params.id });
+      deleteAgent.mutate({ id: id });
     }
   };
 

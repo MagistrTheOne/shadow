@@ -115,8 +115,7 @@ export default function UpgradePage() {
     // Simulate payment processing
     setTimeout(() => {
       createSubscription.mutate({
-        plan: planName.toLowerCase(),
-        status: "active"
+        plan: planName.toLowerCase() as "free" | "pro" | "enterprise"
       });
     }, 2000);
   };
@@ -181,7 +180,7 @@ export default function UpgradePage() {
                     ${subscription.plan === "free" ? 0 : subscription.plan === "pro" ? 29 : 99}/month
                   </p>
                   <p className="text-gray-400 text-sm">
-                    Next billing: {new Date(subscription.nextBillingDate).toLocaleDateString()}
+                    Next billing: {subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString() : "N/A"}
                   </p>
                 </div>
               </div>
