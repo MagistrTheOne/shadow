@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, ClockIcon, BotIcon, VideoIcon, PlusIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon, BotIcon, VideoIcon, PlusIcon, PhoneIcon, MessageSquareIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { LoadingState } from "@/components/loading-state";
@@ -49,19 +49,55 @@ const DashboardContent = () => {
 
   return (
     <div className={`py-6 px-4 md:px-8 flex flex-col gap-8 ${animations.pageEnter}`}>
-      {/* Welcome Section */}
-      <div className={`flex items-center justify-between ${animations.fadeInUp}`}>
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome back!</h1>
-          <p className="text-gray-400">Manage your enterprise AI-powered meetings with intelligent avatars</p>
-        </div>
-        <Button asChild className={`bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 ${animations.buttonHover}`}>
-          <Link href="/meetings/new">
-            <PlusIcon className="w-4 h-4 mr-2" />
-            New Meeting
-          </Link>
-        </Button>
-       </div>
+             {/* Welcome Section */}
+             <div className={`flex items-center justify-between ${animations.fadeInUp}`}>
+               <div>
+                 <h1 className="text-3xl font-bold text-white mb-2">Welcome back!</h1>
+                 <p className="text-gray-400">Manage your enterprise AI-powered meetings with intelligent avatars</p>
+               </div>
+               <div className="flex gap-3">
+                 <Button asChild className={`bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 ${animations.buttonHover}`}>
+                   <Link href="/meetings/new">
+                     <PlusIcon className="w-4 h-4 mr-2" />
+                     New Meeting
+                   </Link>
+                 </Button>
+               </div>
+              </div>
+
+             {/* Quick Actions */}
+             <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.fadeInUp} ${animations.stagger2}`}>
+               <CardHeader>
+                 <CardTitle className="text-white flex items-center gap-2">
+                   <UsersIcon className="w-5 h-5 text-blue-400" />
+                   Quick Actions
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <div className="grid gap-4 md:grid-cols-3">
+                   <Button asChild className={`bg-green-600 hover:bg-green-700 text-white h-20 flex-col gap-2 ${animations.buttonHover}`}>
+                     <Link href="/dashboard/sessions/new?type=call">
+                       <PhoneIcon className="w-6 h-6" />
+                       <span>Start Video Call</span>
+                     </Link>
+                   </Button>
+                   
+                   <Button asChild className={`bg-purple-600 hover:bg-purple-700 text-white h-20 flex-col gap-2 ${animations.buttonHover}`}>
+                     <Link href="/dashboard/sessions/new?type=chat">
+                       <MessageSquareIcon className="w-6 h-6" />
+                       <span>Start Chat</span>
+                     </Link>
+                   </Button>
+                   
+                   <Button asChild className={`bg-blue-600 hover:bg-blue-700 text-white h-20 flex-col gap-2 ${animations.buttonHover}`}>
+                     <Link href="/dashboard/sessions/join">
+                       <UsersIcon className="w-6 h-6" />
+                       <span>Join by Code</span>
+                     </Link>
+                   </Button>
+                 </div>
+               </CardContent>
+             </Card>
 
       {/* Quick Stats */}
       <div className={`grid gap-6 md:grid-cols-3 ${animations.fadeInUp} ${animations.stagger2}`}>

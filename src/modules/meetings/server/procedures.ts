@@ -1,13 +1,13 @@
 import { db } from "@/db";
-import { meetings, meetingParticipants, agents } from "@/db/schema";
+import { meetings, meetingParticipants, sessions, meetingSessions } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { z } from "zod";
+import { generateSessionCode } from "@/lib/session-code";
 
 const meetingCreateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
   duration: z.number().optional(),
   isRecurring: z.boolean().optional(),
@@ -18,7 +18,6 @@ const meetingUpdateSchema = z.object({
   id: z.string(),
   title: z.string().min(1).optional(),
   description: z.string().optional(),
-  agentId: z.string().optional(),
   scheduledAt: z.date().optional(),
   duration: z.number().optional(),
   isRecurring: z.boolean().optional(),
@@ -45,6 +44,44 @@ export const meetingsRouter = createTRPCRouter({
           userId: ctx.auth.user.id,
         })
         .returning();
+
+      // Create a session for the meeting
+      let sessionCode: string;
+      let attempts = 0;
+      do {
+        sessionCode = generateSessionCode();
+        attempts++;
+        
+        // Check if code already exists
+        const existing = await db
+          .select()
+          .from(sessions)
+          .where(eq(sessions.code, sessionCode))
+          .limit(1);
+        
+        if (existing.length === 0) break;
+        
+        if (attempts > 10) {
+          throw new Error("Failed to generate unique session code");
+        }
+      } while (true);
+
+      const [session] = await db
+        .insert(sessions)
+        .values({
+          code: sessionCode,
+          type: "meeting",
+          hostUserId: ctx.auth.user.id,
+        })
+        .returning();
+
+      // Link meeting to session
+      await db
+        .insert(meetingSessions)
+        .values({
+          meetingId: createdMeeting.id,
+          sessionId: session.id,
+        });
 
       return createdMeeting;
     }),
@@ -137,7 +174,6 @@ export const meetingsRouter = createTRPCRouter({
         .values({
           title: `${originalMeeting.title} (Copy)`,
           description: originalMeeting.description,
-          agentId: originalMeeting.agentId,
           userId: ctx.auth.user.id,
           scheduledAt: null, // Сбрасываем время для новой встречи
           status: "scheduled",

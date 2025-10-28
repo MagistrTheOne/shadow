@@ -388,3 +388,112 @@ export const usageMetrics = pgTable(
     metricsDateIdx: index("metrics_date_idx").on(t.date),
   })
 );
+
+/** SESSIONS - Zoom-like session management */
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    code: text("code").notNull().unique(), // 9-11 char join code
+    type: text("type", { enum: ["chat", "call", "meeting"] }).notNull(),
+    hostUserId: text("host_user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: text("status", { enum: ["active", "ended", "expired"] })
+      .notNull()
+      .default("active"),
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    sessionsCodeIdx: index("sessions_code_idx").on(t.code),
+    sessionsHostIdx: index("sessions_host_user_id_idx").on(t.hostUserId),
+    sessionsStatusIdx: index("sessions_status_idx").on(t.status),
+    sessionsTypeIdx: index("sessions_type_idx").on(t.type),
+  })
+);
+
+/** SESSION PARTICIPANTS - Users and agents in sessions */
+export const sessionParticipants = pgTable(
+  "session_participants",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .references(() => user.id, { onDelete: "cascade" }),
+    agentId: text("agent_id")
+      .references(() => agent.id, { onDelete: "cascade" }),
+    role: text("role", { enum: ["host", "cohost", "participant"] })
+      .notNull()
+      .default("participant"),
+    joinedAt: timestamp("joined_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+    leftAt: timestamp("left_at", { withTimezone: true, mode: "date" }),
+    isActive: boolean("is_active").default(true).notNull(),
+  },
+  (t) => ({
+    sessionParticipantsSessionIdx: index("session_participants_session_id_idx").on(t.sessionId),
+    sessionParticipantsUserIdx: index("session_participants_user_id_idx").on(t.userId),
+    sessionParticipantsAgentIdx: index("session_participants_agent_id_idx").on(t.agentId),
+    sessionParticipantsActiveIdx: index("session_participants_active_idx").on(t.isActive),
+    sessionParticipantsUnique: uniqueIndex("session_participants_unique").on(t.sessionId, t.userId, t.agentId),
+  })
+);
+
+/** SESSION MESSAGES - Chat messages in sessions */
+export const sessionMessages = pgTable(
+  "session_messages",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    senderUserId: text("sender_user_id")
+      .references(() => user.id, { onDelete: "cascade" }),
+    senderAgentId: text("sender_agent_id")
+      .references(() => agent.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    type: text("type", { enum: ["text", "system"] })
+      .notNull()
+      .default("text"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    sessionMessagesSessionIdx: index("session_messages_session_id_idx").on(t.sessionId),
+    sessionMessagesSenderUserIdx: index("session_messages_sender_user_id_idx").on(t.senderUserId),
+    sessionMessagesSenderAgentIdx: index("session_messages_sender_agent_id_idx").on(t.senderAgentId),
+    sessionMessagesCreatedAtIdx: index("session_messages_created_at_idx").on(t.createdAt),
+  })
+);
+
+/** MEETING SESSIONS - Link meetings to sessions */
+export const meetingSessions = pgTable(
+  "meeting_sessions",
+  {
+    id: text("id").primaryKey().$defaultFn(() => nanoid()),
+    meetingId: text("meeting_id")
+      .notNull()
+      .references(() => meetings.id, { onDelete: "cascade" }),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    meetingSessionsMeetingIdx: index("meeting_sessions_meeting_id_idx").on(t.meetingId),
+    meetingSessionsSessionIdx: index("meeting_sessions_session_id_idx").on(t.sessionId),
+    meetingSessionsUnique: uniqueIndex("meeting_sessions_unique").on(t.meetingId, t.sessionId),
+  })
+);

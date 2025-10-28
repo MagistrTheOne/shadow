@@ -102,7 +102,8 @@ export default async function EditMeetingPage({ params }: EditMeetingPageProps) 
       reset({
         title: meeting.title,
         description: meeting.description || "",
-        agentId: meeting.agentId || "",
+        // meeting no longer has agentId; leave empty by default
+        agentId: "",
         duration: meeting.duration || 60,
         isRecurring: false,
         recurringType: undefined,
