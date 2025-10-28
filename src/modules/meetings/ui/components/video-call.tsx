@@ -18,6 +18,12 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { MeetingChat, MeetingParticipants } from "./meeting-chat";
 import { AIAvatarController } from "./ai-avatar-controller";
+import { VoiceAgent } from "./voice-agent";
+import { BackgroundEffects } from "./background-effects";
+import { AudioTranscription } from "./audio-transcription";
+import { VisionAI } from "./vision-ai";
+import { ScreenSharing } from "./screen-sharing";
+import { ParticipantManagement } from "./participant-management";
 import { trpc } from "@/trpc/client";
 
 interface VideoCallProps {
@@ -71,6 +77,12 @@ const CallUI = ({ callId }: { callId: string }) => {
   const [showChat, setShowChat] = useState(false);
   const [aiAvatarVisible, setAiAvatarVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [voiceAgentEnabled, setVoiceAgentEnabled] = useState(false);
+  const [backgroundEffectsEnabled, setBackgroundEffectsEnabled] = useState(false);
+  const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
+  const [visionAIEnabled, setVisionAIEnabled] = useState(false);
+  const [screenSharingEnabled, setScreenSharingEnabled] = useState(false);
+  const [participantManagementEnabled, setParticipantManagementEnabled] = useState(false);
 
   // Получаем данные митинга
   const { data: meeting } = trpc.meetings.getById.useQuery({ id: callId });
@@ -131,10 +143,65 @@ const CallUI = ({ callId }: { callId: string }) => {
             </button>
 
             <button
+              onClick={() => setVoiceAgentEnabled(!voiceAgentEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                voiceAgentEnabled
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {voiceAgentEnabled ? 'Disable Voice Agent' : 'Enable Voice Agent'}
+            </button>
+
+            <button
+              onClick={() => setBackgroundEffectsEnabled(!backgroundEffectsEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                backgroundEffectsEnabled
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {backgroundEffectsEnabled ? 'Disable Effects' : 'Enable Effects'}
+            </button>
+
+            <button
+              onClick={() => setVisionAIEnabled(!visionAIEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                visionAIEnabled
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {visionAIEnabled ? 'Disable Vision AI' : 'Enable Vision AI'}
+            </button>
+
+            <button
+              onClick={() => setScreenSharingEnabled(!screenSharingEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                screenSharingEnabled
+                  ? 'bg-cyan-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {screenSharingEnabled ? 'Disable Screen Share' : 'Enable Screen Share'}
+            </button>
+
+            <button
+              onClick={() => setParticipantManagementEnabled(!participantManagementEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                participantManagementEnabled
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {participantManagementEnabled ? 'Disable Participants' : 'Enable Participants'}
+            </button>
+
+            <button
               onClick={() => setAiAvatarVisible(!aiAvatarVisible)}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 aiAvatarVisible
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-orange-600 text-white'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
@@ -145,7 +212,7 @@ const CallUI = ({ callId }: { callId: string }) => {
               onClick={() => setShowChat(!showChat)}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 showChat
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-cyan-600 text-white'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
@@ -178,6 +245,44 @@ const CallUI = ({ callId }: { callId: string }) => {
         isVisible={aiAvatarVisible}
         onToggle={() => setAiAvatarVisible(!aiAvatarVisible)}
         agentId={meeting?.agentId || undefined}
+      />
+
+      {/* Voice Agent */}
+      <VoiceAgent
+        callId={callId}
+        callType="default"
+        isEnabled={voiceAgentEnabled}
+        onToggle={() => setVoiceAgentEnabled(!voiceAgentEnabled)}
+      />
+
+      {/* Background Effects */}
+      <BackgroundEffects
+        isEnabled={backgroundEffectsEnabled}
+        onToggle={() => setBackgroundEffectsEnabled(!backgroundEffectsEnabled)}
+      />
+
+      {/* Audio Transcription */}
+      <AudioTranscription
+        isEnabled={transcriptionEnabled}
+        onToggle={() => setTranscriptionEnabled(!transcriptionEnabled)}
+      />
+
+      {/* Vision AI */}
+      <VisionAI
+        isEnabled={visionAIEnabled}
+        onToggle={() => setVisionAIEnabled(!visionAIEnabled)}
+      />
+
+      {/* Screen Sharing */}
+      <ScreenSharing
+        isEnabled={screenSharingEnabled}
+        onToggle={() => setScreenSharingEnabled(!screenSharingEnabled)}
+      />
+
+      {/* Participant Management */}
+      <ParticipantManagement
+        isEnabled={participantManagementEnabled}
+        onToggle={() => setParticipantManagementEnabled(!participantManagementEnabled)}
       />
     </div>
   );
