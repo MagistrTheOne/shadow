@@ -24,6 +24,10 @@ import { AudioTranscription } from "./audio-transcription";
 import { VisionAI } from "./vision-ai";
 import { ScreenSharing } from "./screen-sharing";
 import { ParticipantManagement } from "./participant-management";
+import { Livestreaming } from "./livestreaming";
+import { AdvancedPermissions } from "./advanced-permissions";
+import { CallStateObserver } from "./call-state-observer";
+import { CustomCallUI } from "./custom-call-ui";
 import { trpc } from "@/trpc/client";
 
 interface VideoCallProps {
@@ -83,6 +87,10 @@ const CallUI = ({ callId }: { callId: string }) => {
   const [visionAIEnabled, setVisionAIEnabled] = useState(false);
   const [screenSharingEnabled, setScreenSharingEnabled] = useState(false);
   const [participantManagementEnabled, setParticipantManagementEnabled] = useState(false);
+  const [livestreamingEnabled, setLivestreamingEnabled] = useState(false);
+  const [advancedPermissionsEnabled, setAdvancedPermissionsEnabled] = useState(false);
+  const [callStateObserverEnabled, setCallStateObserverEnabled] = useState(false);
+  const [customUIEnabled, setCustomUIEnabled] = useState(false);
 
   // Получаем данные митинга
   const { data: meeting } = trpc.meetings.getById.useQuery({ id: callId });
@@ -187,14 +195,47 @@ const CallUI = ({ callId }: { callId: string }) => {
             </button>
 
             <button
-              onClick={() => setParticipantManagementEnabled(!participantManagementEnabled)}
+              onClick={() => setLivestreamingEnabled(!livestreamingEnabled)}
               className={`px-4 py-2 rounded-lg transition-colors ${
-                participantManagementEnabled
-                  ? 'bg-emerald-600 text-white'
+                livestreamingEnabled
+                  ? 'bg-red-600 text-white'
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              {participantManagementEnabled ? 'Disable Participants' : 'Enable Participants'}
+              {livestreamingEnabled ? 'Disable Livestream' : 'Enable Livestream'}
+            </button>
+
+            <button
+              onClick={() => setAdvancedPermissionsEnabled(!advancedPermissionsEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                advancedPermissionsEnabled
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {advancedPermissionsEnabled ? 'Disable Permissions' : 'Enable Permissions'}
+            </button>
+
+            <button
+              onClick={() => setCallStateObserverEnabled(!callStateObserverEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                callStateObserverEnabled
+                  ? 'bg-teal-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {callStateObserverEnabled ? 'Disable Observer' : 'Enable Observer'}
+            </button>
+
+            <button
+              onClick={() => setCustomUIEnabled(!customUIEnabled)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                customUIEnabled
+                  ? 'bg-pink-600 text-white'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {customUIEnabled ? 'Disable Custom UI' : 'Enable Custom UI'}
             </button>
 
             <button
@@ -283,6 +324,30 @@ const CallUI = ({ callId }: { callId: string }) => {
       <ParticipantManagement
         isEnabled={participantManagementEnabled}
         onToggle={() => setParticipantManagementEnabled(!participantManagementEnabled)}
+      />
+
+      {/* Livestreaming */}
+      <Livestreaming
+        isEnabled={livestreamingEnabled}
+        onToggle={() => setLivestreamingEnabled(!livestreamingEnabled)}
+      />
+
+      {/* Advanced Permissions */}
+      <AdvancedPermissions
+        isEnabled={advancedPermissionsEnabled}
+        onToggle={() => setAdvancedPermissionsEnabled(!advancedPermissionsEnabled)}
+      />
+
+      {/* Call State Observer */}
+      <CallStateObserver
+        isEnabled={callStateObserverEnabled}
+        onToggle={() => setCallStateObserverEnabled(!callStateObserverEnabled)}
+      />
+
+      {/* Custom Call UI */}
+      <CustomCallUI
+        isEnabled={customUIEnabled}
+        onToggle={() => setCustomUIEnabled(!customUIEnabled)}
       />
     </div>
   );
