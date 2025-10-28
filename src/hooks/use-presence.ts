@@ -14,12 +14,12 @@ export function usePresence() {
     try {
       await updateStatus.mutateAsync({
         status: profile?.status || "online",
-        richPresence: profile?.richPresence,
+        richPresence: (profile as any)?.richPresence,
       });
     } catch (error) {
       console.error("Heartbeat failed:", error);
     }
-  }, [profile?.status, profile?.richPresence, updateStatus]);
+  }, [profile?.status, (profile as any)?.richPresence, updateStatus]);
 
   // Set up heartbeat interval
   useEffect(() => {
@@ -39,7 +39,7 @@ export function usePresence() {
     if (profile && profile.status === "offline") {
       updateStatus.mutate({
         status: "online",
-        richPresence: profile.richPresence,
+        richPresence: (profile as any).richPresence,
       });
     }
   }, [profile, updateStatus]);
@@ -53,7 +53,7 @@ export function usePresence() {
           "/api/trpc/users.updateStatus",
           JSON.stringify({
             status: "offline",
-            richPresence: profile.richPresence,
+            richPresence: (profile as any).richPresence,
           })
         );
       }
@@ -82,6 +82,6 @@ export function usePresence() {
   return {
     updateRichPresence,
     currentStatus: profile?.status,
-    currentRichPresence: profile?.richPresence,
+    currentRichPresence: (profile as any)?.richPresence,
   };
 }

@@ -134,21 +134,21 @@ export default function FriendsPage() {
   };
 
   // Filter friends based on search query
-  const filteredFriends = friends?.filter(friend => 
+  const filteredFriends = friends?.filter((friend: any) => 
     friend.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     friend.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     friend.displayName?.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
   // Filter pending requests based on search query
-  const filteredPending = pendingRequests?.filter(request => 
+  const filteredPending = pendingRequests?.filter((request: any) => 
     request.sender.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     request.sender.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     request.sender.displayName?.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
   // Filter blocked users based on search query
-  const filteredBlocked = blockedUsers?.filter(blocked => 
+  const filteredBlocked = blockedUsers?.filter((blocked: any) => 
     blocked.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     blocked.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     blocked.displayName?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -224,7 +224,7 @@ export default function FriendsPage() {
           <TabsContent value="all" className="space-y-4">
             {filteredFriends.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredFriends.map((friend, index) => (
+                {filteredFriends.map((friend: any, index: number) => (
                   <Card key={friend.id} className={`bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-all duration-200 ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
@@ -261,7 +261,7 @@ export default function FriendsPage() {
                           </div>
                           {friend.badges && friend.badges.length > 0 && (
                             <div className="flex gap-1 mt-2">
-                              {friend.badges.slice(0, 2).map((badge, badgeIndex) => (
+                              {friend.badges.slice(0, 2).map((badge: any, badgeIndex: number) => (
                                 <Badge
                                   key={badgeIndex}
                                   variant="outline"
@@ -325,7 +325,7 @@ export default function FriendsPage() {
           <TabsContent value="pending" className="space-y-4">
             {filteredPending.length > 0 ? (
               <div className="space-y-4">
-                {filteredPending.map((request, index) => (
+                {filteredPending.map((request: any, index: number) => (
                   <Card key={request.id} className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4">
@@ -397,7 +397,7 @@ export default function FriendsPage() {
           <TabsContent value="blocked" className="space-y-4">
             {filteredBlocked.length > 0 ? (
               <div className="space-y-4">
-                {filteredBlocked.map((blocked, index) => (
+                {filteredBlocked.map((blocked: any, index: number) => (
                   <Card key={blocked.id} className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4">

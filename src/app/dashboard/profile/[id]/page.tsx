@@ -86,8 +86,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const isOwnProfile = currentUser?.id === id;
   
   // Check friendship status
-  const friendship = friends?.find(f => f.id === id);
-  const pendingRequest = pendingRequests?.find(r => r.senderId === id);
+  const friendship = friends?.find((f: any) => f.id === id);
+  const pendingRequest = pendingRequests?.find((r: any) => r.senderId === id);
 
   const sendFriendRequest = trpc.friends.sendRequest.useMutation({
     onSuccess: () => {
@@ -251,7 +251,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <div>
                     <h4 className="text-white font-medium mb-2">Badges</h4>
                     <div className="flex flex-wrap gap-2">
-                      {profile.badges.map((badge, index) => (
+                      {profile.badges.map((badge: any, index: number) => (
                         <Badge
                           key={index}
                           variant="outline"
@@ -366,20 +366,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </Card>
 
             {/* Rich Presence */}
-            {profile.richPresence && (
+            {(profile as any).richPresence && (
               <Card className={`bg-white/5 backdrop-blur-sm border-white/10 ${animations.fadeInUp} ${animations.stagger5}`}>
                 <CardHeader>
                   <CardTitle className="text-white text-lg">Currently</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-gray-300 text-sm">
-                    {profile.richPresence.type === "meeting" && (
+                    {(profile as any).richPresence?.type === "meeting" && (
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                         <span>In a meeting</span>
                       </div>
                     )}
-                    {profile.richPresence.type === "call" && (
+                    {(profile as any).richPresence?.type === "call" && (
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         <span>In a call</span>

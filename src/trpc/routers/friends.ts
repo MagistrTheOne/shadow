@@ -3,13 +3,14 @@ import { TRPCError } from "@trpc/server";
 import { eq, and, or, desc } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { user, friendships, notifications } from "@/db/schema";
+import { db } from "@/db";
 
 export const friendsRouter = createTRPCRouter({
   // Send friend request
   sendRequest: protectedProcedure
     .input(z.object({ receiverId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (input.receiverId === ctx.userId) {
+      if (input.receiverId === ctx.auth.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Cannot send friend request to yourself",
@@ -17,7 +18,7 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Check if user exists
-      const receiver = await ctx.db
+      const receiver = await db
         .select({ id: user.id, name: user.name })
         .from(user)
         .where(eq(user.id, input.receiverId))
@@ -31,13 +32,13 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Check if friendship already exists
-      const existingFriendship = await ctx.db
+      const existingFriendship = await db
         .select({ id: friendships.id, status: friendships.status })
         .from(friendships)
         .where(
           or(
-            and(eq(friendships.senderId, ctx.userId), eq(friendships.receiverId, input.receiverId)),
-            and(eq(friendships.senderId, input.receiverId), eq(friendships.receiverId, ctx.userId))
+            and(eq(friendships.senderId, ctx.auth.user.id), eq(friendships.receiverId, input.receiverId)),
+            and(eq(friendships.senderId, input.receiverId), eq(friendships.receiverId, ctx.auth.user.id))
           )
         )
         .limit(1);
@@ -63,20 +64,20 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Create friendship
-      const newFriendship = await ctx.db
+      const newFriendship = await db
         .insert(friendships)
         .values({
-          senderId: ctx.userId,
+          senderId: ctx.auth.user.id,
           receiverId: input.receiverId,
           status: "pending",
         })
         .returning();
 
       // Create notification
-      await ctx.db.insert(notifications).values({
+      await db.insert(notifications).values({
         userId: input.receiverId,
         type: "friend_request",
-        fromUserId: ctx.userId,
+        fromUserId: ctx.auth.user.id,
         metadata: { friendshipId: newFriendship[0].id },
       });
 
@@ -87,13 +88,13 @@ export const friendsRouter = createTRPCRouter({
   acceptRequest: protectedProcedure
     .input(z.object({ friendshipId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const friendship = await ctx.db
+      const friendship = await db
         .select()
         .from(friendships)
         .where(
           and(
             eq(friendships.id, input.friendshipId),
-            eq(friendships.receiverId, ctx.userId),
+            eq(friendships.receiverId, ctx.auth.user.id),
             eq(friendships.status, "pending")
           )
         )
@@ -107,7 +108,7 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Update friendship status
-      const updatedFriendship = await ctx.db
+      const updatedFriendship = await db
         .update(friendships)
         .set({
           status: "accepted",
@@ -117,10 +118,10 @@ export const friendsRouter = createTRPCRouter({
         .returning();
 
       // Create notification for sender
-      await ctx.db.insert(notifications).values({
+      await db.insert(notifications).values({
         userId: friendship[0].senderId,
         type: "friend_accepted",
-        fromUserId: ctx.userId,
+        fromUserId: ctx.auth.user.id,
         metadata: { friendshipId: input.friendshipId },
       });
 
@@ -131,13 +132,13 @@ export const friendsRouter = createTRPCRouter({
   rejectRequest: protectedProcedure
     .input(z.object({ friendshipId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const friendship = await ctx.db
+      const friendship = await db
         .select()
         .from(friendships)
         .where(
           and(
             eq(friendships.id, input.friendshipId),
-            eq(friendships.receiverId, ctx.userId),
+            eq(friendships.receiverId, ctx.auth.user.id),
             eq(friendships.status, "pending")
           )
         )
@@ -151,7 +152,7 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Update friendship status
-      const updatedFriendship = await ctx.db
+      const updatedFriendship = await db
         .update(friendships)
         .set({
           status: "rejected",
@@ -167,15 +168,15 @@ export const friendsRouter = createTRPCRouter({
   removeFriend: protectedProcedure
     .input(z.object({ friendshipId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const friendship = await ctx.db
+      const friendship = await db
         .select()
         .from(friendships)
         .where(
           and(
             eq(friendships.id, input.friendshipId),
             or(
-              eq(friendships.senderId, ctx.userId),
-              eq(friendships.receiverId, ctx.userId)
+              eq(friendships.senderId, ctx.auth.user.id),
+              eq(friendships.receiverId, ctx.auth.user.id)
             ),
             eq(friendships.status, "accepted")
           )
@@ -190,17 +191,17 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Delete friendship
-      await ctx.db.delete(friendships).where(eq(friendships.id, input.friendshipId));
+      await db.delete(friendships).where(eq(friendships.id, input.friendshipId));
 
       // Create notification for the other user
-      const otherUserId = friendship[0].senderId === ctx.userId 
+      const otherUserId = friendship[0].senderId === ctx.auth.user.id 
         ? friendship[0].receiverId 
         : friendship[0].senderId;
 
-      await ctx.db.insert(notifications).values({
+      await db.insert(notifications).values({
         userId: otherUserId,
         type: "friend_removed",
-        fromUserId: ctx.userId,
+        fromUserId: ctx.auth.user.id,
         metadata: { friendshipId: input.friendshipId },
       });
 
@@ -211,7 +212,7 @@ export const friendsRouter = createTRPCRouter({
   blockUser: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (input.userId === ctx.userId) {
+      if (input.userId === ctx.auth.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Cannot block yourself",
@@ -219,7 +220,7 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Check if user exists
-      const targetUser = await ctx.db
+      const targetUser = await db
         .select({ id: user.id })
         .from(user)
         .where(eq(user.id, input.userId))
@@ -233,20 +234,20 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Check if friendship exists
-      const existingFriendship = await ctx.db
+      const existingFriendship = await db
         .select({ id: friendships.id, status: friendships.status })
         .from(friendships)
         .where(
           or(
-            and(eq(friendships.senderId, ctx.userId), eq(friendships.receiverId, input.userId)),
-            and(eq(friendships.senderId, input.userId), eq(friendships.receiverId, ctx.userId))
+            and(eq(friendships.senderId, ctx.auth.user.id), eq(friendships.receiverId, input.userId)),
+            and(eq(friendships.senderId, input.userId), eq(friendships.receiverId, ctx.auth.user.id))
           )
         )
         .limit(1);
 
       if (existingFriendship[0]) {
         // Update existing friendship to blocked
-        await ctx.db
+        await db
           .update(friendships)
           .set({
             status: "blocked",
@@ -255,18 +256,18 @@ export const friendsRouter = createTRPCRouter({
           .where(eq(friendships.id, existingFriendship[0].id));
       } else {
         // Create new blocked friendship
-        await ctx.db.insert(friendships).values({
-          senderId: ctx.userId,
+        await db.insert(friendships).values({
+          senderId: ctx.auth.user.id,
           receiverId: input.userId,
           status: "blocked",
         });
       }
 
       // Create notification for blocked user
-      await ctx.db.insert(notifications).values({
+      await db.insert(notifications).values({
         userId: input.userId,
         type: "blocked_by_other",
-        fromUserId: ctx.userId,
+        fromUserId: ctx.auth.user.id,
       });
 
       return { success: true };
@@ -276,12 +277,12 @@ export const friendsRouter = createTRPCRouter({
   unblockUser: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const friendship = await ctx.db
+      const friendship = await db
         .select()
         .from(friendships)
         .where(
           and(
-            eq(friendships.senderId, ctx.userId),
+            eq(friendships.senderId, ctx.auth.user.id),
             eq(friendships.receiverId, input.userId),
             eq(friendships.status, "blocked")
           )
@@ -296,13 +297,13 @@ export const friendsRouter = createTRPCRouter({
       }
 
       // Delete the blocked relationship
-      await ctx.db.delete(friendships).where(eq(friendships.id, friendship[0].id));
+      await db.delete(friendships).where(eq(friendships.id, friendship[0].id));
 
       // Create notification for unblocked user
-      await ctx.db.insert(notifications).values({
+      await db.insert(notifications).values({
         userId: input.userId,
         type: "unblocked_by_other",
-        fromUserId: ctx.userId,
+        fromUserId: ctx.auth.user.id,
       });
 
       return { success: true };
@@ -310,7 +311,7 @@ export const friendsRouter = createTRPCRouter({
 
   // Get friends list
   getFriends: protectedProcedure.query(async ({ ctx }) => {
-    const friends = await ctx.db
+    const friends = await db
       .select({
         id: user.id,
         name: user.name,
@@ -327,15 +328,15 @@ export const friendsRouter = createTRPCRouter({
       .innerJoin(
         user,
         or(
-          and(eq(friendships.senderId, ctx.userId), eq(user.id, friendships.receiverId)),
-          and(eq(friendships.receiverId, ctx.userId), eq(user.id, friendships.senderId))
+          and(eq(friendships.senderId, ctx.auth.user.id), eq(user.id, friendships.receiverId)),
+          and(eq(friendships.receiverId, ctx.auth.user.id), eq(user.id, friendships.senderId))
         )
       )
       .where(
         and(
           or(
-            eq(friendships.senderId, ctx.userId),
-            eq(friendships.receiverId, ctx.userId)
+            eq(friendships.senderId, ctx.auth.user.id),
+            eq(friendships.receiverId, ctx.auth.user.id)
           ),
           eq(friendships.status, "accepted")
         )
@@ -347,7 +348,7 @@ export const friendsRouter = createTRPCRouter({
 
   // Get pending friend requests
   getPendingRequests: protectedProcedure.query(async ({ ctx }) => {
-    const pendingRequests = await ctx.db
+    const pendingRequests = await db
       .select({
         id: friendships.id,
         senderId: friendships.senderId,
@@ -366,7 +367,7 @@ export const friendsRouter = createTRPCRouter({
       .innerJoin(user, eq(friendships.senderId, user.id))
       .where(
         and(
-          eq(friendships.receiverId, ctx.userId),
+          eq(friendships.receiverId, ctx.auth.user.id),
           eq(friendships.status, "pending")
         )
       )
@@ -377,7 +378,7 @@ export const friendsRouter = createTRPCRouter({
 
   // Get blocked users
   getBlocked: protectedProcedure.query(async ({ ctx }) => {
-    const blockedUsers = await ctx.db
+    const blockedUsers = await db
       .select({
         id: user.id,
         name: user.name,
@@ -391,7 +392,7 @@ export const friendsRouter = createTRPCRouter({
       .innerJoin(user, eq(friendships.receiverId, user.id))
       .where(
         and(
-          eq(friendships.senderId, ctx.userId),
+          eq(friendships.senderId, ctx.auth.user.id),
           eq(friendships.status, "blocked")
         )
       )

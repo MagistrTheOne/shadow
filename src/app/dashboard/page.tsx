@@ -155,7 +155,7 @@ const DashboardContent = () => {
                    <div className="flex items-center justify-between">
                      <CardTitle className="text-white flex items-center gap-2">
                        <UsersIcon className="w-5 h-5 text-green-400" />
-                       Online Friends ({friends.filter(f => f.status === "online").length})
+                        Online Friends ({friends.filter((f: any) => f.status === "online").length})
                      </CardTitle>
                      <Button asChild variant="ghost" size="sm" className="text-gray-400 hover:text-white">
                        <Link href="/dashboard/friends">View All</Link>
@@ -164,10 +164,10 @@ const DashboardContent = () => {
                  </CardHeader>
                  <CardContent>
                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                     {friends
-                       .filter(friend => friend.status === "online")
-                       .slice(0, 6)
-                       .map((friend, index) => (
+                      {friends
+                        .filter((friend: any) => friend.status === "online")
+                        .slice(0, 6)
+                        .map((friend: any, index: number) => (
                          <div key={friend.id} className={`flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-all duration-200 ${animations.listItem} ${animations[`stagger${index + 1}` as keyof typeof animations]}`}>
                            <div className="relative">
                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
@@ -212,7 +212,7 @@ const DashboardContent = () => {
                          </div>
                        ))}
                    </div>
-                   {friends.filter(f => f.status === "online").length === 0 && (
+                    {friends.filter((f: any) => f.status === "online").length === 0 && (
                      <div className="text-center py-6">
                        <UsersIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                        <p className="text-gray-400 text-sm">No friends online</p>

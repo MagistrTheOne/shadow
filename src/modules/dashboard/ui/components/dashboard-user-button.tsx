@@ -63,7 +63,7 @@ export const DashboardUserButton = () => {
     const handleStatusChange = (status: string) => {
         updateStatus.mutate({
             status: status as any,
-            richPresence: profile?.richPresence,
+            richPresence: (profile as any)?.richPresence,
         });
     };
 

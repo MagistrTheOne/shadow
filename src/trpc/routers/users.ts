@@ -3,13 +3,14 @@ import { TRPCError } from "@trpc/server";
 import { eq, and, or, ilike, desc } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { user, friendships } from "@/db/schema";
+import { db } from "@/db";
 
 export const usersRouter = createTRPCRouter({
   // Get user profile by ID
   getProfile: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const profile = await ctx.db
+      const profile = await db
         .select({
           id: user.id,
           name: user.name,
@@ -54,13 +55,13 @@ export const usersRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Check if username is unique (if provided)
       if (input.username) {
-        const existingUser = await ctx.db
+        const existingUser = await db
           .select({ id: user.id })
           .from(user)
-          .where(and(eq(user.username, input.username), eq(user.id, ctx.userId)))
+          .where(and(eq(user.username, input.username), eq(user.id, ctx.auth.user.id)))
           .limit(1);
 
-        if (existingUser[0] && existingUser[0].id !== ctx.userId) {
+        if (existingUser[0] && existingUser[0].id !== ctx.auth.user.id) {
           throw new TRPCError({
             code: "CONFLICT",
             message: "Username already taken",
@@ -68,13 +69,13 @@ export const usersRouter = createTRPCRouter({
         }
       }
 
-      const updatedUser = await ctx.db
+      const updatedUser = await db
         .update(user)
         .set({
           ...input,
           updatedAt: new Date(),
         })
-        .where(eq(user.id, ctx.userId))
+        .where(eq(user.id, ctx.auth.user.id))
         .returning({
           id: user.id,
           username: user.username,
@@ -93,11 +94,11 @@ export const usersRouter = createTRPCRouter({
     .input(
       z.object({
         status: z.enum(["online", "dnd", "away", "offline", "invisible"]),
-        richPresence: z.record(z.any()).optional(),
+        richPresence: z.any().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const updatedUser = await ctx.db
+      const updatedUser = await db
         .update(user)
         .set({
           status: input.status,
@@ -105,7 +106,7 @@ export const usersRouter = createTRPCRouter({
           lastSeenAt: new Date(),
           updatedAt: new Date(),
         })
-        .where(eq(user.id, ctx.userId))
+        .where(eq(user.id, ctx.auth.user.id))
         .returning({
           id: user.id,
           status: user.status,
@@ -127,7 +128,7 @@ export const usersRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const searchTerm = `%${input.query}%`;
 
-      const users = await ctx.db
+      const users = await db
         .select({
           id: user.id,
           name: user.name,
@@ -143,7 +144,7 @@ export const usersRouter = createTRPCRouter({
         .where(
           and(
             // Exclude current user
-            eq(user.id, ctx.userId),
+            eq(user.id, ctx.auth.user.id),
             // Search by username, email, displayName, or exact ID match
             or(
               ilike(user.username, searchTerm),
@@ -161,7 +162,7 @@ export const usersRouter = createTRPCRouter({
 
   // Get current user's profile
   getCurrentProfile: protectedProcedure.query(async ({ ctx }) => {
-    const profile = await ctx.db
+    const profile = await db
       .select({
         id: user.id,
         name: user.name,
@@ -178,7 +179,7 @@ export const usersRouter = createTRPCRouter({
         createdAt: user.createdAt,
       })
       .from(user)
-      .where(eq(user.id, ctx.userId))
+      .where(eq(user.id, ctx.auth.user.id))
       .limit(1);
 
     return profile[0];
@@ -188,14 +189,14 @@ export const usersRouter = createTRPCRouter({
   checkUsername: protectedProcedure
     .input(z.object({ username: z.string().min(3).max(20) }))
     .query(async ({ ctx, input }) => {
-      const existingUser = await ctx.db
+      const existingUser = await db
         .select({ id: user.id })
         .from(user)
         .where(eq(user.username, input.username))
         .limit(1);
 
       return {
-        available: !existingUser[0] || existingUser[0].id === ctx.userId,
+        available: !existingUser[0] || existingUser[0].id === ctx.auth.user.id,
       };
     }),
 });

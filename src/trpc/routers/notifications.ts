@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { eq, and, desc, count } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { notifications, user } from "@/db/schema";
+import { db } from "@/db";
 
 export const notificationsRouter = createTRPCRouter({
   // Get unread notifications
@@ -14,7 +15,7 @@ export const notificationsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const notificationsList = await ctx.db
+      const notificationsList = await db
         .select({
           id: notifications.id,
           type: notifications.type,
@@ -32,15 +33,15 @@ export const notificationsRouter = createTRPCRouter({
         })
         .from(notifications)
         .leftJoin(user, eq(notifications.fromUserId, user.id))
-        .where(eq(notifications.userId, ctx.userId))
+        .where(eq(notifications.userId, ctx.auth.user.id))
         .orderBy(desc(notifications.createdAt))
         .limit(input.limit)
         .offset(input.offset);
 
-      const totalCount = await ctx.db
+      const totalCount = await db
         .select({ count: count() })
         .from(notifications)
-        .where(eq(notifications.userId, ctx.userId));
+        .where(eq(notifications.userId, ctx.auth.user.id));
 
       return {
         notifications: notificationsList,
@@ -52,13 +53,13 @@ export const notificationsRouter = createTRPCRouter({
   markAsRead: protectedProcedure
     .input(z.object({ notificationId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const notification = await ctx.db
+      const notification = await db
         .select()
         .from(notifications)
         .where(
           and(
             eq(notifications.id, input.notificationId),
-            eq(notifications.userId, ctx.userId)
+            eq(notifications.userId, ctx.auth.user.id)
           )
         )
         .limit(1);
@@ -70,7 +71,7 @@ export const notificationsRouter = createTRPCRouter({
         });
       }
 
-      const updatedNotification = await ctx.db
+      const updatedNotification = await db
         .update(notifications)
         .set({ isRead: true })
         .where(eq(notifications.id, input.notificationId))
@@ -81,12 +82,12 @@ export const notificationsRouter = createTRPCRouter({
 
   // Mark all notifications as read
   markAllAsRead: protectedProcedure.mutation(async ({ ctx }) => {
-    await ctx.db
+    await db
       .update(notifications)
       .set({ isRead: true })
       .where(
         and(
-          eq(notifications.userId, ctx.userId),
+          eq(notifications.userId, ctx.auth.user.id),
           eq(notifications.isRead, false)
         )
       );
@@ -96,12 +97,12 @@ export const notificationsRouter = createTRPCRouter({
 
   // Get unread count
   getUnreadCount: protectedProcedure.query(async ({ ctx }) => {
-    const result = await ctx.db
+    const result = await db
       .select({ count: count() })
       .from(notifications)
       .where(
         and(
-          eq(notifications.userId, ctx.userId),
+          eq(notifications.userId, ctx.auth.user.id),
           eq(notifications.isRead, false)
         )
       );
@@ -113,13 +114,13 @@ export const notificationsRouter = createTRPCRouter({
   deleteNotification: protectedProcedure
     .input(z.object({ notificationId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const notification = await ctx.db
+      const notification = await db
         .select()
         .from(notifications)
         .where(
           and(
             eq(notifications.id, input.notificationId),
-            eq(notifications.userId, ctx.userId)
+            eq(notifications.userId, ctx.auth.user.id)
           )
         )
         .limit(1);
@@ -131,16 +132,16 @@ export const notificationsRouter = createTRPCRouter({
         });
       }
 
-      await ctx.db.delete(notifications).where(eq(notifications.id, input.notificationId));
+      await db.delete(notifications).where(eq(notifications.id, input.notificationId));
 
       return { success: true };
     }),
 
   // Delete all notifications
   deleteAll: protectedProcedure.mutation(async ({ ctx }) => {
-    await ctx.db
+    await db
       .delete(notifications)
-      .where(eq(notifications.userId, ctx.userId));
+      .where(eq(notifications.userId, ctx.auth.user.id));
 
     return { success: true };
   }),

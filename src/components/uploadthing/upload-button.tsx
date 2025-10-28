@@ -26,7 +26,7 @@ export function UploadButton({
   const [isUploading, setIsUploading] = useState(false);
 
   return (
-    <UploadThingButton
+    <UploadThingButton<typeof ourFileRouter, "avatarUploader" | "bannerUploader">
       endpoint={type === "avatar" ? "avatarUploader" : "bannerUploader"}
       onClientUploadComplete={(res) => {
         if (res?.[0]?.url) {
