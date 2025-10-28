@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FaGoogle,FaGithub  } from "react-icons/fa";
  
 
@@ -33,8 +33,11 @@ import { FaGoogle,FaGithub  } from "react-icons/fa";
 export const SignUpView =() => {
 
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [error,setError] = useState<string | null>(null);
     const [pending,setPending] =useState(false);
+    
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
         const form = useForm<z.infer<typeof formSchema>>(
             {resolver:zodResolver(formSchema),
@@ -60,7 +63,7 @@ export const SignUpView =() => {
                 {
                     onSuccess: () => {
                      setPending(false);
-                     router.push("/dashboard")
+                     router.push(callbackUrl)
                     },
                     onError: ({error}) => {
                         setError(error.message);
@@ -76,12 +79,12 @@ export const SignUpView =() => {
            authClient.signIn.social(
                 {
                      provider: provider,
-                     callbackURL:"/dashboard"
+                     callbackURL: callbackUrl
                 },
                 {
                     onSuccess: () => {
                         setPending(false);
-                        router.push("/dashboard");
+                        router.push(callbackUrl);
                     },
                     onError: ({error}) => {
                         setError(error.message);

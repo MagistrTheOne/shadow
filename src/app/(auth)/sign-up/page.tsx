@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { SignUpView } from "@/modules/auth/ui/views/sign-up-view";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 const Page = async () => {
   try {
@@ -16,7 +17,11 @@ const Page = async () => {
       redirect("/dashboard");
       }
 
-    return <SignUpView />;
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignUpView />
+      </Suspense>
+    );
   } catch (error) {
     // Проверяем, является ли это редиректом
     if (error && typeof error === 'object' && 'digest' in error && 
@@ -27,7 +32,11 @@ const Page = async () => {
     
     console.error("Auth session error:", error);
     // Если есть проблемы с базой данных, все равно показываем форму регистрации
-    return <SignUpView />;
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignUpView />
+      </Suspense>
+    );
   }
 };
  

@@ -62,6 +62,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(signInUrl);
     }
 
+    // Если пользователь авторизован и идет на главную страницу
+    if (session && pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
     // Все остальные случаи - пропускаем
     return NextResponse.next();
   } catch (error) {

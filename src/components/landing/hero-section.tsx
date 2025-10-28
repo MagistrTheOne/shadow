@@ -45,7 +45,7 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
               </Link>
             </Button>
             <Button size="lg" className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4" asChild>
-              <Link href="/dashboard">
+              <Link href={session ? "/dashboard" : "/sign-in"}>
                 Go to Dashboard
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>

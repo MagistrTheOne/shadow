@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { SignInView } from "@/modules/auth/ui/views/sign-in-view";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 const Page = async () => {
   try {
@@ -15,7 +16,11 @@ const session = await auth.api.getSession({
       redirect("/dashboard");
       }
     
-    return <SignInView />;
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignInView />
+      </Suspense>
+    );
   } catch (error) {
     // Проверяем, является ли это редиректом
     if (error && typeof error === 'object' && 'digest' in error && 
@@ -26,7 +31,11 @@ const session = await auth.api.getSession({
     
     console.error("Auth session error:", error);
     // Если есть проблемы с базой данных, все равно показываем форму входа
-    return <SignInView />;
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <SignInView />
+      </Suspense>
+    );
 }
 };
  
