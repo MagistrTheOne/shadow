@@ -47,33 +47,7 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
     { id: 'gesture', name: 'Gesture Recognition', icon: AlertTriangleIcon },
   ] as const;
 
-  // Моковые данные для демонстрации
-  const mockDetections: VisionDetection[] = [
-    {
-      id: '1',
-      type: 'face',
-      confidence: 0.95,
-      position: { x: 100, y: 50, width: 80, height: 80 },
-      label: 'John Smith',
-      timestamp: new Date(Date.now() - 5000)
-    },
-    {
-      id: '2',
-      type: 'emotion',
-      confidence: 0.87,
-      position: { x: 120, y: 60, width: 40, height: 40 },
-      label: 'Happy',
-      timestamp: new Date(Date.now() - 3000)
-    },
-    {
-      id: '3',
-      type: 'object',
-      confidence: 0.92,
-      position: { x: 200, y: 100, width: 60, height: 40 },
-      label: 'Laptop',
-      timestamp: new Date(Date.now() - 1000)
-    }
-  ];
+  // Реальные детекции будут загружаться из Stream Vision AI SDK
 
   useEffect(() => {
     if (isEnabled && isActive && call) {

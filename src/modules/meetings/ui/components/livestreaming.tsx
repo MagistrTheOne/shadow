@@ -50,20 +50,29 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
   const call = useCall();
 
   useEffect(() => {
-    if (isStreaming) {
-      // Симуляция обновления статистики в реальном времени
-      const interval = setInterval(() => {
-        setStats(prev => ({
-          ...prev,
-          viewers: prev.viewers + Math.floor(Math.random() * 3) - 1,
-          duration: formatDuration(Date.now() - Date.now() + 300000), // Mock duration
-          bitrate: prev.bitrate + Math.floor(Math.random() * 100) - 50
-        }));
+    if (isStreaming && call) {
+      // Реальная интеграция с Stream Livestreaming API для статистики
+      const interval = setInterval(async () => {
+        try {
+          // Получаем реальную статистику стрима
+          const streamStats = await call.getLivestreamStats();
+          if (streamStats) {
+            setStats(prev => ({
+              ...prev,
+              viewers: streamStats.viewers || prev.viewers,
+              duration: formatDuration(streamStats.duration || 0),
+              bitrate: streamStats.bitrate || prev.bitrate,
+              fps: streamStats.fps || prev.fps
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching stream stats:', error);
+        }
       }, 2000);
 
       return () => clearInterval(interval);
     }
-  }, [isStreaming]);
+  }, [isStreaming, call]);
 
   const formatDuration = (ms: number) => {
     const seconds = Math.floor(ms / 1000);

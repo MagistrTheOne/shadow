@@ -204,19 +204,38 @@ export const InteractiveAvatar = ({ onReady, onError }: InteractiveAvatarProps) 
     setAvatarState('thinking');
     setCurrentText(`Processing: "${text}"`);
     
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
+    try {
+      // Real AI integration - replace with actual AI service call
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: text,
+          context: 'meeting_assistant'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('AI service unavailable');
+      }
+
+      const data = await response.json();
+      speakText(data.response || "I'm processing your request...");
+    } catch (error) {
+      console.error('AI service error:', error);
+      // Fallback responses
+      const fallbackResponses = [
+        "I'm having trouble processing that right now. Could you try again?",
+        "I understand you're speaking, but I need a moment to process.",
         "That's an interesting point! Let me think about that.",
-        "I understand what you're saying. Here's my perspective...",
-        "Great question! Based on my analysis, I would suggest...",
-        "I see your concern. Let me provide some insights on this topic.",
-        "Excellent observation! This reminds me of a similar situation..."
+        "I'm here to help with your meeting needs."
       ];
       
-      const response = responses[Math.floor(Math.random() * responses.length)];
+      const response = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
       speakText(response);
-    }, 1000);
+    }
   };
 
   const speakText = (text: string) => {

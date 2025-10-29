@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Volume2, VolumeX, Users, Loader2, Play } from 'lucide-react';
 
-interface DidAvatarProps {
+interface HeyGenAvatarProps {
   apiKey?: string;
   onReady?: () => void;
   onError?: (error: Error) => void;
 }
 
-export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
+export const HeyGenAvatar = ({ apiKey, onReady, onError }: HeyGenAvatarProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,7 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
     setError(null);
 
     try {
-      // Create a demo talking avatar using D-ID API
+      // Create a demo talking avatar using HeyGen API
       if (apiKey) {
         await createTalkingAvatar("Привет! Я Shadow AI, ваш интеллектуальный помощник для встреч. Как дела?");
       } else {
@@ -39,8 +39,8 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
         onReady?.();
       }
     } catch (err) {
-      console.error('D-ID initialization error:', err);
-      setError('Failed to initialize D-ID avatar');
+      console.error('HeyGen initialization error:', err);
+      setError('Failed to initialize HeyGen avatar');
       setIsLoading(false);
       onError?.(err as Error);
     }
@@ -48,62 +48,71 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
 
   const createTalkingAvatar = async (text: string) => {
     if (!apiKey) {
-      throw new Error('D-ID API key not provided');
+      throw new Error('HeyGen API key not provided');
     }
 
     try {
       setIsSpeaking(true);
       
-      // D-ID API call to create talking avatar
-      const response = await fetch('https://api.d-id.com/talks', {
+      // HeyGen API call to create talking avatar
+      const response = await fetch('https://api.heygen.com/v1/video.generate', {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${apiKey}`,
+          'X-API-KEY': apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          script: {
-            type: 'text',
-            input: text,
-            provider: {
-              type: 'microsoft',
-              voice_id: 'ru-RU-SvetlanaNeural'
+          video_inputs: [
+            {
+              character: {
+                type: "avatar",
+                avatar_id: "1652863dc2354b499db342a63feca19a", // ANNA avatar ID
+                avatar_style: "normal"
+              },
+              voice: {
+                type: "text",
+                input_text: text,
+                voice_id: "1bd001e7e50f421d891986aad5158bc3", // Russian voice
+                speed: 1.0,
+                emotion: "friendly"
+              }
             }
+          ],
+          dimension: {
+            width: 1280,
+            height: 720
           },
-          source_url: 'https://d-id-public-bucket.s3.amazonaws.com/alice.jpg', // Default avatar
-          config: {
-            fluent: true,
-            pad_audio: 0.0
-          }
+          aspect_ratio: "16:9"
         })
       });
 
       if (!response.ok) {
-        throw new Error(`D-ID API error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`HeyGen API error: ${response.status} - ${errorData.message || 'Unknown error'}`);
       }
 
       const result = await response.json();
       
       // Poll for completion
-      await pollForCompletion(result.id);
+      await pollForCompletion(result.data.video_id);
       
     } catch (err) {
-      console.error('D-ID API error:', err);
+      console.error('HeyGen API error:', err);
       setError('Failed to create talking avatar');
       setIsSpeaking(false);
       throw err;
     }
   };
 
-  const pollForCompletion = async (talkId: string) => {
-    const maxAttempts = 30; // 30 seconds max
+  const pollForCompletion = async (videoId: string) => {
+    const maxAttempts = 60; // 60 seconds max for HeyGen
     let attempts = 0;
 
     const poll = async () => {
       try {
-        const response = await fetch(`https://api.d-id.com/talks/${talkId}`, {
+        const response = await fetch(`https://api.heygen.com/v1/video_status.get?video_id=${videoId}`, {
           headers: {
-            'Authorization': `Basic ${apiKey}`,
+            'X-API-KEY': apiKey!,
           }
         });
 
@@ -113,14 +122,14 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
 
         const result = await response.json();
         
-        if (result.status === 'done') {
-          setCurrentVideoUrl(result.result_url);
+        if (result.data.status === 'completed') {
+          setCurrentVideoUrl(result.data.video_url);
           setIsSpeaking(false);
           setIsReady(true);
           onReady?.();
           return;
-        } else if (result.status === 'error') {
-          throw new Error(result.error || 'Unknown error');
+        } else if (result.data.status === 'failed') {
+          throw new Error(result.data.error_message || 'Video generation failed');
         }
 
         attempts++;
@@ -190,38 +199,41 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
 
   const handleLiveStream = async () => {
     if (!apiKey) {
-      onError?.(new Error('D-ID API key required for live streaming'));
+      onError?.(new Error('HeyGen API key required for live streaming'));
       return;
     }
 
     try {
       setIsSpeaking(true);
       
-      // Create a live stream using D-ID's new streaming API
-      const response = await fetch('https://api.d-id.com/talks/streams', {
+      // Create a live stream using HeyGen's streaming API
+      const response = await fetch('https://api.heygen.com/v1/streaming.create', {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${apiKey}`,
+          'X-API-KEY': apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          source_url: 'https://d-id-public-bucket.s3.amazonaws.com/alice.jpg',
-          config: {
-            fluent: true,
-            pad_audio: 0.0
+          avatar_name: "ANNA",
+          avatar_style: "normal",
+          quality: "high",
+          background: {
+            type: "color",
+            value: "#000000"
           }
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Stream creation error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Stream creation error: ${response.status} - ${errorData.message || 'Unknown error'}`);
       }
 
       const result = await response.json();
       console.log('Live stream created:', result);
       
       // Start WebRTC connection for real-time streaming
-      // This would require additional WebRTC setup
+      // This would require additional WebRTC setup with HeyGen's streaming endpoint
       
     } catch (err) {
       console.error('Live stream error:', err);
@@ -251,9 +263,9 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
             <div className="w-32 h-32 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-4">
               <Users className="w-16 h-16 text-white" />
             </div>
-            <p className="text-white font-semibold mb-2">Shadow AI Avatar</p>
+            <p className="text-white font-semibold mb-2">ANNA - Shadow AI Avatar</p>
             <p className="text-gray-400 text-sm mb-4">
-              {apiKey ? 'Готов к созданию говорящего аватара' : 'Режим Web Speech API'}
+              {apiKey ? 'Готов к созданию говорящего аватара ANNA' : 'Режим Web Speech API'}
             </p>
             {isSpeaking && (
               <div className="flex items-center justify-center text-purple-400">
@@ -316,7 +328,7 @@ export const DidAvatar = ({ apiKey, onReady, onError }: DidAvatarProps) => {
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 text-white z-10">
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-            <p>Initializing D-ID Avatar...</p>
+            <p>Initializing HeyGen ANNA Avatar...</p>
             {!apiKey && (
               <p className="text-sm text-gray-400 mt-2">Using Web Speech API fallback</p>
             )}

@@ -27,7 +27,7 @@ export const sessionParticipantsRouter = createTRPCRouter({
         });
       }
 
-      // Get all participants with their info
+      // Get all participants with their info and real-time status
       const participants = await db
         .select({
           id: sessionParticipants.id,
@@ -43,6 +43,8 @@ export const sessionParticipantsRouter = createTRPCRouter({
             name: user.name,
             email: user.email,
             image: user.image,
+            status: user.status,
+            customStatus: user.customStatus,
           },
           agent: {
             id: agent.id,
@@ -51,6 +53,7 @@ export const sessionParticipantsRouter = createTRPCRouter({
             avatar: agent.avatar,
             provider: agent.provider,
             model: agent.model,
+            isActive: agent.isActive,
           },
         })
         .from(sessionParticipants)
