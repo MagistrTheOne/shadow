@@ -22,6 +22,8 @@ const agentSchema = z.object({
   description: z.string().max(200, "Description must be less than 200 characters").optional(),
   voice: z.enum(["alloy", "echo", "fable", "onyx", "nova", "shimmer"]),
   instructions: z.string().min(10, "Instructions must be at least 10 characters").max(2000, "Instructions must be less than 2000 characters"),
+  provider: z.enum(["sber", "openai"]),
+  model: z.string(),
   personality: z.object({
     tone: z.enum(["professional", "casual", "friendly", "formal"]),
     expertise: z.array(z.string()),

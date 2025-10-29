@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 interface NavbarProps {
   session?: any;
@@ -11,6 +13,7 @@ interface NavbarProps {
 
 export const Navbar = ({ session }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-2xl border-b border-white/10 transition-all duration-500">
@@ -34,13 +37,14 @@ export const Navbar = ({ session }: NavbarProps) => {
                 href={`/${item.toLowerCase()}`}
                 className="text-gray-300 hover:text-cyan-300 transition-colors duration-300 text-sm sm:text-base"
               >
-                {item}
+                {t(`nav.${item.toLowerCase()}`)}
               </Link>
             ))}
           </div>
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
             {session ? (
               <>
                 <Button
@@ -48,7 +52,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                   className="text-gray-200 hover:text-white hover:bg-white/10 transition"
                   asChild
                 >
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/dashboard">{t('nav.dashboard')}</Link>
                 </Button>
                 <Button
                   className="bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm transition"
@@ -64,13 +68,13 @@ export const Navbar = ({ session }: NavbarProps) => {
                   className="text-gray-200 hover:text-white hover:bg-white/10 transition"
                   asChild
                 >
-                  <Link href="/sign-in">Sign In</Link>
+                  <Link href="/sign-in">{t('nav.signIn')}</Link>
                 </Button>
                 <Button
                   className="bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm transition"
                   asChild
                 >
-                  <Link href="/sign-up">Get Started</Link>
+                  <Link href="/sign-up">{t('nav.getStarted')}</Link>
                 </Button>
               </>
             )}
@@ -104,11 +108,14 @@ export const Navbar = ({ session }: NavbarProps) => {
                   className="block px-3 py-2 rounded-lg text-gray-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item}
+                  {t(`nav.${item.toLowerCase()}`)}
                 </Link>
               ))}
 
               <div className="pt-3 space-y-2 border-t border-white/10">
+                <div className="flex justify-center mb-2">
+                  <LanguageSwitcher />
+                </div>
                 {session ? (
                   <>
                     <Button
@@ -117,7 +124,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                       asChild
                     >
                       <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                        Dashboard
+                        {t('nav.dashboard')}
                       </Link>
                     </Button>
                     <Button
@@ -140,7 +147,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                       asChild
                     >
                       <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
-                        Sign In
+                        {t('nav.signIn')}
                       </Link>
                     </Button>
                     <Button
@@ -151,7 +158,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                         href="/sign-up"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Get Started
+                        {t('nav.getStarted')}
                       </Link>
                     </Button>
                   </>

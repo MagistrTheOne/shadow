@@ -1,6 +1,6 @@
 import { inngest } from '@/lib/inngest';
 import { db } from '@/db';
-import { recordings, transcripts, transcriptSummaries, meetings } from '@/db/schema';
+import { recordings, transcripts, transcriptSummaries, meetings, user, notifications } from '@/db/schema';
 import { eq, lt } from 'drizzle-orm';
 import { transcribeAudio, formatTranscript } from '@/lib/deepgram';
 import { generateSummary } from '@/lib/gigachat-summary';
@@ -197,42 +197,40 @@ export const sendMeetingReminders = inngest.createFunction(
     return await step.run('send-meeting-reminders', async () => {
       try {
         // Получаем данные о встрече
-        const meeting = await db.query.meetings.findFirst({
-          where: eq(meetings.id, meetingId),
-          with: {
-            user: true
-          }
-        });
+        const meeting = await db
+          .select()
+          .from(meetings)
+          .where(eq(meetings.id, meetingId))
+          .limit(1);
 
-        if (!meeting) {
+        if (!meeting.length) {
           logger.warn('Meeting not found for reminder', { meetingId });
           return { success: false, meetingId, userId, reason: 'Meeting not found' };
         }
 
         // Получаем данные о пользователе
-        const user = await db.query.user.findFirst({
-          where: eq(user.id, userId)
-        });
+        const userData = await db
+          .select()
+          .from(user)
+          .where(eq(user.id, userId))
+          .limit(1);
 
-        if (!user) {
+        if (!userData.length) {
           logger.warn('User not found for reminder', { userId });
           return { success: false, meetingId, userId, reason: 'User not found' };
         }
 
         // Создаем уведомление в базе данных
         await db.insert(notifications).values({
-          id: nanoid(),
           userId: userId,
           type: 'meeting_reminder',
           fromUserId: null,
           metadata: {
             meetingId: meetingId,
-            meetingTitle: meeting.title,
+            meetingTitle: meeting[0].title,
             scheduledAt: scheduledAt
           },
-          isRead: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          isRead: false
         });
 
         // TODO: Добавить отправку email/push уведомлений
@@ -242,7 +240,7 @@ export const sendMeetingReminders = inngest.createFunction(
           meetingId, 
           userId, 
           scheduledAt,
-          meetingTitle: meeting.title 
+          meetingTitle: meeting[0].title 
         });
 
         return { success: true, meetingId, userId };
@@ -279,9 +277,10 @@ export const cleanupExpiredRecordings = inngest.createFunction(
         });
 
         // 1. Find recordings older than cutoff date
-        const expiredRecordings = await db.query.recordings.findMany({
-          where: lt(recordings.createdAt, cutoffDate)
-        });
+        const expiredRecordings = await db
+          .select()
+          .from(recordings)
+          .where(lt(recordings.createdAt, cutoffDate));
 
         logger.info('Found expired recordings', { 
           count: expiredRecordings.length,
@@ -296,13 +295,8 @@ export const cleanupExpiredRecordings = inngest.createFunction(
 
         // 3. Remove database records
         for (const recording of expiredRecordings) {
-          // Delete related transcript summaries first
-          await db.delete(transcriptSummaries).where(eq(transcriptSummaries.transcriptId, recording.id));
-          
-          // Delete related transcripts
-          await db.delete(transcripts).where(eq(transcripts.recordingId, recording.id));
-          
-          // Delete the recording
+          // TODO: Добавить каскадное удаление связанных записей
+          // Пока удаляем только записи
           await db.delete(recordings).where(eq(recordings.id, recording.id));
         }
 

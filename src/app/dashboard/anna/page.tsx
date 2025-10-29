@@ -107,7 +107,7 @@ export default function AnnaPage() {
                 <AnnaAgentIntegration
                   agentId={annaAgent.id}
                   agentName={annaAgent.name}
-                  agentPersonality={annaAgent.personality}
+                  agentPersonality={annaAgent.personality?.tone || "friendly"}
                   isActive={true}
                 />
 

@@ -5,6 +5,7 @@ import { StreamFeed } from 'stream-feed';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Settings } from 'lucide-react';
 import { Activity, Heart, MessageSquare, Share, User, Calendar, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
@@ -43,12 +44,12 @@ export function StreamActivityFeeds({ isEnabled, onToggle }: StreamActivityFeeds
       setIsLoading(true);
       
       // Получаем данные пользователя
-      const { data: session } = await authClient.api.getSession();
+      const session = await authClient.getSession();
       if (!session) {
         throw new Error('User not authenticated');
       }
       
-      setUser(session.user);
+      setUser(session.data?.user);
 
       // Создаем Stream Feed клиент
       const client = new StreamFeed(
@@ -57,16 +58,11 @@ export function StreamActivityFeeds({ isEnabled, onToggle }: StreamActivityFeeds
         process.env.NEXT_PUBLIC_STREAM_APP_ID!
       );
 
-      // Создаем токен для пользователя
-      const token = client.createUserToken(session.user.id);
-      
-      // Аутентифицируем пользователя
-      await client.setUser(session.user.id, token);
-
+      // Инициализируем клиент
       setFeedClient(client);
 
       // Подписываемся на фид пользователя
-      const userFeed = client.feed('user', session.user.id);
+      const userFeed = client.feed('user', session.data?.user?.id || '');
       const activities = await userFeed.get({ limit: 20 });
       
       setActivities(activities.results.map((activity: any) => ({
@@ -81,7 +77,7 @@ export function StreamActivityFeeds({ isEnabled, onToggle }: StreamActivityFeeds
       })));
 
       // Подписываемся на real-time обновления
-      userFeed.subscribe((data) => {
+      userFeed.subscribe((data: any) => {
         if (data.new) {
           const newActivity: ActivityEvent = {
             id: data.new.id,
@@ -115,7 +111,7 @@ export function StreamActivityFeeds({ isEnabled, onToggle }: StreamActivityFeeds
         const userFeed = feedClient.feed('user', user?.id);
         await userFeed.unsubscribe();
         
-        feedClient.disconnect();
+        // feedClient.disconnect(); // StreamFeed не имеет метода disconnect
         setFeedClient(null);
       }
       setIsActive(false);

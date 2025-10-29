@@ -6,6 +6,7 @@ interface WebSocketMessage {
   type: string;
   data?: any;
   message?: string;
+  channel?: string;
 }
 
 interface UseWebSocketOptions {

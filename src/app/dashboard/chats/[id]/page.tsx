@@ -2,11 +2,11 @@ import { Suspense } from "react";
 import { ChatClient } from "./chat-client";
 
 interface ChatPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function ChatPage({ params }: ChatPageProps) {
-  const { id } = params;
+export default async function ChatPage({ params }: ChatPageProps) {
+  const { id } = await params;
 
   return (
     <Suspense fallback={<div>Loading chat...</div>}>

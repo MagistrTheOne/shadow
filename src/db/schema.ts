@@ -553,7 +553,7 @@ export const notifications = pgTable(
       enum: [
         "friend_request", "friend_accepted", "friend_removed", 
         "blocked_by_other", "unblocked_by_other",
-        "meeting_invite", "meeting_started", "meeting_cancelled",
+        "meeting_invite", "meeting_started", "meeting_cancelled", "meeting_reminder",
         "friend_online"
       ] 
     }).notNull(),

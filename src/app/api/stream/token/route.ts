@@ -18,9 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем аутентификацию пользователя
-    const session = await authClient.api.getSession({
-      headers: request.headers
-    });
+    const session = await authClient.getSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -28,12 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Создаем токен для Stream Video
     const chatClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
-    const token = chatClient.createToken(userId, {
-      exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
-      iat: Math.floor(Date.now() / 1000),
-      user_id: userId,
-      name: userName || 'User'
-    });
+    const token = chatClient.createToken(userId, Math.floor(Date.now() / 1000) + 3600);
 
     return NextResponse.json({ 
       token,

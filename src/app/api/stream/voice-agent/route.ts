@@ -22,12 +22,7 @@ export async function POST(request: NextRequest) {
     // Реальная интеграция с Stream Voice Agent
     try {
       // Создаем канал для голосового агента
-      const channel = serverClient.channel('messaging', `voice-agent-${callId}`, {
-        name: `Voice Agent - ${callId}`,
-        call_id: callId,
-        call_type: callType,
-        agent_enabled: true
-      });
+      const channel = serverClient.channel('messaging', `voice-agent-${callId}`);
 
       await channel.create();
 
@@ -35,12 +30,7 @@ export async function POST(request: NextRequest) {
       const voiceAgent = await serverClient.upsertUser({
         id: `voice-agent-${callId}`,
         name: 'AI Voice Agent',
-        role: 'admin',
-        custom: {
-          agent_type: 'voice',
-          call_id: callId,
-          capabilities: ['speech_to_text', 'text_to_speech', 'ai_response']
-        }
+        role: 'admin'
       });
 
       // Подключаем агента к каналу

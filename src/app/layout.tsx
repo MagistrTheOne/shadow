@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "@/trpc/client";
 import { ToasterProvider } from "@/components/toaster-provider";
+import { LanguageProvider } from "@/contexts/language-context";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -23,14 +24,16 @@ export default function RootLayout({
 }>) {
   return (
     <TRPCReactProvider>
-    <html lang="en">
-      <body
-        className={`${inter.className}   antialiased`}
-      >
-        {children}
-        <ToasterProvider />
-      </body>
-    </html>
+      <LanguageProvider>
+        <html lang="en">
+          <body
+            className={`${inter.className}   antialiased`}
+          >
+            {children}
+            <ToasterProvider />
+          </body>
+        </html>
+      </LanguageProvider>
     </TRPCReactProvider>
   );
 }

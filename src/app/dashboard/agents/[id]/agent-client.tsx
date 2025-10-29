@@ -74,12 +74,12 @@ export function AgentClient({ id }: AgentClientProps) {
   const testAgent = trpc.agents.testAgent.useMutation({
     onSuccess: (data) => {
       setTestResponse(data.response);
-      setIsTestLoading(false);
+      setIsTesting(false);
       toast.success("Agent test completed!");
     },
     onError: (error) => {
       toast.error(error.message || "Failed to test agent");
-      setIsTestLoading(false);
+      setIsTesting(false);
     },
   });
 
@@ -108,10 +108,10 @@ export function AgentClient({ id }: AgentClientProps) {
       return;
     }
     
-    setIsTestLoading(true);
+    setIsTesting(true);
     setTestResponse("");
     testAgent.mutate({ 
-      id: id, 
+      agentId: id, 
       message: testMessage 
     });
   };
@@ -150,9 +150,9 @@ export function AgentClient({ id }: AgentClientProps) {
           </h1>
           <Badge 
             variant="outline" 
-            className={`${getStatusColor(agent.status || 'inactive')} text-white border-current`}
+            className={`${getStatusColor(agent.isActive ? 'active' : 'inactive')} text-white border-current`}
           >
-            {getStatusLabel(agent.status || 'inactive')}
+            {getStatusLabel(agent.isActive ? 'active' : 'inactive')}
           </Badge>
         </div>
 
@@ -178,7 +178,7 @@ export function AgentClient({ id }: AgentClientProps) {
                         className="w-16 h-16"
                       />
                     )}
-                    <div className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-black ${getStatusColor(agent.status || 'inactive')}`} />
+                    <div className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-black ${getStatusColor(agent.isActive ? 'active' : 'inactive')}`} />
                   </div>
                   <div>
                     <CardTitle className="text-white text-xl">{agent.name}</CardTitle>
@@ -337,10 +337,10 @@ export function AgentClient({ id }: AgentClientProps) {
                   <div className="flex space-x-2">
                     <Button 
                       onClick={handleTestAgent} 
-                      disabled={isTestLoading || !testMessage.trim()}
+                      disabled={isTesting || !testMessage.trim()}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {isTestLoading ? (
+                      {isTesting ? (
                         <>
                           <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           Testing...
@@ -430,9 +430,9 @@ export function AgentClient({ id }: AgentClientProps) {
                     <span className="text-gray-400">Status</span>
                     <Badge 
                       variant="outline" 
-                      className={`${getStatusColor(agent.status || 'inactive')} text-white border-current`}
+                      className={`${getStatusColor(agent.isActive ? 'active' : 'inactive')} text-white border-current`}
                     >
-                      {getStatusLabel(agent.status || 'inactive')}
+                      {getStatusLabel(agent.isActive ? 'active' : 'inactive')}
                     </Badge>
                   </div>
                 </div>

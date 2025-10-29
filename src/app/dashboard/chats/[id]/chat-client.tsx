@@ -23,15 +23,12 @@ export function ChatClient({ chatId }: ChatClientProps) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: chat, isLoading: chatLoading } = trpc.chats.getById.useQuery({
+  const { data: chat, isLoading: chatLoading } = trpc.chats.getOne.useQuery({
     chatId,
   });
 
-  const { data: messages, isLoading: messagesLoading } =
-    trpc.chats.getMessages.useQuery({
-      chatId,
-      limit: 50,
-    });
+  const messages = chat?.messages || [];
+  const messagesLoading = chatLoading;
 
   const sendMessageMutation = trpc.chats.sendMessage.useMutation({
     onSuccess: () => {
@@ -44,7 +41,7 @@ export function ChatClient({ chatId }: ChatClientProps) {
     },
   });
 
-  const markAsReadMutation = trpc.chats.markMessagesAsRead.useMutation();
+  // const markAsReadMutation = trpc.chats.markMessagesAsRead.useMutation();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,20 +51,20 @@ export function ChatClient({ chatId }: ChatClientProps) {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (messages && messages.length > 0) {
-      const unreadMessageIds = messages
-        .filter((msg) => !msg.isRead && msg.senderId !== chat?.userId)
-        .map((msg) => msg.id);
+  // useEffect(() => {
+  //   if (messages && messages.length > 0) {
+  //     const unreadMessageIds = messages
+  //       .filter((msg) => !msg.isRead && msg.senderId !== chat?.userId)
+  //       .map((msg) => msg.id);
 
-      if (unreadMessageIds.length > 0) {
-        markAsReadMutation.mutate({
-          chatId,
-          messageIds: unreadMessageIds,
-        });
-      }
-    }
-  }, [messages, chat?.userId, chatId, markAsReadMutation]);
+  //     if (unreadMessageIds.length > 0) {
+  //       markAsReadMutation.mutate({
+  //         chatId,
+  //         messageIds: unreadMessageIds,
+  //       });
+  //     }
+  //   }
+  // }, [messages, chat?.userId, chatId, markAsReadMutation]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,13 +168,13 @@ export function ChatClient({ chatId }: ChatClientProps) {
             <div
               key={msg.id}
               className={`flex space-x-3 ${
-                msg.senderId === chat.userId ? "flex-row-reverse space-x-reverse" : ""
+                msg.senderId !== chat?.agent.id ? "flex-row-reverse space-x-reverse" : ""
               }`}
             >
               <Avatar className="w-8 h-8">
-                <AvatarImage src={msg.sender.avatarUrl || undefined} />
+                <AvatarImage src={msg.senderId !== chat?.agent.id ? undefined : chat?.agent.avatar || undefined} />
                 <AvatarFallback>
-                  {msg.senderId === chat.userId ? (
+                  {msg.senderId !== chat?.agent.id ? (
                     <UserIcon className="w-4 h-4" />
                   ) : (
                     <BotIcon className="w-4 h-4" />
@@ -186,7 +183,7 @@ export function ChatClient({ chatId }: ChatClientProps) {
               </Avatar>
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  msg.senderId === chat.userId
+                  msg.senderId !== chat?.agent.id
                     ? "bg-blue-500 text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
@@ -194,7 +191,7 @@ export function ChatClient({ chatId }: ChatClientProps) {
                 <p className="text-sm">{msg.content}</p>
                 <p
                   className={`text-xs mt-1 ${
-                    msg.senderId === chat.userId
+                    msg.senderId !== chat?.agent.id
                       ? "text-blue-100"
                       : "text-gray-500"
                   }`}

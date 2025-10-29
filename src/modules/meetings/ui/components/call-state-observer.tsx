@@ -26,7 +26,7 @@ interface CallStateObserverProps {
 
 interface CallEvent {
   id: string;
-  type: 'participant_joined' | 'participant_left' | 'mute_changed' | 'video_changed' | 'call_started' | 'call_ended' | 'recording_started' | 'recording_stopped';
+  type: 'participant_joined' | 'participant_left' | 'mute_changed' | 'video_changed' | 'call_started' | 'call_ended' | 'recording_started' | 'recording_stopped' | 'call_updated';
   participant?: string;
   timestamp: Date;
   details: string;
@@ -57,49 +57,13 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
   const [isPaused, setIsPaused] = useState(false);
 
   const call = useCall();
-  const { useCallCallingState, useParticipants, useCallRecordingState } = useCallStateHooks();
+  const { useCallCallingState, useParticipants } = useCallStateHooks();
   
   const callingState = useCallCallingState();
   const participants = useParticipants();
-  const recordingState = useCallRecordingState();
+  // const recordingState = useCallRecordingState(); // Хук не существует
 
-  // Моковые данные для демонстрации
-  const mockEvents: CallEvent[] = [
-    {
-      id: '1',
-      type: 'call_started',
-      timestamp: new Date(Date.now() - 300000),
-      details: 'Call started by John Smith'
-    },
-    {
-      id: '2',
-      type: 'participant_joined',
-      participant: 'Jane Doe',
-      timestamp: new Date(Date.now() - 240000),
-      details: 'Jane Doe joined the call'
-    },
-    {
-      id: '3',
-      type: 'participant_joined',
-      participant: 'AI Assistant',
-      timestamp: new Date(Date.now() - 180000),
-      details: 'AI Assistant joined the call'
-    },
-    {
-      id: '4',
-      type: 'mute_changed',
-      participant: 'Jane Doe',
-      timestamp: new Date(Date.now() - 120000),
-      details: 'Jane Doe muted their microphone'
-    },
-    {
-      id: '5',
-      type: 'video_changed',
-      participant: 'AI Assistant',
-      timestamp: new Date(Date.now() - 60000),
-      details: 'AI Assistant turned off their camera'
-    }
-  ];
+  // Реальные события будут загружаться из Stream API
 
   useEffect(() => {
     if (isEnabled && call) {
@@ -109,11 +73,11 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
           // Подписываемся на события звонка
           const unsubscribe = call.on('call.updated', (event) => {
             const newEvent: CallEvent = {
-              id: event.id || Date.now().toString(),
-              type: event.type || 'call_updated',
-              timestamp: new Date(event.timestamp || Date.now()),
-              details: event.details || 'Call state updated',
-              participant: event.participant || 'System'
+              id: Date.now().toString(),
+              type: 'call_updated',
+              timestamp: new Date(),
+              details: 'Call state updated',
+              participant: 'System'
             };
             
             setEvents(prev => [newEvent, ...prev.slice(0, 19)]); // Keep last 20 events
@@ -342,8 +306,8 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Recording</span>
-              <Badge variant="outline" className={recordingState ? "text-red-400 border-red-400" : "text-gray-400 border-gray-400"}>
-                {recordingState ? "Recording" : "Not Recording"}
+              <Badge variant="outline" className={isRecording ? "text-red-400 border-red-400" : "text-gray-400 border-gray-400"}>
+                {isRecording ? "Recording" : "Not Recording"}
               </Badge>
             </div>
           </div>

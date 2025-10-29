@@ -23,7 +23,8 @@ export function StreamChatComponent({ callId }: StreamChatProps) {
   useEffect(() => {
     const initializeChat = async () => {
       try {
-        const { data: user } = await authClient.api.getSession();
+        const session = await authClient.getSession();
+        const user = session.data?.user;
         
         if (!user) {
           throw new Error('User not authenticated');
@@ -35,29 +36,26 @@ export function StreamChatComponent({ callId }: StreamChatProps) {
         // Аутентифицируем пользователя
         await client.connectUser(
           {
-            id: user.user.id,
-            name: user.user.name || 'User',
-            image: user.user.image || undefined,
+            id: user.id,
+            name: user.name || 'User',
+            image: user.image || undefined,
           },
-          user.session.token
+          session.data?.session?.token || ''
         );
 
         setChatClient(client);
 
         // Создаем или получаем канал для звонка
         const channelId = `call-${callId}`;
-        const channel = client.channel('messaging', channelId, {
-          name: `Call Chat - ${callId}`,
-          call_id: callId,
-        });
+        const channel = client.channel('messaging', channelId);
 
         await channel.create();
         setChannel(channel);
 
         // Подключаем чат к звонку
-        if (call) {
-          call.setChatChannel(channel);
-        }
+        // if (call) {
+        //   call.setChatChannel(channel);
+        // }
 
         setIsLoading(false);
       } catch (err: any) {

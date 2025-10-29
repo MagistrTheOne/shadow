@@ -63,7 +63,7 @@ export const DashboardUserButton = () => {
       if (profile) {
         setUserStatus(profile.status as any);
         setCustomStatus(profile.customStatus || '');
-        setRichPresence(profile.richPresence as any);
+        // setRichPresence(profile.richPresence as any); // Поле не существует в схеме
       }
     },
     onError: (error: any) =>
@@ -93,7 +93,7 @@ export const DashboardUserButton = () => {
     if (profile) {
       setUserStatus(profile.status as any);
       setCustomStatus(profile.customStatus || '');
-      setRichPresence(profile.richPresence as any);
+      // setRichPresence(profile.richPresence as any); // Поле не существует в схеме
     }
   }, [profile, setUserStatus, setCustomStatus, setRichPresence]);
 

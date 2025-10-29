@@ -52,59 +52,9 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
   const call = useCall();
 
   // Моковые данные для демонстрации
-  const mockPermissions: Permission[] = [
-    // Audio permissions
-    { id: 'audio_mute_all', name: 'Mute All Participants', description: 'Allow host to mute all participants at once', enabled: true, category: 'audio' },
-    { id: 'audio_unmute_request', name: 'Unmute Request', description: 'Participants can request to be unmuted', enabled: true, category: 'audio' },
-    { id: 'audio_auto_mute', name: 'Auto Mute on Join', description: 'Automatically mute participants when they join', enabled: false, category: 'audio' },
-    
-    // Video permissions
-    { id: 'video_turn_off_all', name: 'Turn Off All Cameras', description: 'Allow host to turn off all cameras', enabled: true, category: 'video' },
-    { id: 'video_require_approval', name: 'Camera Approval Required', description: 'Host must approve camera access', enabled: false, category: 'video' },
-    { id: 'video_background_effects', name: 'Background Effects', description: 'Allow participants to use background effects', enabled: true, category: 'video' },
-    
-    // Chat permissions
-    { id: 'chat_send_messages', name: 'Send Messages', description: 'Allow participants to send chat messages', enabled: true, category: 'chat' },
-    { id: 'chat_send_files', name: 'Send Files', description: 'Allow participants to send files', enabled: true, category: 'chat' },
-    { id: 'chat_private_messages', name: 'Private Messages', description: 'Allow private messages between participants', enabled: false, category: 'chat' },
-    
-    // Meeting permissions
-    { id: 'meeting_invite_others', name: 'Invite Others', description: 'Allow participants to invite others', enabled: true, category: 'meeting' },
-    { id: 'meeting_share_screen', name: 'Share Screen', description: 'Allow participants to share their screen', enabled: true, category: 'meeting' },
-    { id: 'meeting_record', name: 'Record Meeting', description: 'Allow participants to record the meeting', enabled: false, category: 'meeting' },
-    
-    // Moderation permissions
-    { id: 'mod_kick_participants', name: 'Kick Participants', description: 'Allow moderators to kick participants', enabled: true, category: 'moderation' },
-    { id: 'mod_ban_participants', name: 'Ban Participants', description: 'Allow moderators to ban participants', enabled: true, category: 'moderation' },
-    { id: 'mod_remove_messages', name: 'Remove Messages', description: 'Allow moderators to remove chat messages', enabled: true, category: 'moderation' },
-  ];
+  // Реальные разрешения будут загружаться из Stream Permissions API
 
-  const mockModerationActions: ModerationAction[] = [
-    {
-      id: '1',
-      type: 'mute',
-      target: 'John Smith',
-      reason: 'Background noise',
-      timestamp: new Date(Date.now() - 300000),
-      moderator: 'Jane Doe'
-    },
-    {
-      id: '2',
-      type: 'warn',
-      target: 'Mike Johnson',
-      reason: 'Inappropriate language',
-      timestamp: new Date(Date.now() - 180000),
-      moderator: 'Jane Doe'
-    },
-    {
-      id: '3',
-      type: 'kick',
-      target: 'Spam User',
-      reason: 'Spamming chat',
-      timestamp: new Date(Date.now() - 120000),
-      moderator: 'John Smith'
-    }
-  ];
+  // Реальные действия модерации будут загружаться из Stream Moderation API
 
   const categories = [
     { id: 'all', name: 'All', icon: SettingsIcon },
@@ -117,8 +67,9 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
 
   useEffect(() => {
     if (isEnabled) {
-      setPermissions(mockPermissions);
-      setModerationActions(mockModerationActions);
+      // TODO: Загрузить реальные разрешения из Stream API
+      // setPermissions(realPermissions);
+      // setModerationActions(realModerationActions);
     }
   }, [isEnabled]);
 

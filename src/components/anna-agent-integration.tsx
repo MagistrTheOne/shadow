@@ -38,12 +38,12 @@ export function AnnaAgentIntegration({
   const { data: agent } = trpc.agents.getOne.useQuery({ id: agentId });
   
   // Мутация для отправки сообщения агенту
-  const sendMessage = trpc.agents.test.useMutation({
+  const sendMessage = trpc.agents.testAgent.useMutation({
     onSuccess: (response) => {
       const agentMessage = {
         id: Date.now().toString(),
         type: 'agent' as const,
-        message: response.content || 'I understand your message.',
+        message: response.response || 'I understand your message.',
         timestamp: new Date()
       };
       
@@ -123,12 +123,8 @@ export function AnnaAgentIntegration({
 
     // Отправляем сообщение агенту через tRPC
     sendMessage.mutate({
-      id: agentId,
-      message: message.trim(),
-      context: {
-        conversationHistory: conversationHistory.slice(-5), // Последние 5 сообщений для контекста
-        agentPersonality: agentPersonality
-      }
+      agentId: agentId,
+      message: message.trim()
     });
   };
 

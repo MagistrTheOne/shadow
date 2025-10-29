@@ -75,7 +75,7 @@ function CreateSessionContent() {
     createSession.mutate({
       type: sessionType,
       withAgents: selectedAgents.length > 0 ? selectedAgents : undefined,
-      expiresAt,
+      expiresAt: expiresAt?.toISOString(),
     });
   };
 
