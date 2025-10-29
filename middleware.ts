@@ -21,7 +21,6 @@ export async function middleware(request: NextRequest) {
     "/pricing",
     "/features",
     "/product",
-    "/demo",
     "/company",
     "/support",
   ];

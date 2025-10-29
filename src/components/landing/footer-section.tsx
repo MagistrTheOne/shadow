@@ -52,7 +52,7 @@ export const FooterSection = () => {
           <div>
             <h3 className="text-white font-semibold mb-4">{t('landing.footer.product')}</h3>
             <ul className="space-y-2 text-sm">
-              {[t('nav.product'), t('nav.features'), t('nav.demo'), t('nav.pricing'), t('nav.getStarted')].map(
+              {[t('nav.product'), t('nav.features'), t('nav.pricing'), t('nav.getStarted')].map(
                 (item, i) => (
                   <li key={i}>
                     <Link

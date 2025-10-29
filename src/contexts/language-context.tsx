@@ -18,7 +18,6 @@ const translations = {
     // Navbar
     'nav.product': 'Product',
     'nav.features': 'Features',
-    'nav.demo': 'Demo',
     'nav.pricing': 'Pricing',
     'nav.whitelist': 'Whitelist',
     'nav.getStarted': 'Get Started',
@@ -240,7 +239,6 @@ const translations = {
     // Navbar
     'nav.product': 'Продукт',
     'nav.features': 'Возможности',
-    'nav.demo': 'Демо',
     'nav.pricing': 'Тарифы',
     'nav.whitelist': 'Белый список',
     'nav.getStarted': 'Начать',
