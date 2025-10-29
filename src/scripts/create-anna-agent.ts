@@ -1,5 +1,6 @@
 import { db } from '@/db';
 import { agent } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 async function createAnnaAgent() {
   try {
@@ -9,7 +10,7 @@ async function createAnnaAgent() {
     const [existingAgent] = await db
       .select()
       .from(agent)
-      .where((eq) => eq(agent.id, '1652863dc2354b499db342a63feca19a'))
+      .where(eq(agent.id, '1652863dc2354b499db342a63feca19a'))
       .limit(1);
 
     if (existingAgent) {
