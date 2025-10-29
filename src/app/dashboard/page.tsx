@@ -11,6 +11,7 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { format } from "date-fns";
 import { usePresence } from "@/hooks/use-presence";
+import { AnnaDashboard } from "@/components/anna-avatar";
 
 import { animations } from "@/lib/animations";
 
@@ -58,9 +59,12 @@ const DashboardContent = () => {
     <div className={`py-6 px-4 md:px-8 flex flex-col gap-8 ${animations.pageEnter}`}>
              {/* Welcome Section */}
              <div className={`flex items-center justify-between ${animations.fadeInUp}`}>
-               <div>
-                 <h1 className="text-3xl font-bold text-white mb-2">Welcome back!</h1>
-                 <p className="text-gray-400">Manage your enterprise AI-powered meetings with intelligent avatars</p>
+               <div className="flex items-center gap-6">
+                 <div>
+                   <h1 className="text-3xl font-bold text-white mb-2">Welcome back!</h1>
+                   <p className="text-gray-400">Manage your enterprise AI-powered meetings with intelligent avatars</p>
+                 </div>
+                 <AnnaDashboard />
                </div>
                <div className="flex gap-3">
                  <Button asChild className={`bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 ${animations.buttonHover}`}>

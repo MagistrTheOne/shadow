@@ -40,9 +40,9 @@ export const user = pgTable(
   })
 );
 
-/** SESSION */
-export const session = pgTable(
-  "session",
+/** AUTH_SESSION - Better Auth sessions */
+export const authSession = pgTable(
+  "auth_session",
   {
     id: text("id").primaryKey(),
     expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
@@ -56,8 +56,8 @@ export const session = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
   },
   (t) => ({
-    sessionUserIdx: index("session_user_id_idx").on(t.userId),
-    sessionTokenUq: uniqueIndex("session_token_uniq").on(t.token),
+    authSessionUserIdx: index("auth_session_user_id_idx").on(t.userId),
+    authSessionTokenUq: uniqueIndex("auth_session_token_uniq").on(t.token),
   })
 );
 

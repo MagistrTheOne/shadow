@@ -21,7 +21,10 @@ export const auth = betterAuth({
    database: drizzleAdapter(db, {
         provider: "pg", 
         schema: {
-          ...schema,
+          user: schema.user,
+          session: schema.authSession,
+          account: schema.account,
+          verification: schema.verification,
         }
     }),
     trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
