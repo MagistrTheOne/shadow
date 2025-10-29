@@ -14,7 +14,7 @@ export const sessionsRouter = createTRPCRouter({
       meetingId: z.string().optional(),
       invitees: z.array(z.string()).optional(), // User IDs to invite
       withAgents: z.array(z.string()).optional(), // Agent IDs to include
-      expiresAt: z.date().optional(),
+      expiresAt: z.string().datetime().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       // Generate unique session code
@@ -48,7 +48,7 @@ export const sessionsRouter = createTRPCRouter({
           code,
           type: input.type,
           hostUserId: ctx.auth.user.id,
-          expiresAt: input.expiresAt,
+          expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
         })
         .returning();
 

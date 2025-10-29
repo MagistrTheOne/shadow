@@ -251,7 +251,7 @@ export default function AgentsPage() {
                     <Settings className="w-4 h-4" /> {agent.voice} voice
                   </div>
                   <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4" /> {agent.provider} – {agent.model}
+                    <Bot className="w-4 h-4" /> {agent.provider === 'sber' ? 'Sber GigaChat' : 'OpenAI'} – {agent.model}
                   </div>
                 </div>
 

@@ -306,9 +306,9 @@ export const transcriptSummaries = pgTable(
   })
 );
 
-/** CHAT MESSAGES */
-export const chatMessages = pgTable(
-  "chat_messages",
+/** MEETING CHAT MESSAGES */
+export const meetingChatMessages = pgTable(
+  "meeting_chat_messages",
   {
     id: text("id").primaryKey().$defaultFn(() => nanoid()),
     meetingId: text("meeting_id")
@@ -324,9 +324,9 @@ export const chatMessages = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({
-    messagesMeetingIdx: index("messages_meeting_id_idx").on(t.meetingId),
-    messagesUserIdx: index("messages_user_id_idx").on(t.userId),
-    messagesTimestampIdx: index("messages_timestamp_idx").on(t.timestamp),
+    meetingMessagesMeetingIdx: index("meeting_messages_meeting_id_idx").on(t.meetingId),
+    meetingMessagesUserIdx: index("meeting_messages_user_id_idx").on(t.userId),
+    meetingMessagesTimestampIdx: index("meeting_messages_timestamp_idx").on(t.timestamp),
   })
 );
 
