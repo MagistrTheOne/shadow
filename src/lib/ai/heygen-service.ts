@@ -1,4 +1,4 @@
-interface HeyGenConfig {
+export interface HeyGenConfig {
   apiKey: string;
   baseUrl: string;
 }
