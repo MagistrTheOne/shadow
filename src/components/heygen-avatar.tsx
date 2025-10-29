@@ -62,27 +62,12 @@ export const HeyGenAvatar = ({ apiKey, onReady, onError }: HeyGenAvatarProps) =>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          video_inputs: [
-            {
-              character: {
-                type: "avatar",
-                avatar_id: "1652863dc2354b499db342a63feca19a", // ANNA avatar ID
-                avatar_style: "normal"
-              },
-              voice: {
-                type: "text",
-                input_text: text,
-                voice_id: "1bd001e7e50f421d891986aad5158bc3", // Russian voice
-                speed: 1.0,
-                emotion: "friendly"
-              }
-            }
-          ],
-          dimension: {
-            width: 1280,
-            height: 720
-          },
-          aspect_ratio: "16:9"
+          avatar_id: "1652863dc2354b499db342a63feca19a", // ANNA avatar ID
+          voice_id: process.env.NEXT_PUBLIC_HEYGEN_ANNA_VOICE_ID || "f8c69e517f424cafaecde32dde57096b",
+          text: text,
+          language: "en",
+          quality: "high",
+          ratio: "16:9"
         })
       });
 
@@ -110,7 +95,8 @@ export const HeyGenAvatar = ({ apiKey, onReady, onError }: HeyGenAvatarProps) =>
 
     const poll = async () => {
       try {
-        const response = await fetch(`https://api.heygen.com/v1/video_status.get?video_id=${videoId}`, {
+        const response = await fetch(`https://api.heygen.com/v1/video/${videoId}`, {
+          method: 'GET',
           headers: {
             'X-API-KEY': apiKey!,
           }
