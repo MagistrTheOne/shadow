@@ -94,17 +94,6 @@ export function AgentClient({ id }: AgentClientProps) {
     },
   });
 
-  const testAgent = trpc.agents.test.useMutation({
-    onSuccess: (response: any) => {
-      setTestResponse(response.message || "Test completed successfully");
-      setIsTesting(false);
-      toast.success("Agent test completed!");
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to test agent");
-      setIsTesting(false);
-    },
-  });
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this agent? This action cannot be undone.")) {
@@ -122,7 +111,7 @@ export function AgentClient({ id }: AgentClientProps) {
     setIsTestLoading(true);
     setTestResponse("");
     testAgent.mutate({ 
-      agentId: id, 
+      id: id, 
       message: testMessage 
     });
   };

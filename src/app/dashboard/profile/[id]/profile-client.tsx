@@ -97,7 +97,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GeneratedAvatar } from "@/components/generate-avatar";
-import { AnnaProfile } from "@/components/anna-avatar";
+import { AnnaAvatar } from "@/components/anna-avatar";
 
 interface ProfilePageClientProps {
   id: string;
@@ -260,7 +260,7 @@ export function ProfilePageClient({ id }: ProfilePageClientProps) {
                 
                 {/* ANNA Avatar */}
                 <div className="mb-4">
-                  <AnnaProfile />
+                  <AnnaAvatar size="medium" />
                 </div>
                 
                 <p className="text-gray-400 mb-2">@{profile.username || profile.name.toLowerCase()}</p>

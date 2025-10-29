@@ -74,8 +74,8 @@ function handleWebSocketMessage(ws: any, message: any) {
   }
 }
 
-// Функция для отправки уведомлений всем подключенным клиентам
-export function broadcastToAll(message: any) {
+// Внутренние функции для WebSocket управления
+function broadcastToAll(message: any) {
   if (wss) {
     wss.clients.forEach((client) => {
       if (client.readyState === client.OPEN) {
@@ -85,8 +85,7 @@ export function broadcastToAll(message: any) {
   }
 }
 
-// Функция для отправки уведомления конкретному пользователю
-export function sendToUser(userId: string, message: any) {
+function sendToUser(userId: string, message: any) {
   if (wss) {
     wss.clients.forEach((client) => {
       if (client.readyState === client.OPEN && (client as any).userId === userId) {
