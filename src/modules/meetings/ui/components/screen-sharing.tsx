@@ -34,10 +34,19 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
   ] as const;
 
   useEffect(() => {
-    // В реальном приложении здесь будет подписка на события call
+    // Реальная подписка на события call
     if (call) {
-      // Симуляция получения количества участников
-      setParticipants(Math.floor(Math.random() * 5) + 1);
+      // Подписываемся на изменения участников
+      const unsubscribe = call.on('call.participants_updated', (event) => {
+        setParticipants(event.participants?.length || 0);
+      });
+
+      // Инициализируем количество участников
+      setParticipants(call.state.participants?.length || 0);
+
+      return () => {
+        unsubscribe();
+      };
     }
   }, [call]);
 
@@ -46,12 +55,18 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
     try {
       if (!call) throw new Error('Call not available');
 
-      // В реальном приложении здесь будет вызов Stream API для начала демонстрации экрана
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Реальная интеграция с Stream Screen Sharing API
+      await call.startScreenShare({
+        type: sharingType,
+        onStateChange: (state) => {
+          setIsSharing(state === 'sharing');
+        }
+      });
       
-      setIsSharing(true);
+      toast.success('Screen sharing started');
     } catch (error) {
       console.error('Error starting screen share:', error);
+      toast.error('Failed to start screen sharing');
     } finally {
       setIsLoading(false);
     }
@@ -61,10 +76,13 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
     try {
       if (!call) return;
 
-      // В реальном приложении здесь будет вызов Stream API для остановки демонстрации экрана
+      // Реальная остановка Stream Screen Sharing
+      await call.stopScreenShare();
       setIsSharing(false);
+      toast.success('Screen sharing stopped');
     } catch (error) {
       console.error('Error stopping screen share:', error);
+      toast.error('Failed to stop screen sharing');
     }
   };
 

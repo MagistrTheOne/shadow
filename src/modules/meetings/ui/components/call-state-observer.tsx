@@ -102,24 +102,56 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
   ];
 
   useEffect(() => {
-    if (isEnabled) {
-      setEvents(mockEvents);
-      
-      // Симуляция обновления статистики в реальном времени
-      const interval = setInterval(() => {
-        setStats(prev => ({
-          ...prev,
-          duration: formatDuration(Date.now() - Date.now() + 300000), // Mock duration
-          participants: participants.length,
-          bandwidth: Math.floor(Math.random() * 1000) + 500,
-          packetLoss: Math.random() * 2,
-          jitter: Math.random() * 10
-        }));
-      }, 1000);
+    if (isEnabled && call) {
+      // Реальная интеграция с Stream Call State Observer
+      const initializeCallObserver = async () => {
+        try {
+          // Подписываемся на события звонка
+          const unsubscribe = call.on('call.updated', (event) => {
+            const newEvent: CallEvent = {
+              id: event.id || Date.now().toString(),
+              type: event.type || 'call_updated',
+              timestamp: new Date(event.timestamp || Date.now()),
+              details: event.details || 'Call state updated',
+              participant: event.participant || 'System'
+            };
+            
+            setEvents(prev => [newEvent, ...prev.slice(0, 19)]); // Keep last 20 events
+          });
 
-      return () => clearInterval(interval);
+          // Подписываемся на статистику звонка
+          const statsUnsubscribe = call.on('call.stats', (stats) => {
+            setStats({
+              duration: formatDuration(stats.duration || 0),
+              participants: stats.participants || participants.length,
+              bandwidth: stats.bandwidth || 0,
+              packetLoss: stats.packetLoss || 0,
+              jitter: stats.jitter || 0
+            });
+          });
+
+          // Сохраняем функции отписки
+          (window as any).callObserverUnsubscribe = unsubscribe;
+          (window as any).callStatsUnsubscribe = statsUnsubscribe;
+        } catch (error) {
+          console.error('Error initializing call observer:', error);
+          toast.error('Failed to initialize call observer');
+        }
+      };
+
+      initializeCallObserver();
+
+      return () => {
+        // Очищаем подписки при размонтировании
+        if ((window as any).callObserverUnsubscribe) {
+          (window as any).callObserverUnsubscribe();
+        }
+        if ((window as any).callStatsUnsubscribe) {
+          (window as any).callStatsUnsubscribe();
+        }
+      };
     }
-  }, [isEnabled, participants.length]);
+  }, [isEnabled, call, participants.length]);
 
   const formatDuration = (ms: number) => {
     const seconds = Math.floor(ms / 1000);

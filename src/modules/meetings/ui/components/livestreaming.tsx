@@ -78,18 +78,29 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
     try {
       if (!call) throw new Error('Call not available');
 
-      // В реальном приложении здесь будет вызов Stream API для начала стрима
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Генерируем URL и ключ для стрима
-      const generatedUrl = `https://stream.getstream.io/live/${call.id}`;
-      const generatedKey = `stream_${call.id}_${Date.now()}`;
-      
-      setStreamUrl(generatedUrl);
-      setStreamKey(generatedKey);
+      // Реальная интеграция с Stream Livestreaming API
+      const streamConfig = await call.startLivestream({
+        title: streamTitle || `Live Stream - ${call.id}`,
+        isPublic: isPublic,
+        onStats: (stats) => {
+          setStats(prev => ({
+            ...prev,
+            viewers: stats.viewers || 0,
+            duration: formatDuration(stats.duration || 0),
+            quality: stats.quality || '1080p',
+            bitrate: stats.bitrate || 2500,
+            fps: stats.fps || 30
+          }));
+        }
+      });
+
+      setStreamUrl(streamConfig.url);
+      setStreamKey(streamConfig.key);
       setIsStreaming(true);
+      toast.success('Livestream started successfully');
     } catch (error) {
       console.error('Error starting stream:', error);
+      toast.error('Failed to start livestream');
     } finally {
       setIsLoading(false);
     }
@@ -99,12 +110,15 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
     try {
       if (!call) return;
 
-      // В реальном приложении здесь будет вызов Stream API для остановки стрима
+      // Реальная остановка Stream Livestreaming
+      await call.stopLivestream();
       setIsStreaming(false);
       setStreamUrl("");
       setStreamKey("");
+      toast.success('Livestream stopped');
     } catch (error) {
       console.error('Error stopping stream:', error);
+      toast.error('Failed to stop livestream');
     }
   };
 

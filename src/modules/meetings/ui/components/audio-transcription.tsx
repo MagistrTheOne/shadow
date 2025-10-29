@@ -72,10 +72,37 @@ export const AudioTranscription = ({ isEnabled, onToggle }: AudioTranscriptionPr
   ];
 
   useEffect(() => {
-    if (isEnabled) {
-      setTranscriptions(mockTranscriptions);
+    if (isEnabled && call) {
+      // Реальная интеграция с Stream Audio Transcription
+      const initializeTranscription = async () => {
+        try {
+          // Подключаемся к Stream Audio Transcription
+          const transcription = await call.enableAudioTranscription({
+            language: 'auto', // Автоопределение языка
+            onTranscription: (entry) => {
+              const newEntry: TranscriptionEntry = {
+                id: entry.id || Date.now().toString(),
+                speaker: entry.speaker || 'Unknown',
+                text: entry.text || '',
+                timestamp: new Date(entry.timestamp || Date.now()),
+                confidence: entry.confidence || 0.8
+              };
+              
+              setTranscriptions(prev => [...prev, newEntry]);
+            }
+          });
+
+          // Сохраняем ссылку для управления
+          (window as any).streamTranscription = transcription;
+        } catch (error) {
+          console.error('Error initializing transcription:', error);
+          toast.error('Failed to initialize transcription');
+        }
+      };
+
+      initializeTranscription();
     }
-  }, [isEnabled]);
+  }, [isEnabled, call]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -86,24 +113,51 @@ export const AudioTranscription = ({ isEnabled, onToggle }: AudioTranscriptionPr
   const startTranscription = async () => {
     setIsLoading(true);
     try {
-      // В реальном приложении здесь будет вызов Stream API для начала транскрипции
+      if (!call) throw new Error('Call not available');
+
+      // Реальная инициализация Stream Audio Transcription
+      const transcription = await call.enableAudioTranscription({
+        language: 'auto',
+        onTranscription: (entry) => {
+          const newEntry: TranscriptionEntry = {
+            id: entry.id || Date.now().toString(),
+            speaker: entry.speaker || 'Unknown',
+            text: entry.text || '',
+            timestamp: new Date(entry.timestamp || Date.now()),
+            confidence: entry.confidence || 0.8
+          };
+          
+          setTranscriptions(prev => [...prev, newEntry]);
+        }
+      });
+
+      // Сохраняем ссылку для управления
+      (window as any).streamTranscription = transcription;
       setIsRecording(true);
-      // Симуляция получения транскрипции в реальном времени
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
+      toast.success('Transcription started');
     } catch (error) {
       console.error('Error starting transcription:', error);
+      toast.error('Failed to start transcription');
+    } finally {
       setIsLoading(false);
     }
   };
 
   const stopTranscription = async () => {
     try {
-      // В реальном приложении здесь будет вызов Stream API для остановки транскрипции
+      if (!call) return;
+
+      // Останавливаем Stream Audio Transcription
+      if ((window as any).streamTranscription) {
+        await (window as any).streamTranscription.disable();
+        delete (window as any).streamTranscription;
+      }
+      
       setIsRecording(false);
+      toast.success('Transcription stopped');
     } catch (error) {
       console.error('Error stopping transcription:', error);
+      toast.error('Failed to stop transcription');
     }
   };
 
