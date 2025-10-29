@@ -46,19 +46,30 @@ export const VideoCall = ({ callId }: VideoCallProps) => {
       return;
     }
 
-    const streamClient = getStreamVideoClient(user.user.id, user.user.name || "Guest");
-    setClient(streamClient);
+    const initializeCall = async () => {
+      try {
+        const streamClient = await getStreamVideoClient(user.user.id, user.user.name || "Guest");
+        setClient(streamClient);
 
-    const newCall = streamClient.call('default', callId);
-    setCall(newCall);
+        const newCall = streamClient.call('default', callId);
+        setCall(newCall);
 
-    newCall.join().catch((err: any) => {
-      console.error("Failed to join call", err);
-    });
+        await newCall.join();
+      } catch (err: any) {
+        console.error("Failed to join call", err);
+        router.push("/dashboard/meetings");
+      }
+    };
+
+    initializeCall();
 
     return () => {
-      newCall.leave().catch((err: any) => console.error("Failed to leave call", err));
-      streamClient.disconnectUser();
+      if (call) {
+        call.leave().catch((err: any) => console.error("Failed to leave call", err));
+      }
+      if (client) {
+        client.disconnectUser();
+      }
     };
   }, [user, callId, router]);
 
@@ -354,33 +365,37 @@ const CallUI = ({ callId }: { callId: string }) => {
 };
 
 // Функция для получения Stream Video клиента
-const getStreamVideoClient = (userId: string, userName: string): StreamVideoClient => {
-  const client = new StreamVideoClient({
-    apiKey: process.env.NEXT_PUBLIC_STREAM_API_KEY!,
-    user: {
-      id: userId,
-      name: userName,
-    },
-    tokenProvider: async () => {
-      const response = await fetch('/api/stream/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          userName,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to get Stream token');
-      }
-      
-      const { token } = await response.json();
-      return token;
-    },
-  });
+const getStreamVideoClient = async (userId: string, userName: string): Promise<StreamVideoClient> => {
+  try {
+    const response = await fetch('/api/stream/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        userName,
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get Stream token');
+    }
+    
+    const { token, apiKey } = await response.json();
+    
+    const client = new StreamVideoClient({
+      apiKey: apiKey || process.env.NEXT_PUBLIC_STREAM_API_KEY!,
+      user: {
+        id: userId,
+        name: userName,
+      },
+      token: token,
+    });
 
-  return client;
+    return client;
+  } catch (error) {
+    console.error('Error creating Stream client:', error);
+    throw error;
+  }
 };

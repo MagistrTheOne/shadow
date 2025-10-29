@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StreamChat } from 'stream-chat';
+import { authClient } from '@/lib/auth-client';
 
 const STREAM_API_KEY = process.env.STREAM_API_KEY!;
 const STREAM_API_SECRET = process.env.STREAM_API_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await request.json();
+    const { userId, userName } = await request.json();
     
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -16,12 +17,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Stream API credentials not configured' }, { status: 500 });
     }
 
-    const chatClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
-    
-    // Создаем токен для пользователя
-    const token = chatClient.createToken(userId);
+    // Проверяем аутентификацию пользователя
+    const session = await authClient.api.getSession({
+      headers: request.headers
+    });
 
-    return NextResponse.json({ token });
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Создаем токен для Stream Video
+    const chatClient = StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET);
+    const token = chatClient.createToken(userId, {
+      exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+      iat: Math.floor(Date.now() / 1000),
+      user_id: userId,
+      name: userName || 'User'
+    });
+
+    return NextResponse.json({ 
+      token,
+      apiKey: STREAM_API_KEY,
+      userId,
+      userName: userName || 'User'
+    });
   } catch (error: any) {
     console.error('Error generating Stream token:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -1,7 +1,7 @@
 import { inngest } from '@/lib/inngest';
 import { db } from '@/db';
 import { recordings, transcripts, transcriptSummaries, meetings } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, lt } from 'drizzle-orm';
 import { transcribeAudio, formatTranscript } from '@/lib/deepgram';
 import { generateSummary } from '@/lib/gigachat-summary';
 import { logger } from '@/lib/logger';
@@ -196,9 +196,54 @@ export const sendMeetingReminders = inngest.createFunction(
 
     return await step.run('send-meeting-reminders', async () => {
       try {
-        // TODO: Implement email/push notification sending
-        // For now, just log the reminder
-        logger.info('Meeting reminder sent', { meetingId, userId, scheduledAt });
+        // Получаем данные о встрече
+        const meeting = await db.query.meetings.findFirst({
+          where: eq(meetings.id, meetingId),
+          with: {
+            user: true
+          }
+        });
+
+        if (!meeting) {
+          logger.warn('Meeting not found for reminder', { meetingId });
+          return { success: false, meetingId, userId, reason: 'Meeting not found' };
+        }
+
+        // Получаем данные о пользователе
+        const user = await db.query.user.findFirst({
+          where: eq(user.id, userId)
+        });
+
+        if (!user) {
+          logger.warn('User not found for reminder', { userId });
+          return { success: false, meetingId, userId, reason: 'User not found' };
+        }
+
+        // Создаем уведомление в базе данных
+        await db.insert(notifications).values({
+          id: nanoid(),
+          userId: userId,
+          type: 'meeting_reminder',
+          fromUserId: null,
+          metadata: {
+            meetingId: meetingId,
+            meetingTitle: meeting.title,
+            scheduledAt: scheduledAt
+          },
+          isRead: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+
+        // TODO: Добавить отправку email/push уведомлений
+        // Здесь можно интегрировать с SendGrid, Resend, или другими сервисами
+        
+        logger.info('Meeting reminder sent', { 
+          meetingId, 
+          userId, 
+          scheduledAt,
+          meetingTitle: meeting.title 
+        });
 
         return { success: true, meetingId, userId };
       } catch (error) {
@@ -233,15 +278,38 @@ export const cleanupExpiredRecordings = inngest.createFunction(
           cutoffDate: cutoffDate.toISOString()
         });
 
-        // TODO: Implement cleanup logic
         // 1. Find recordings older than cutoff date
-        // 2. Delete files from S3
-        // 3. Remove database records
+        const expiredRecordings = await db.query.recordings.findMany({
+          where: lt(recordings.createdAt, cutoffDate)
+        });
 
-        // For now, just log the operation
+        logger.info('Found expired recordings', { 
+          count: expiredRecordings.length,
+          cutoffDate: cutoffDate.toISOString()
+        });
+
+        // 2. Delete files from S3 (if using S3)
+        // TODO: Implement S3 file deletion
+        // for (const recording of expiredRecordings) {
+        //   await deleteS3File(recording.fileUrl);
+        // }
+
+        // 3. Remove database records
+        for (const recording of expiredRecordings) {
+          // Delete related transcript summaries first
+          await db.delete(transcriptSummaries).where(eq(transcriptSummaries.transcriptId, recording.id));
+          
+          // Delete related transcripts
+          await db.delete(transcripts).where(eq(transcripts.recordingId, recording.id));
+          
+          // Delete the recording
+          await db.delete(recordings).where(eq(recordings.id, recording.id));
+        }
+
         logger.info('Expired recordings cleanup completed', {
           olderThanDays,
-          cutoffDate: cutoffDate.toISOString()
+          cutoffDate: cutoffDate.toISOString(),
+          deletedCount: expiredRecordings.length
         });
 
         return { success: true, olderThanDays, cutoffDate: cutoffDate.toISOString() };
@@ -267,10 +335,23 @@ export const syncSubscriptionStatus = inngest.createFunction(
 
     return await step.run('sync-subscription-status', async () => {
       try {
-        // TODO: Implement Polar subscription sync
-        // 1. Get subscription from Polar
+        // 1. Get subscription from Polar API
+        // TODO: Implement actual Polar API integration
+        // const polarSubscription = await getPolarSubscription(subscriptionId);
+        
         // 2. Update local subscription status
+        // TODO: Update subscription in database
+        // await db.update(subscriptions).set({
+        //   status: polarSubscription.status,
+        //   currentPeriodEnd: polarSubscription.currentPeriodEnd,
+        //   updatedAt: new Date()
+        // }).where(eq(subscriptions.id, subscriptionId));
+
         // 3. Handle cancellations, renewals, etc.
+        // if (polarSubscription.status === 'cancelled') {
+        //   // Downgrade user to free plan
+        //   await downgradeUserToFree(userId);
+        // }
 
         logger.info('Subscription sync completed', { subscriptionId, userId });
 
