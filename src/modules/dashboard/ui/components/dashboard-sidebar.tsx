@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarHeader,
@@ -36,6 +37,10 @@ const firstSection = [
   { icon: BotIcon, label: "Agents", href: "/dashboard/agents" },
   { icon: MessageSquareIcon, label: "Chats", href: "/dashboard/chats" },
   { icon: UsersIcon, label: "Friends", href: "/dashboard/friends" },
+];
+
+const annaSection = [
+  { icon: BotIcon, label: "ANNA", href: "/dashboard/anna", isSpecial: true },
 ];
 
 const secondSection = [
@@ -155,8 +160,45 @@ export const DashboardSidebar = () => {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-            {/* Quick actions */}
+        {/* ANNA Special Section */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {annaSection.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    className={cn(
+                      "h-10 flex items-center gap-2 border border-transparent hover:border-purple-400/30 text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 transition-all duration-200 group rounded-lg",
+                      pathname === item.href &&
+                        "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 text-purple-200"
+                    )}
+                    onMouseEnter={() => setHoveredItem(item.href)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  >
+                    <Link href={item.href}>
+                      <item.icon className="size-5" />
+                      <span className="text-sm font-medium">
+                        {item.label}
+                      </span>
+                      <Badge variant="secondary" className="ml-auto text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                        AI
+                      </Badge>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Quick actions */}
+        <SidebarGroup>
+          <SidebarGroupContent>
             <div className="px-2 py-3 space-y-1">
               {[
                 {
