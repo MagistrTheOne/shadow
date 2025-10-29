@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# test files
+test-heygen.js
+test-heygen-direct.js
+
 # next.js
 /.next/
 /out/
