@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/landing/navbar";
 import { PricingSection } from "@/components/landing/pricing-section";
-import { DemoSection } from "@/components/landing/demo-section";
 import { FooterSection } from "@/components/landing/footer-section";
 
 export default function PricingPage() {
@@ -9,7 +8,6 @@ export default function PricingPage() {
       <Navbar />
       <main className="pt-16">
         <PricingSection />
-        <DemoSection />
       </main>
       <FooterSection />
     </div>

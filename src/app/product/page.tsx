@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/landing/navbar";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
-import { DemoSection } from "@/components/landing/demo-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FooterSection } from "@/components/landing/footer-section";
 

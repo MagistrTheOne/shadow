@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Zap, Mail, Twitter, Github, Linkedin } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 export const FooterSection = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="relative py-14 mt-20 bg-gradient-to-t from-black via-gray-900/80 to-transparent border-t border-white/10">
@@ -18,12 +20,11 @@ export const FooterSection = () => {
               <div className="w-9 h-9 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)] border border-cyan-400/30">
                 <Zap className="w-5 h-5 text-cyan-300" />
               </div>
-              <span className="text-xl font-bold text-white">Shadow AI</span>
+              <span className="text-xl font-bold text-white">{t('landing.footer.brand')}</span>
             </Link>
 
             <p className="text-gray-400 text-sm mb-6 max-w-xs">
-              The future of professional meetings with intelligent AI avatars
-              and seamless collaboration.
+              {t('landing.footer.description')}
             </p>
 
             <div className="flex space-x-3">
@@ -49,9 +50,9 @@ export const FooterSection = () => {
 
           {/* Product */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Product</h3>
+            <h3 className="text-white font-semibold mb-4">{t('landing.footer.product')}</h3>
             <ul className="space-y-2 text-sm">
-              {["Product", "Features", "Demo", "Pricing", "Get Started"].map(
+              {[t('nav.product'), t('nav.features'), t('nav.demo'), t('nav.pricing'), t('nav.getStarted')].map(
                 (item, i) => (
                   <li key={i}>
                     <Link
@@ -68,7 +69,7 @@ export const FooterSection = () => {
 
           {/* Company */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
+            <h3 className="text-white font-semibold mb-4">{t('landing.footer.company')}</h3>
             <ul className="space-y-2 text-sm">
               {["About", "Blog", "Careers", "Contact"].map((item, i) => (
                 <li key={i}>
@@ -85,7 +86,7 @@ export const FooterSection = () => {
 
           {/* Support */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Support</h3>
+            <h3 className="text-white font-semibold mb-4">{t('landing.footer.support')}</h3>
             <ul className="space-y-2 text-sm">
               {[
                 "Help Center",
@@ -109,7 +110,7 @@ export const FooterSection = () => {
         {/* Divider */}
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
           <div className="mb-4 md:mb-0">
-            © {currentYear} Shadow AI. All rights reserved. 
+            © {currentYear} {t('landing.footer.brand')}. {t('landing.footer.copyright')} 
             <span className="text-white font-semibold">@MagistrTheOne</span>
           </div>
           <div className="flex space-x-6">
@@ -137,7 +138,7 @@ export const FooterSection = () => {
             </a>
           </div>
           <div className="text-center sm:text-right">
-            Created by{" "}
+            {t('landing.footer.createdBy')}{" "}
             <a
               href="https://github.com/MagistrTheOne"
               target="_blank"

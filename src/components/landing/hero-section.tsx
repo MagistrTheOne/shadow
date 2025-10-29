@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap, Maximize2, X } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/language-context";
 
 interface HeroSectionProps {
   session?: any;
@@ -11,6 +12,7 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ session }: HeroSectionProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -37,40 +39,40 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
           {/* Left column */}
           <div className="flex-1 text-center lg:text-left max-w-2xl">
             <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-sm mb-6">
-              <Zap className="w-4 h-4 text-gray-400 mr-2" />
+            <Zap className="w-4 h-4 text-gray-400 mr-2" />
               <span className="text-sm text-gray-300">
-                Premium AI Technology • 2025
+                {t('landing.hero.badge')}
               </span>
-            </div>
+          </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-              <span className="block">Intelligent</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              <span className="block">{t('landing.hero.title1')}</span>
               <span className="block bg-gradient-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent">
-                AI Avatars
-              </span>
-            </h1>
+                {t('landing.hero.title2')}
+            </span>
+          </h1>
 
-            <p className="text-lg sm:text-xl text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto lg:mx-0">
-              Experience the future of professional meetings with AI avatars that
-              understand context, generate insights, and enhance collaboration.
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 leading-relaxed max-w-3xl mx-auto lg:mx-0">
+              {t('landing.hero.subtitle')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button
+              {/* Временно закомментировано */}
+              {/* <Button
                 size="lg"
                 className="w-full sm:w-auto bg-white/10 backdrop-blur-sm text-white hover:bg-white/30 text-lg px-8 py-4"
                 asChild
               >
                 <Link href={session ? "/dashboard" : "/sign-in"}>
-                  Go to Dashboard
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
+                  {t('landing.hero.cta')}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              </Button> */}
             </div>
           </div>
 
           {/* Right column — Avatar video */}
-          <div className="flex-1 w-full max-w-xs sm:max-w-sm md:max-w-md relative">
+          <div className="flex-1 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg relative mt-8 lg:mt-0">
             <div
               className="relative rounded-xl overflow-hidden border border-cyan-400/30 shadow-[0_0_30px_-10px_rgba(56,189,248,0.5)] transition-shadow duration-500 hover:shadow-[0_0_40px_-5px_rgba(56,189,248,0.6)]"
             >
@@ -93,12 +95,12 @@ export const HeroSection = ({ session }: HeroSectionProps) => {
                   onClick={() => setIsFullscreen(true)}
                 >
                   <Maximize2 className="w-5 h-5" />
-                </Button>
+            </Button>
               </div>
             </div>
 
             <p className="text-gray-400 text-xs mt-3 text-center">
-              Watch our AI avatar in action during a real meeting scenario
+              {t('landing.hero.videoDescription')}
             </p>
           </div>
         </div>

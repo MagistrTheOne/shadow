@@ -2,67 +2,69 @@
 
 import { Button } from "@/components/ui/button";
 import { Check, Zap, Crown, Rocket } from "lucide-react";
-
-const plans = [
-  {
-    name: "Starter",
-    price: "Free",
-    period: "forever",
-    description: "Perfect for individuals and small teams",
-    icon: Zap,
-    color: "text-gray-400",
-    features: [
-      "Up to 5 meetings per month",
-      "Basic AI avatar",
-      "Standard video quality",
-      "Basic transcripts",
-      "Email support"
-    ],
-    cta: "Get Started",
-    popular: false
-  },
-  {
-    name: "Professional",
-    price: "$29",
-    period: "per month",
-    description: "Best for growing teams and businesses",
-    icon: Crown,
-    color: "text-gray-300",
-    features: [
-      "Unlimited meetings",
-      "Advanced AI avatars",
-      "HD video quality",
-      "Smart transcripts & summaries",
-      "AI-powered insights",
-      "Priority support",
-      "Custom branding"
-    ],
-    cta: "Start Free Trial",
-    popular: true
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "pricing",
-    description: "For large organizations with advanced needs",
-    icon: Rocket,
-    color: "text-gray-300",
-    features: [
-      "Everything in Professional",
-      "Custom AI avatar training",
-      "4K video quality",
-      "Advanced analytics",
-      "SSO integration",
-      "Dedicated support",
-      "Custom integrations",
-      "On-premise deployment"
-    ],
-    cta: "Contact Sales",
-    popular: false
-  }
-];
+import { useLanguage } from "@/contexts/language-context";
 
 export const PricingSection = () => {
+  const { t } = useLanguage();
+  
+  const plans = [
+    {
+      name: t('landing.pricing.starter.name'),
+      price: t('landing.pricing.starter.price'),
+      period: t('landing.pricing.starter.period'),
+      description: t('landing.pricing.starter.desc'),
+      icon: Zap,
+      color: "text-gray-400",
+      features: [
+        t('landing.pricing.features.meetings5'),
+        t('landing.pricing.features.basicAvatar'),
+        t('landing.pricing.features.standardVideo'),
+        t('landing.pricing.features.basicTranscripts'),
+        t('landing.pricing.features.emailSupport')
+      ],
+      cta: t('landing.pricing.starter.cta'),
+      popular: false
+    },
+    {
+      name: t('landing.pricing.professional.name'),
+      price: t('landing.pricing.professional.price'),
+      period: t('landing.pricing.professional.period'),
+      description: t('landing.pricing.professional.desc'),
+      icon: Crown,
+      color: "text-gray-300",
+      features: [
+        t('landing.pricing.features.unlimitedMeetings'),
+        t('landing.pricing.features.advancedAvatars'),
+        t('landing.pricing.features.hdVideo'),
+        t('landing.pricing.features.smartTranscripts'),
+        t('landing.pricing.features.aiInsights'),
+        t('landing.pricing.features.prioritySupport'),
+        t('landing.pricing.features.customBranding')
+      ],
+      cta: t('landing.pricing.professional.cta'),
+      popular: true
+    },
+    {
+      name: t('landing.pricing.enterprise.name'),
+      price: t('landing.pricing.enterprise.price'),
+      period: t('landing.pricing.enterprise.period'),
+      description: t('landing.pricing.enterprise.desc'),
+      icon: Rocket,
+      color: "text-gray-300",
+      features: [
+        t('landing.pricing.features.everythingPro'),
+        t('landing.pricing.features.customTraining'),
+        t('landing.pricing.features.4kVideo'),
+        t('landing.pricing.features.advancedAnalytics'),
+        t('landing.pricing.features.sso'),
+        t('landing.pricing.features.dedicatedSupport'),
+        t('landing.pricing.features.customIntegrations'),
+        t('landing.pricing.features.onPremise')
+      ],
+      cta: t('landing.pricing.enterprise.cta'),
+      popular: false
+    }
+  ];
   return (
     <section id="pricing" className="py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,17 +72,16 @@ export const PricingSection = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-6">
             <Crown className="w-4 h-4 text-gray-400 mr-2" />
-            <span className="text-sm text-gray-300">Pricing</span>
+            <span className="text-sm text-gray-300">{t('landing.pricing.badge')}</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Choose your{" "}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
+            {t('landing.pricing.title1')}{" "}
             <span className="bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent">
-              perfect plan
+              {t('landing.pricing.title2')}
             </span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Start free and scale as you grow. All plans include our enterprise AI avatar technology
-            and premium meeting features.
+          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">
+            {t('landing.pricing.subtitle')}
           </p>
         </div>
 
@@ -99,7 +100,7 @@ export const PricingSection = () => {
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-white/20 backdrop-blur-sm text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Most Popular
+                    {t('landing.pricing.popular')}
                   </div>
                 </div>
               )}
@@ -127,16 +128,16 @@ export const PricingSection = () => {
                 ))}
               </div>
 
-              {/* CTA Button */}
-              <Button
-                className={`w-full py-3 text-lg font-semibold ${
+              {/* CTA Button - Временно закомментировано */}
+              {/* <Button
+                className={`w-full py-3 text-sm sm:text-base md:text-lg font-semibold ${
                   plan.popular
                     ? "bg-white/20 hover:bg-white/30 text-white"
                     : "bg-white/10 hover:bg-white/30 text-white"
                 }`}
               >
-                {plan.cta}
-              </Button>
+                <span className="truncate">{plan.cta}</span>
+              </Button> */}
             </div>
           ))}
         </div>
@@ -144,12 +145,12 @@ export const PricingSection = () => {
         {/* Bottom Note */}
         <div className="text-center mt-12">
           <p className="text-gray-400 mb-4">
-            All plans include 14-day free trial • No credit card required • Cancel anytime
+            {t('landing.pricing.trial')}
           </p>
           <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
-            <span>✓ SOC 2 Compliant</span>
-            <span>✓ GDPR Ready</span>
-            <span>✓ 99.9% Uptime SLA</span>
+            <span>{t('landing.pricing.compliance')}</span>
+            <span>{t('landing.pricing.gdpr')}</span>
+            <span>{t('landing.pricing.uptime')}</span>
           </div>
         </div>
       </div>

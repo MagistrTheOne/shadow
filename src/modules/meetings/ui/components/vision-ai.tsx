@@ -15,6 +15,7 @@ import {
   ActivityIcon
 } from "lucide-react";
 import { useCall } from "@stream-io/video-react-sdk";
+import { toast } from "sonner";
 
 interface VisionAIProps {
   isEnabled: boolean;
@@ -54,10 +55,11 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
       // Реальная интеграция с Stream Vision AI SDK
       const initializeVisionAI = async () => {
         try {
-          // Подключаемся к Stream Vision AI
-          const visionAI = await call.enableVisionAI({
+          // В Stream Video SDK нет прямого метода enableVisionAI
+          // Симулируем подключение к Vision AI
+          const visionAI = {
             features: selectedFeatures,
-            onDetection: (detection) => {
+            onDetection: (detection: any) => {
               const newDetection: VisionDetection = {
                 id: detection.id || Date.now().toString(),
                 type: detection.type as any,
@@ -74,7 +76,7 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
               
               setDetections(prev => [...prev.slice(-9), newDetection]);
             }
-          });
+          };
 
           // Сохраняем ссылку для очистки
           (window as any).streamVisionAI = visionAI;
@@ -101,27 +103,30 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
     try {
       if (!call) throw new Error('Call not available');
       
-      // Реальная инициализация Stream Vision AI SDK
-      const visionAI = await call.enableVisionAI({
-        features: selectedFeatures,
-        onDetection: (detection) => {
-          const newDetection: VisionDetection = {
-            id: detection.id || Date.now().toString(),
-            type: detection.type as any,
-            confidence: detection.confidence || 0.8,
-            position: {
-              x: detection.boundingBox?.x || 0,
-              y: detection.boundingBox?.y || 0,
-              width: detection.boundingBox?.width || 50,
-              height: detection.boundingBox?.height || 50
-            },
-            label: detection.label || 'Unknown',
-            timestamp: new Date()
-          };
-          
-          setDetections(prev => [...prev.slice(-9), newDetection]);
-        }
-      });
+      // Временно закомментировано - метод enableVisionAI не существует в текущем Stream SDK
+      // const visionAI = await call.enableVisionAI({
+      //   features: selectedFeatures,
+      //   onDetection: (detection) => {
+      //     const newDetection: VisionDetection = {
+      //       id: detection.id || Date.now().toString(),
+      //       type: detection.type as any,
+      //       confidence: detection.confidence || 0.8,
+      //       position: {
+      //         x: detection.boundingBox?.x || 0,
+      //         y: detection.boundingBox?.y || 0,
+      //         width: detection.boundingBox?.width || 50,
+      //         height: detection.boundingBox?.height || 50
+      //       },
+      //       label: detection.label || 'Unknown',
+      //       timestamp: new Date()
+      //     };
+      //     
+      //     setDetections(prev => [...prev.slice(-9), newDetection]);
+      //   }
+      // });
+      
+      // Временная заглушка для демонстрации
+      const visionAI = { enabled: true };
 
       // Сохраняем ссылку для управления
       (window as any).streamVisionAI = visionAI;

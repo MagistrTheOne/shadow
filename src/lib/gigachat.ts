@@ -28,7 +28,7 @@ export async function generateChatCompletion(request: ChatCompletionRequest) {
   const token = await getGigaChatAccessToken();
   
   try {
-    const response = await gigachatAxios.post('https://gigachat.devices.sberbank.ru/api/v1/chat/completions', request, {
+    const response = await gigachatAxios.post(`${process.env.SBER_API_URL}/chat/completions`, request, {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -84,7 +84,7 @@ export async function getAvailableModels() {
   const token = await getGigaChatAccessToken();
   
   try {
-    const response = await gigachatAxios.get('https://gigachat.devices.sberbank.ru/api/v1/models', {
+    const response = await gigachatAxios.get(`${process.env.SBER_API_URL}/models`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -102,7 +102,7 @@ export async function generateEmbedding(text: string | string[]) {
   const token = await getGigaChatAccessToken();
   
   try {
-    const response = await gigachatAxios.post('https://gigachat.devices.sberbank.ru/api/v1/embeddings', {
+    const response = await gigachatAxios.post(`${process.env.SBER_API_URL}/embeddings`, {
       model: 'Embeddings',
       input: text
     }, {

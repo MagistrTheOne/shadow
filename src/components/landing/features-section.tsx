@@ -9,47 +9,43 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-
-const features = [
-  {
-    icon: Bot,
-    title: "AI Avatars",
-    description:
-      "Sophisticated avatars that understand context and respond naturally to your meetings.",
-  },
-  {
-    icon: Video,
-    title: "Premium Video Calls",
-    description:
-      "Crystal clear video quality with advanced noise cancellation and background effects.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Real-time Chat",
-    description:
-      "Instant messaging during meetings with AI-powered suggestions and translations.",
-  },
-  {
-    icon: FileText,
-    title: "Smart Transcripts",
-    description:
-      "Automatic transcription with AI-powered summaries and action item extraction.",
-  },
-  {
-    icon: Brain,
-    title: "AI Insights",
-    description:
-      "Get intelligent insights, sentiment analysis, and meeting effectiveness metrics.",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description:
-      "Bank-level encryption, SOC 2 compliance, and advanced privacy controls.",
-  },
-];
+import { useLanguage } from "@/contexts/language-context";
 
 export const FeaturesSection = () => {
+  const { t } = useLanguage();
+  
+  const features = [
+    {
+      icon: Bot,
+      title: t('landing.features.aiAvatars.title'),
+      description: t('landing.features.aiAvatars.desc'),
+    },
+    {
+      icon: Video,
+      title: t('landing.features.videoCalls.title'),
+      description: t('landing.features.videoCalls.desc'),
+    },
+    {
+      icon: MessageSquare,
+      title: t('landing.features.chat.title'),
+      description: t('landing.features.chat.desc'),
+    },
+    {
+      icon: FileText,
+      title: t('landing.features.transcripts.title'),
+      description: t('landing.features.transcripts.desc'),
+    },
+    {
+      icon: Brain,
+      title: t('landing.features.insights.title'),
+      description: t('landing.features.insights.desc'),
+    },
+    {
+      icon: Shield,
+      title: t('landing.features.security.title'),
+      description: t('landing.features.security.desc'),
+    },
+  ];
   return (
     <section id="features" className="py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,17 +53,16 @@ export const FeaturesSection = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-6">
             <Zap className="w-4 h-4 text-cyan-400 mr-2" />
-            <span className="text-sm text-gray-300">Product Features</span>
+            <span className="text-sm text-gray-300">{t('landing.features.badge')}</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Everything you need for{" "}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
+            {t('landing.features.title1')}{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
-              professional meetings
+              {t('landing.features.title2')}
             </span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Experience enterprise-grade video conferencing with sophisticated AI
-            avatars, intelligent automation, and seamless collaboration tools.
+          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto">
+            {t('landing.features.subtitle')}
           </p>
         </div>
 
@@ -103,7 +98,7 @@ export const FeaturesSection = () => {
         {/* CTA */}
         <div className="text-center mt-20">
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-sm backdrop-blur-sm">
-            Trusted by enterprise teams worldwide
+            {t('landing.features.trusted')}
           </div>
         </div>
       </div>

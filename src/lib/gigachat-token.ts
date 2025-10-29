@@ -22,14 +22,14 @@ export async function getGigaChatAccessToken(): Promise<string> {
   const rquid = nanoid();
   
   try {
-    const response = await axios.post('https://ngw.devices.sberbank.ru:9443/api/v2/oauth', 
+    const response = await axios.post(process.env.SBER_OAUTH_URL!, 
       'scope=GIGACHAT_API_PERS',
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
           'RqUID': rquid,
-          'Authorization': `Basic ${process.env.GIGACHAT_AUTHORIZATION_KEY!}`
+          'Authorization': `Basic ${process.env.SBER_AUTHORIZATION_KEY!}`
         },
         httpsAgent
       }

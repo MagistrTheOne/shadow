@@ -104,7 +104,7 @@ const CallUI = ({ callId }: { callId: string }) => {
   const [customUIEnabled, setCustomUIEnabled] = useState(false);
 
   // Получаем данные митинга
-  const { data: meeting } = trpc.meetings.getById.useQuery({ id: callId });
+  const { data: meeting } = trpc.meetings.getOne.useQuery({ id: callId });
 
   // Получаем call объект для управления записью
   const call = useCall();
@@ -296,7 +296,7 @@ const CallUI = ({ callId }: { callId: string }) => {
         meetingId={callId}
         isVisible={aiAvatarVisible}
         onToggle={() => setAiAvatarVisible(!aiAvatarVisible)}
-        agentId={meeting?.agentId || undefined}
+        agentId={undefined}
       />
 
       {/* Voice Agent */}

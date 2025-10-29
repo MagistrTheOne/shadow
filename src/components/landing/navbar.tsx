@@ -31,10 +31,10 @@ export const Navbar = ({ session }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
-            {["Product", "Features", "Demo", "Pricing"].map((item) => (
+            {["Product", "Features", "Pricing", "Whitelist"].map((item) => (
               <Link
                 key={item}
-                href={`/${item.toLowerCase()}`}
+                href={item === "Whitelist" ? "/whitelist" : `/${item.toLowerCase()}`}
                 className="text-gray-300 hover:text-cyan-300 transition-colors duration-300 text-sm sm:text-base"
               >
                 {t(`nav.${item.toLowerCase()}`)}
@@ -45,39 +45,7 @@ export const Navbar = ({ session }: NavbarProps) => {
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
-            {session ? (
-              <>
-                <Button
-                  variant="ghost"
-                  className="text-gray-200 hover:text-white hover:bg-white/10 transition"
-                  asChild
-                >
-                  <Link href="/dashboard">{t('nav.dashboard')}</Link>
-                </Button>
-                <Button
-                  className="bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm transition"
-                  asChild
-                >
-                  <Link href="/dashboard/profile/edit">Profile</Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  className="text-gray-200 hover:text-white hover:bg-white/10 transition"
-                  asChild
-                >
-                  <Link href="/sign-in">{t('nav.signIn')}</Link>
-                </Button>
-                <Button
-                  className="bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 backdrop-blur-sm transition"
-                  asChild
-                >
-                  <Link href="/sign-up">{t('nav.getStarted')}</Link>
-                </Button>
-              </>
-            )}
+            {/* Авторизация временно скрыта в бета-версии */}
           </div>
 
           {/* Mobile Toggle */}
@@ -101,10 +69,10 @@ export const Navbar = ({ session }: NavbarProps) => {
         {isMenuOpen && (
           <div className="md:hidden animate-fadeIn">
             <div className="px-3 py-4 mt-2 rounded-lg bg-black/70 backdrop-blur-xl border border-white/10 space-y-2">
-              {["Product", "Features", "Demo", "Pricing"].map((item) => (
+              {["Product", "Features", "Pricing", "Whitelist"].map((item) => (
                 <Link
                   key={item}
-                  href={`/${item.toLowerCase()}`}
+                  href={item === "Whitelist" ? "/whitelist" : `/${item.toLowerCase()}`}
                   className="block px-3 py-2 rounded-lg text-gray-300 hover:text-cyan-300 hover:bg-cyan-400/10 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -116,53 +84,7 @@ export const Navbar = ({ session }: NavbarProps) => {
                 <div className="flex justify-center mb-2">
                   <LanguageSwitcher />
                 </div>
-                {session ? (
-                  <>
-                    <Button
-                      variant="ghost"
-                      className="w-full text-white hover:bg-white/10"
-                      asChild
-                    >
-                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                        {t('nav.dashboard')}
-                      </Link>
-                    </Button>
-                    <Button
-                      className="w-full bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30"
-                      asChild
-                    >
-                      <Link
-                        href="/dashboard/profile/edit"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="ghost"
-                      className="w-full text-white hover:bg-white/10"
-                      asChild
-                    >
-                      <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
-                        {t('nav.signIn')}
-                      </Link>
-                    </Button>
-                    <Button
-                      className="w-full bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 border border-cyan-400/30"
-                      asChild
-                    >
-                      <Link
-                        href="/sign-up"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {t('nav.getStarted')}
-                      </Link>
-                    </Button>
-                  </>
-                )}
+                {/* Авторизация временно скрыта в бета-версии */}
               </div>
             </div>
           </div>

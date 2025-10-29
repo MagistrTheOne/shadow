@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/landing/navbar";
 import { FeaturesSection } from "@/components/landing/features-section";
-import { DemoSection } from "@/components/landing/demo-section";
 import { FooterSection } from "@/components/landing/footer-section";
 
 export default function FeaturesPage() {
@@ -9,7 +8,6 @@ export default function FeaturesPage() {
       <Navbar />
       <main className="pt-16">
         <FeaturesSection />
-        <DemoSection />
       </main>
       <FooterSection />
     </div>

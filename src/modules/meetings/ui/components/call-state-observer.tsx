@@ -18,6 +18,7 @@ import {
   SquareIcon
 } from "lucide-react";
 import { useCall, useCallStateHooks } from "@stream-io/video-react-sdk";
+import { toast } from "sonner";
 
 interface CallStateObserverProps {
   isEnabled: boolean;
@@ -83,20 +84,11 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
             setEvents(prev => [newEvent, ...prev.slice(0, 19)]); // Keep last 20 events
           });
 
-          // Подписываемся на статистику звонка
-          const statsUnsubscribe = call.on('call.stats', (stats) => {
-            setStats({
-              duration: formatDuration(stats.duration || 0),
-              participants: stats.participants || participants.length,
-              bandwidth: stats.bandwidth || 0,
-              packetLoss: stats.packetLoss || 0,
-              jitter: stats.jitter || 0
-            });
-          });
+          // Статистика звонка будет обновляться через другие события
+          // call.stats не является валидным типом события в Stream Video SDK
 
           // Сохраняем функции отписки
           (window as any).callObserverUnsubscribe = unsubscribe;
-          (window as any).callStatsUnsubscribe = statsUnsubscribe;
         } catch (error) {
           console.error('Error initializing call observer:', error);
           toast.error('Failed to initialize call observer');
@@ -109,9 +101,6 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
         // Очищаем подписки при размонтировании
         if ((window as any).callObserverUnsubscribe) {
           (window as any).callObserverUnsubscribe();
-        }
-        if ((window as any).callStatsUnsubscribe) {
-          (window as any).callStatsUnsubscribe();
         }
       };
     }
