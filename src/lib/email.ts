@@ -23,7 +23,13 @@ async function getResendClient() {
   }
 
   try {
-    const { Resend } = await import('resend');
+    // Dynamic import с обработкой ошибок
+    const resendModule = await import('resend').catch(() => null);
+    if (!resendModule || !resendModule.Resend) {
+      console.warn('Resend package not installed, email sending disabled');
+      return null;
+    }
+    const { Resend } = resendModule;
     resendClient = new Resend(RESEND_API_KEY);
     return resendClient;
   } catch (error) {
