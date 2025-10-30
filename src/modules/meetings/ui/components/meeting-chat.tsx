@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { authClient } from "@/lib/auth-client";
 import { StreamChat } from "stream-chat";
-import { Chat, Channel, MessageList, MessageInput } from "stream-chat-react";
+import { Chat, Channel, MessageList, MessageInput, Window } from "stream-chat-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +56,8 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
 
         const { token } = await response.json();
 
-        // Инициализируем Stream Chat клиент
+        // Инициализируем Stream Chat клиент согласно документации
+        // https://getstream.io/chat/docs/sdk/react/
         const client = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
 
         await client.connectUser(
@@ -68,7 +69,19 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
           token
         );
 
+        // Создаем или получаем канал для встречи
+        const channelId = `meeting-${meetingId}`;
+        const channel = client.channel('messaging', channelId, {
+          members: [user?.user?.id!],
+        });
+
+        // Watch канала для подписки на обновления (обязательно по документации)
+        await channel.watch();
+
+        // Сохраняем channel в ref для использования
         chatClientRef.current = client;
+        chatClientRef.current.channel = channel;
+        
         setIsConnected(true);
         setIsLoading(false);
       } catch (err) {
@@ -194,15 +207,22 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
           </div>
         </div>
 
-        <Chat client={chatClientRef.current}>
-            <div className="flex flex-col h-full">
-              <div className="flex-1 overflow-hidden">
-              <div className="p-4 text-center text-gray-400">
-                Chat functionality will be implemented
-              </div>
-            </div>
-          </div>
-        </Chat>
+        {chatClientRef.current?.channel && (
+          <Chat client={chatClientRef.current}>
+            <Channel channel={chatClientRef.current.channel}>
+              <Window>
+                <div className="flex flex-col h-full">
+                  <div className="flex-1 overflow-y-auto">
+                    <MessageList />
+                  </div>
+                  <div className="border-t border-dashboard-border">
+                    <MessageInput />
+                  </div>
+                </div>
+              </Window>
+            </Channel>
+          </Chat>
+        )}
       </CardContent>
     </Card>
   );

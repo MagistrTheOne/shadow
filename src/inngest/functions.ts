@@ -6,6 +6,8 @@ import { transcribeAudio, formatTranscript } from '@/lib/deepgram';
 import { generateSummary, generateKeyPoints, generateActionItems } from '@/lib/gigachat-summary';
 import { logger } from '@/lib/logger';
 import { getPolarSubscription } from '@/lib/polar';
+import { deleteS3Files } from '@/lib/s3-utils';
+import { sendMeetingReminderEmail } from '@/lib/email';
 
 // Process recording after meeting ends
 export const processRecording = inngest.createFunction(
@@ -241,8 +243,16 @@ export const sendMeetingReminders = inngest.createFunction(
           isRead: false
         });
 
-        // TODO: Добавить отправку email/push уведомлений
-        // Здесь можно интегрировать с SendGrid, Resend, или другими сервисами
+        // Send email notification
+        if (userData[0].email) {
+          await sendMeetingReminderEmail(
+            userData[0].email,
+            userData[0].name || 'User',
+            meeting[0].title,
+            meetingId,
+            scheduledAt
+          );
+        }
         
         logger.info('Meeting reminder sent', { 
           meetingId, 
@@ -295,11 +305,15 @@ export const cleanupExpiredRecordings = inngest.createFunction(
           cutoffDate: cutoffDate.toISOString()
         });
 
-        // 2. Delete files from S3 (if using S3)
-        // TODO: Implement S3 file deletion
-        // for (const recording of expiredRecordings) {
-        //   await deleteS3File(recording.fileUrl);
-        // }
+        // 2. Delete files from S3
+        const fileUrls = expiredRecordings
+          .map(r => r.fileUrl)
+          .filter(url => url && url.length > 0);
+        
+        if (fileUrls.length > 0) {
+          logger.info('Deleting files from S3', { count: fileUrls.length });
+          await deleteS3Files(fileUrls);
+        }
 
         // 3. Remove database records (cascade deletion handled by DB schema)
         for (const recording of expiredRecordings) {

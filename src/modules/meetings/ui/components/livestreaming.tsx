@@ -38,6 +38,7 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [streamUrl, setStreamUrl] = useState("");
   const [streamKey, setStreamKey] = useState("");
+  const [livestreamId, setLivestreamId] = useState<string | null>(null);
   const [streamTitle, setStreamTitle] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -81,17 +82,39 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
     try {
       if (!call) throw new Error('Call not available');
 
-      // В Stream Video SDK нет прямого метода startLivestream
-      // Симулируем запуск стрима
-      const streamConfig = {
-        streamUrl: `rtmp://stream.example.com/live/${call.id}`,
-        streamKey: `key_${call.id}_${Date.now()}`,
-        title: streamTitle || `Live Stream - ${call.id}`
-      };
+      // Use Stream Backend API to start livestream
+      const response = await fetch('/api/stream/livestream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          callId: call.id,
+          rtmpUrl: undefined, // Optional: provide custom RTMP URL
+        }),
+      });
 
-      setStreamUrl(streamConfig.streamUrl);
-      setStreamKey(streamConfig.streamKey);
+      if (!response.ok) {
+        throw new Error('Failed to start livestream');
+      }
+
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to start livestream');
+      }
+      
+      // Store stream information
+      setStreamUrl(data.playbackUrl || data.hlsUrl || data.rtmpUrl || '');
+      setStreamKey(data.streamKey || '');
+      setLivestreamId(data.livestreamId);
       setIsStreaming(true);
+      
+      // Reset start time for duration tracking
+      setStats(prev => ({ 
+        ...prev, 
+        startTime: Date.now(),
+        duration: '00:00:00'
+      }));
+      
       toast.success('Livestream started successfully');
     } catch (error) {
       console.error('Error starting stream:', error);
@@ -102,14 +125,26 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
   };
 
   const stopStream = async () => {
+    setIsLoading(true);
     try {
-      if (!call) return;
+      if (!call || !livestreamId) {
+        setIsStreaming(false);
+        return;
+      }
 
-      // В Stream Video SDK нет прямого метода stopLivestream
-      // Симулируем остановку стрима
+      // Use Stream Backend API to stop livestream
+      const response = await fetch(`/api/stream/livestream?livestreamId=${livestreamId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to stop livestream');
+      }
+
       setIsStreaming(false);
       setStreamUrl("");
       setStreamKey("");
+      setLivestreamId(null);
       setStats({
         viewers: 0,
         duration: "00:00:00",
@@ -121,6 +156,8 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
     } catch (error) {
       console.error('Error stopping stream:', error);
       toast.error('Failed to stop livestream');
+    } finally {
+      setIsLoading(false);
     }
   };
 

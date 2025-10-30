@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { StreamChat } from 'stream-chat';
-import { Chat, Channel, ChannelList, MessageList, MessageInput, Thread, Window } from 'stream-chat-react';
+import { Chat, Channel, MessageList, MessageInput, Thread, Window } from 'stream-chat-react';
 import { useCall } from '@stream-io/video-react-sdk';
 import { authClient } from '@/lib/auth-client';
 import { trpc } from '@/trpc/client';
@@ -34,24 +34,42 @@ export function StreamChatComponent({ callId }: StreamChatProps) {
         // Создаем Stream Chat клиент
         const client = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
         
-        // Получаем подписанный Stream user token с сервера (tRPC)
-        const tokenResp = await trpc.stream.getUserToken.fetch();
+        // Получаем подписанный Stream user token с сервера (API route)
+        const tokenResp = await fetch('/api/stream/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            userName: user.name || 'User',
+          }),
+        });
+
+        if (!tokenResp.ok) {
+          throw new Error('Failed to get Stream token');
+        }
+
+        const { token } = await tokenResp.json();
+        
         await client.connectUser(
           {
             id: user.id,
             name: user.name || 'User',
             image: user.image || undefined,
           },
-          tokenResp.token
+          token
         );
 
         setChatClient(client);
 
         // Создаем или получаем канал для звонка
+        // Согласно документации Stream Chat SDK: https://getstream.io/chat/docs/sdk/react/
         const channelId = `call-${callId}`;
-        const channel = client.channel('messaging', channelId);
+        const channel = client.channel('messaging', channelId, {
+          members: [user.id], // Добавляем текущего пользователя в участники
+        });
 
-        await channel.create();
+        // Watch канала необходим для подписки на обновления
+        await channel.watch();
         setChannel(channel);
 
         // Подключаем чат к звонку
@@ -89,16 +107,18 @@ export function StreamChatComponent({ callId }: StreamChatProps) {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col dashboard-card">
       <Chat client={chatClient} theme="str-chat__theme-dark">
-        <ChannelList
-          filters={{ type: 'messaging' }}
-          sort={{ last_message_at: -1 }}
-        />
         <Channel channel={channel}>
           <Window>
-            <MessageList />
-            <MessageInput />
+            <div className="flex flex-col h-full">
+              <div className="flex-1 overflow-y-auto">
+                <MessageList />
+              </div>
+              <div className="border-t border-dashboard-border">
+                <MessageInput />
+              </div>
+            </div>
             <Thread />
           </Window>
         </Channel>
