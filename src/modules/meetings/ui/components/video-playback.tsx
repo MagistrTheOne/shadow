@@ -100,7 +100,7 @@ export function VideoPlayback({ recordingId, meetingId }: VideoPlaybackProps) {
             <div className="relative bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
-                src={recording.fileUrl}
+                src={recording.recording.fileUrl}
                 className="w-full aspect-video"
                 controls
               />
@@ -151,16 +151,16 @@ export function VideoPlayback({ recordingId, meetingId }: VideoPlaybackProps) {
               <p className="text-sm text-muted-strong whitespace-pre-wrap">
                 {summary.summary.summary}
               </p>
-              {summary.summary.keyPoints && (
+              {Array.isArray(summary.summary.keyPoints) && summary.summary.keyPoints.length > 0 ? (
                 <div className="mt-4">
                   <h4 className="font-semibold mb-2">Key Points</h4>
                   <ul className="list-disc list-inside space-y-1 text-sm text-muted-strong">
-                    {(summary.summary.keyPoints as string[]).map((point, i) => (
+                    {(summary.summary.keyPoints as string[]).map((point: string, i: number) => (
                       <li key={i}>{point}</li>
                     ))}
                   </ul>
                 </div>
-              )}
+              ) : null}
             </CardContent>
           </Card>
         )}

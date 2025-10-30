@@ -11,7 +11,7 @@ import type { Meeting, Agent } from '@/trpc/types';
 
 export const HomeView = () => {
   const { data: upcomingMeetings, isLoading: upcomingLoading } = trpc.meetings.getUpcoming.useQuery();
-  const { data: recentMeetings, isLoading: recentLoading } = trpc.meetings.getHistory.useQuery({ limit: 5, offset: 0 });
+  const { data: recentMeetings, isLoading: recentLoading } = trpc.meetings.getHistory.useQuery({ limit: 5 });
   const { data: agents, isLoading: agentsLoading } = trpc.agents.getMany.useQuery();
 
   // Показываем загрузку если данные еще не загружены

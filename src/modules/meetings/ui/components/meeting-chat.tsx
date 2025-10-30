@@ -208,20 +208,20 @@ export const MeetingChat = ({ meetingId, participants }: MeetingChatProps) => {
         </div>
 
         {chatClientRef.current?.channel && (
-          <Chat client={chatClientRef.current}>
+        <Chat client={chatClientRef.current}>
             <Channel channel={chatClientRef.current.channel}>
               <Window>
-                <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full">
                   <div className="flex-1 overflow-y-auto">
                     <MessageList />
-                  </div>
+              </div>
                   <div className="border-t border-dashboard-border">
                     <MessageInput />
-                  </div>
-                </div>
+            </div>
+          </div>
               </Window>
             </Channel>
-          </Chat>
+        </Chat>
         )}
       </CardContent>
     </Card>
