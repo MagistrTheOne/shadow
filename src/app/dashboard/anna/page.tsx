@@ -15,9 +15,6 @@ import {
 } from "lucide-react";
 import { AnnaAvatar } from "@/components/anna-avatar";
 import { AnnaAgentIntegration } from "@/components/anna-agent-integration";
-import { StreamAIChatbot } from "@/components/stream-ai-chatbot";
-import { StreamAIModeration } from "@/components/stream-ai-moderation";
-import { StreamActivityFeeds } from "@/components/stream-activity-feeds";
 import { trpc } from "@/trpc/client";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
@@ -25,9 +22,6 @@ import { toast } from "sonner";
 
 export default function AnnaPage() {
   const [activeTab, setActiveTab] = useState<"chat" | "video" | "settings">("chat");
-  const [aiChatbotEnabled, setAiChatbotEnabled] = useState(false);
-  const [aiModerationEnabled, setAiModerationEnabled] = useState(false);
-  const [activityFeedsEnabled, setActivityFeedsEnabled] = useState(false);
 
   const { data: annaAgent, isLoading, isError } = trpc.agents.getOne.useQuery({
     id: "1652863dc2354b499db342a63feca19a",
@@ -111,11 +105,6 @@ export default function AnnaPage() {
                   agentName={annaAgent.name}
                   agentPersonality={annaAgent.personality?.tone || "friendly"}
                   isActive
-                />
-                <StreamAIChatbot
-                  callId="anna-chat"
-                  isEnabled={aiChatbotEnabled}
-                  onToggle={() => setAiChatbotEnabled(!aiChatbotEnabled)}
                 />
               </>
             )}
@@ -202,15 +191,6 @@ export default function AnnaPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <StreamAIModeration
-              callId="anna-chat"
-              isEnabled={aiModerationEnabled}
-              onToggle={() => setAiModerationEnabled(!aiModerationEnabled)}
-            />
-            <StreamActivityFeeds
-              isEnabled={activityFeedsEnabled}
-              onToggle={() => setActivityFeedsEnabled(!activityFeedsEnabled)}
-            />
             <Card className="bg-white/5 backdrop-blur-md border-white/10">
               <CardHeader>
                 <CardTitle className="text-white text-lg">ANNA Stats</CardTitle>
