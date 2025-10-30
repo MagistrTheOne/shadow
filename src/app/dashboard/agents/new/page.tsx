@@ -18,6 +18,7 @@ import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 import { animations } from "@/lib/animations";
 import { formAnimations } from "@/lib/form-animations";
+import { agentTemplates } from "@/modules/agents/templates";
 
 const agentSchema = z.object({
   name: z.string().min(1, "Name is required").max(50, "Name must be less than 50 characters"),
@@ -63,9 +64,7 @@ const SBER_MODELS = [
 
 const OPENAI_MODELS = [
   { value: "gpt-4o", label: "GPT-4o (Latest)" },
-  { value: "gpt-4o-mini", label: "GPT-4o Mini (Fast & Cost-effective)" },
-  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
-  { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+ 
 ];
 
 const TONE_OPTIONS = [
@@ -97,6 +96,7 @@ const EXPERTISE_OPTIONS = [
 export default function CreateAgentPage() {
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   const {
     register,
@@ -176,6 +176,57 @@ export default function CreateAgentPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Template picker */}
+              <div className="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+                <div>
+                  <Label htmlFor="template" className="text-gray-300">Template</Label>
+                  <Select
+                    onValueChange={(value) => setSelectedTemplateId(value)}
+                    value={selectedTemplateId || undefined}
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder="Select a template (optional)" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      {agentTemplates.map(t => (
+                        <SelectItem key={t.id} value={t.id} className="text-white">
+                          {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedTemplateId && (
+                    <p className="text-gray-400 text-xs mt-1">
+                      {agentTemplates.find(t => t.id === selectedTemplateId)?.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={!selectedTemplateId}
+                    onClick={() => {
+                      const tpl = agentTemplates.find(t => t.id === selectedTemplateId);
+                      if (!tpl) return;
+                      const confirmApply = window.confirm("Apply template? This will overwrite the current form values.");
+                      if (!confirmApply) return;
+                      // Ensure provider/model coherence then reset all values at once
+                      const preset = tpl.preset;
+                      const allowedModels = preset.provider === "sber" ? SBER_MODELS : OPENAI_MODELS;
+                      const model = allowedModels.find(m => m.value === preset.model)?.value || allowedModels[0]?.value || "";
+                      const nextValues = { ...preset, model } as const;
+                      // reset from react-hook-form (preserves registration)
+                      // @ts-expect-error ensure shape matches AgentFormData
+                      reset(nextValues);
+                      toast.success("Template applied");
+                    }}
+                  >
+                    Apply Template
+                  </Button>
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="name" className="text-gray-300">Agent Name *</Label>
                 <Input

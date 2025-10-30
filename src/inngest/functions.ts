@@ -1,10 +1,11 @@
 import { inngest } from '@/lib/inngest';
 import { db } from '@/db';
-import { recordings, transcripts, transcriptSummaries, meetings, user, notifications } from '@/db/schema';
+import { recordings, transcripts, transcriptSummaries, meetings, user, notifications, subscriptions } from '@/db/schema';
 import { eq, lt } from 'drizzle-orm';
 import { transcribeAudio, formatTranscript } from '@/lib/deepgram';
-import { generateSummary } from '@/lib/gigachat-summary';
+import { generateSummary, generateKeyPoints, generateActionItems } from '@/lib/gigachat-summary';
 import { logger } from '@/lib/logger';
+import { getPolarSubscription } from '@/lib/polar';
 
 // Process recording after meeting ends
 export const processRecording = inngest.createFunction(
@@ -160,14 +161,21 @@ export const summarizeMeeting = inngest.createFunction(
           summaryLength: summary.length
         });
 
+        // Extract key points and action items
+        logger.info('Extracting key points and action items', { transcriptId });
+        const [keyPoints, actionItems] = await Promise.all([
+          generateKeyPoints(transcript.content),
+          generateActionItems(transcript.content)
+        ]);
+
         // Save summary to database
         await db
           .insert(transcriptSummaries)
           .values({
             transcriptId,
             summary,
-            keyPoints: null, // TODO: Extract key points
-            actionItems: null, // TODO: Extract action items
+            keyPoints: keyPoints.length > 0 ? keyPoints : null,
+            actionItems: actionItems.length > 0 ? actionItems : null,
           });
 
         logger.info('Meeting summary saved to database', { transcriptId, meetingId });
@@ -293,10 +301,9 @@ export const cleanupExpiredRecordings = inngest.createFunction(
         //   await deleteS3File(recording.fileUrl);
         // }
 
-        // 3. Remove database records
+        // 3. Remove database records (cascade deletion handled by DB schema)
         for (const recording of expiredRecordings) {
-          // TODO: Добавить каскадное удаление связанных записей
-          // Пока удаляем только записи
+          // Drizzle ORM will cascade delete related transcripts via foreign key constraints
           await db.delete(recordings).where(eq(recordings.id, recording.id));
         }
 
@@ -330,24 +337,26 @@ export const syncSubscriptionStatus = inngest.createFunction(
     return await step.run('sync-subscription-status', async () => {
       try {
         // 1. Get subscription from Polar API
-        // TODO: Implement actual Polar API integration
-        // const polarSubscription = await getPolarSubscription(subscriptionId);
+        const polarSubscription = await getPolarSubscription(subscriptionId);
         
         // 2. Update local subscription status
-        // TODO: Update subscription in database
-        // await db.update(subscriptions).set({
-        //   status: polarSubscription.status,
-        //   currentPeriodEnd: polarSubscription.currentPeriodEnd,
-        //   updatedAt: new Date()
-        // }).where(eq(subscriptions.id, subscriptionId));
+        await db.update(subscriptions).set({
+          status: polarSubscription.status === 'active' ? 'active' : 
+                  polarSubscription.status === 'cancelled' ? 'cancelled' : 'expired',
+          currentPeriodStart: polarSubscription.current_period_start ? new Date(polarSubscription.current_period_start) : undefined,
+          currentPeriodEnd: polarSubscription.current_period_end ? new Date(polarSubscription.current_period_end) : undefined,
+          updatedAt: new Date()
+        }).where(eq(subscriptions.id, subscriptionId));
 
-        // 3. Handle cancellations, renewals, etc.
-        // if (polarSubscription.status === 'cancelled') {
-        //   // Downgrade user to free plan
-        //   await downgradeUserToFree(userId);
-        // }
+        // 3. Handle cancellations - downgrade to free plan
+        if (polarSubscription.status === 'cancelled' || polarSubscription.status === 'expired') {
+          await db.update(subscriptions).set({
+            plan: 'free',
+            status: 'expired'
+          }).where(eq(subscriptions.id, subscriptionId));
+        }
 
-        logger.info('Subscription sync completed', { subscriptionId, userId });
+        logger.info('Subscription sync completed', { subscriptionId, userId, status: polarSubscription.status });
 
         return { success: true, subscriptionId, userId };
       } catch (error) {

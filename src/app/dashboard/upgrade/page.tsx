@@ -108,16 +108,13 @@ export default function UpgradePage() {
 
   const handleUpgrade = (planName: string) => {
     if (planName === "Free") return;
-    
+
     setIsProcessing(true);
     setSelectedPlan(planName);
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      createSubscription.mutate({
-        plan: planName.toLowerCase() as "free" | "pro" | "enterprise"
-      });
-    }, 2000);
+
+    createSubscription.mutate({
+      plan: planName.toLowerCase() as "free" | "pro" | "enterprise",
+    });
   };
 
   if (isLoading) {

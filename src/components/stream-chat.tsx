@@ -5,6 +5,7 @@ import { StreamChat } from 'stream-chat';
 import { Chat, Channel, ChannelList, MessageList, MessageInput, Thread, Window } from 'stream-chat-react';
 import { useCall } from '@stream-io/video-react-sdk';
 import { authClient } from '@/lib/auth-client';
+import { trpc } from '@/trpc/client';
 import { LoadingState } from '@/components/loading-state';
 import { ErrorState } from '@/components/error-state';
 import { toast } from 'sonner';
@@ -33,14 +34,15 @@ export function StreamChatComponent({ callId }: StreamChatProps) {
         // Создаем Stream Chat клиент
         const client = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_API_KEY!);
         
-        // Аутентифицируем пользователя
+        // Получаем подписанный Stream user token с сервера (tRPC)
+        const tokenResp = await trpc.stream.getUserToken.fetch();
         await client.connectUser(
           {
             id: user.id,
             name: user.name || 'User',
             image: user.image || undefined,
           },
-          session.data?.session?.token || ''
+          tokenResp.token
         );
 
         setChatClient(client);

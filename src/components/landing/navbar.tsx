@@ -45,7 +45,19 @@ export const Navbar = ({ session }: NavbarProps) => {
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
-            {/* Авторизация временно скрыта в бета-версии */}
+            {!session ? (
+              <>
+                <Link href="/sign-up">
+                  <Button variant="secondary" size="sm">Sign Up</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href={`/dashboard/profile/${session.user?.id || "me"}`}>
+                  <Button variant="default" size="sm">Profile</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Toggle */}
@@ -84,7 +96,23 @@ export const Navbar = ({ session }: NavbarProps) => {
                 <div className="flex justify-center mb-2">
                   <LanguageSwitcher />
                 </div>
-                {/* Авторизация временно скрыта в бета-версии */}
+                {!session ? (
+                  <Link
+                    href="/sign-up"
+                    className="block px-3 py-2 rounded-lg text-white bg-cyan-600 hover:bg-cyan-500 text-center transition"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/dashboard/profile/${session.user?.id || "me"}`}
+                    className="block px-3 py-2 rounded-lg text-white bg-cyan-600 hover:bg-cyan-500 text-center transition"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                )}
               </div>
             </div>
           </div>

@@ -11,24 +11,38 @@ export const SystemStatus = () => {
   const [lastChecked, setLastChecked] = useState<Date>(new Date());
 
   useEffect(() => {
+    let interval: number | null = null;
+    let abortController: AbortController | null = null;
+
     const checkStatus = async () => {
       try {
-        // Simulate status check
-        const response = await fetch('/api/health');
+        abortController?.abort();
+        abortController = new AbortController();
+        const response = await fetch('/api/health', {
+          method: 'GET',
+          signal: abortController.signal,
+          cache: 'no-store',
+        });
         if (response.ok) {
           setStatus('online');
         } else {
           setStatus('degraded');
         }
-      } catch {
-        setStatus('offline');
+      } catch (e) {
+        if ((e as any)?.name !== 'AbortError') {
+          setStatus('offline');
+        }
+      } finally {
+        setLastChecked(new Date());
       }
-      setLastChecked(new Date());
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
+    interval = window.setInterval(checkStatus, 60000);
+    return () => {
+      if (interval !== null) window.clearInterval(interval);
+      abortController?.abort();
+    };
   }, []);
 
   const getStatusConfig = () => {
@@ -64,9 +78,8 @@ export const SystemStatus = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center space-x-2 cursor-pointer">
+          <div className="flex items-center cursor-pointer">
             <div className={`w-2 h-2 rounded-full ${config.bgColor} animate-pulse`} />
-            <span className="text-xs text-gray-400">System</span>
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="bg-black/90 border-white/10 text-white">

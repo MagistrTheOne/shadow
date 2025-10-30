@@ -7,13 +7,14 @@ import {
   PanelLeftCloseIcon,
   PanelLeftIcon,
   SearchIcon,
-  Settings,
+  Bell,
 } from "lucide-react";
 import { DashboardCommand } from "./dashboard-command";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SystemStatus } from "./system-status";
-import { Notifications } from "./dashboard-notifications";
 import { useCommandState } from "@/stores/dashboard-store";
+import { trpc } from "@/trpc/client";
+import { useRouter } from "next/navigation";
 
 function isEditingTarget(el: EventTarget | null) {
   if (!(el instanceof HTMLElement)) return false;
@@ -30,6 +31,10 @@ function isOpenCommandCombo(e: KeyboardEvent) {
 export const DashboardNavbar = () => {
   const { state, toggleSidebar, isMobile } = useSidebar();
   const { commandOpen, setCommandOpen, toggleCommand } = useCommandState();
+  const { data: unreadCount } = trpc.notifications.getUnreadCount.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
+  const router = useRouter();
 
   const openCommand = useCallback(() => setCommandOpen(true), [setCommandOpen]);
   const closeCommand = useCallback(() => setCommandOpen(false), [setCommandOpen]);
@@ -65,7 +70,7 @@ export const DashboardNavbar = () => {
         }
       />
 
-      <nav className="flex items-center gap-x-3 px-4 py-2 border-b border-white/10 bg-black/40 backdrop-blur-2xl shadow-[0_0_25px_-10px_rgba(56,189,248,0.3)] transition-all">
+      <nav className="dashboard-surface sticky top-0 z-20 flex items-center gap-x-3 px-4 py-2 border-b transition-all">
         {/* Sidebar toggle */}
         <Button
           className="size-8 border-white/20 text-white hover:bg-cyan-400/10 hover:border-cyan-400/20 transition-all"
@@ -94,30 +99,35 @@ export const DashboardNavbar = () => {
         {/* Right controls */}
         <div className="flex items-center gap-x-1">
           <SystemStatus />
-          <Notifications />
           <Button
             variant="ghost"
             size="sm"
-            className="size-8 p-0 text-gray-400 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all"
-            title="Settings"
+            className="relative size-8 p-0 text-gray-400 hover:text-cyan-300 hover:bg-cyan-400/10 transition-all"
+            title="Notifications"
+            onClick={() => router.push("/dashboard/notifications")}
           >
-            <Settings className="w-4 h-4" />
+            <Bell className="w-4 h-4" />
+            {unreadCount && unreadCount.count > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
+                {unreadCount.count}
+              </span>
+            )}
           </Button>
         </div>
 
         {/* Command palette */}
         <Button
-          className="h-8 w-[200px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:border-cyan-400/20 hover:bg-cyan-400/10 text-sm transition-all"
+          className="h-8 w-[160px] justify-start font-normal text-gray-300 hover:text-white border-white/20 hover:border-cyan-400/20 hover:bg-cyan-400/10 text-sm transition-all"
           variant="outline"
           size="sm"
           onClick={openCommand}
           aria-haspopup="dialog"
           aria-expanded={commandOpen}
           aria-controls="dashboard-command"
-          title="Open command palette (⌘K / Ctrl+K / Alt+K)"
+          title="Open command palette"
         >
           <SearchIcon className="mr-2 size-3" />
-          <span className="truncate">Search...</span>
+          <span className="truncate">Search…</span>
           <kbd className="ml-auto pointer-events-none inline-flex h-4 select-none items-center gap-1 border border-white/20 bg-black/40 px-1 font-mono text-[9px] font-medium text-gray-300">
             <span className="text-[8px]">⌘</span>K
           </kbd>

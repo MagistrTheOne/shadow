@@ -76,23 +76,25 @@ export const DashboardSidebar = () => {
         subscription.plan.slice(1),
       color:
         subscription.plan === "pro"
-          ? "text-cyan-400"
+          ? "text-indigo-400"
           : subscription.plan === "enterprise"
-          ? "text-purple-400"
+          ? "text-violet-400"
           : "text-gray-400",
     };
   };
 
   return (
-    <Sidebar className="bg-black/60 backdrop-blur-xl border-r border-white/10 text-white">
+    <Sidebar className="bg-[#121214]/70 backdrop-blur-2xl border-r border-white/10 text-white shadow-[inset_0_0_30px_rgba(255,255,255,0.03)]">
       {/* Header */}
       <SidebarHeader>
         <div className="flex items-center justify-between px-3 pt-3">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-cyan-400/30 shadow-[0_0_20px_-5px_rgba(56,189,248,0.6)] group-hover:shadow-[0_0_30px_-5px_rgba(56,189,248,0.8)] transition-all">
-              <ZapIcon className="w-5 h-5 text-cyan-300" />
+            <div className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-slate-400/30 shadow-[0_0_20px_-5px_rgba(148,163,184,0.4)] group-hover:shadow-[0_0_30px_-5px_rgba(148,163,184,0.6)] transition-all">
+              <ZapIcon className="w-5 h-5 text-slate-200" />
             </div>
-            <p className="text-xl font-semibold tracking-tight">Shadow.AI</p>
+            <p className="text-xl font-semibold tracking-tight text-slate-100">
+              Shadow.AI
+            </p>
           </Link>
 
           <Button
@@ -134,9 +136,9 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={pathname === item.href}
                     className={cn(
-                      "h-10 flex items-center gap-2 border border-transparent hover:border-blue-400/30 text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200 group rounded-lg",
+                      "h-10 flex items-center gap-2 border border-transparent hover:border-slate-400/20 text-white/80 hover:text-white hover:bg-white/5 transition-all duration-200 group rounded-lg",
                       pathname === item.href &&
-                        "bg-blue-500/20 border-blue-400/30 text-white"
+                        "bg-slate-400/10 border-slate-400/30 text-white shadow-[0_0_15px_rgba(148,163,184,0.25)]"
                     )}
                     onMouseEnter={() => setHoveredItem(item.href)}
                     onMouseLeave={() => setHoveredItem(null)}
@@ -173,9 +175,9 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={pathname === item.href}
                     className={cn(
-                      "h-10 flex items-center gap-2 border border-transparent hover:border-purple-400/30 text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 transition-all duration-200 group rounded-lg",
+                      "h-10 flex items-center gap-2 border border-transparent hover:border-violet-400/20 text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-violet-500/10 hover:to-slate-500/10 transition-all duration-200 group rounded-lg",
                       pathname === item.href &&
-                        "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 text-purple-200"
+                        "bg-gradient-to-r from-violet-500/15 to-slate-500/15 border-violet-400/20 text-violet-200 shadow-[0_0_20px_rgba(139,92,246,0.2)]"
                     )}
                     onMouseEnter={() => setHoveredItem(item.href)}
                     onMouseLeave={() => setHoveredItem(null)}
@@ -185,7 +187,10 @@ export const DashboardSidebar = () => {
                       <span className="text-sm font-medium">
                         {item.label}
                       </span>
-                      <Badge variant="secondary" className="ml-auto text-xs bg-purple-500/20 text-purple-300 border-purple-400/30">
+                      <Badge
+                        variant="secondary"
+                        className="ml-auto text-xs bg-violet-500/10 text-violet-300 border-violet-400/30"
+                      >
                         AI
                       </Badge>
                     </Link>
@@ -200,29 +205,23 @@ export const DashboardSidebar = () => {
         <SidebarGroup>
           <SidebarGroupContent>
             <div className="px-2 py-3 space-y-1">
-              {[
-                {
-                  href: "/dashboard/meetings/new",
-                  label: "New Meeting",
-                },
-                {
-                  href: "/dashboard/agents/new",
-                  label: "New Agent",
-                },
-              ].map((action, idx) => (
-                <Button
-                  key={idx}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start text-gray-400 hover:text-white hover:bg-white/10 rounded-md"
-                  asChild
-                >
-                  <Link href={action.href}>
-                    <PlusIcon className="w-4 h-4 mr-2" />
-                    {action.label}
-                  </Link>
-                </Button>
-              ))}
+              {[{ href: "/dashboard/meetings/new", label: "New Meeting" },
+                { href: "/dashboard/agents/new", label: "New Agent" }].map(
+                (action, idx) => (
+                  <Button
+                    key={idx}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-gray-400 hover:text-white hover:bg-white/10 rounded-md"
+                    asChild
+                  >
+                    <Link href={action.href}>
+                      <PlusIcon className="w-4 h-4 mr-2" />
+                      {action.label}
+                    </Link>
+                  </Button>
+                )
+              )}
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -240,9 +239,9 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={pathname === item.href}
                     className={cn(
-                      "h-10 hover:bg-white/10 hover:border-blue-400/30 border border-transparent text-white/80 hover:text-white transition-all duration-200 rounded-lg",
+                      "h-10 hover:bg-white/5 hover:border-slate-400/20 border border-transparent text-white/80 hover:text-white transition-all duration-200 rounded-lg",
                       pathname === item.href &&
-                        "bg-blue-500/20 border-blue-400/30 text-white"
+                        "bg-slate-400/10 border-slate-400/30 text-white shadow-[0_0_15px_rgba(148,163,184,0.25)]"
                     )}
                   >
                     <Link href={item.href}>
@@ -260,7 +259,7 @@ export const DashboardSidebar = () => {
       </SidebarContent>
 
       {/* Footer */}
-      <SidebarFooter className="text-white">
+      <SidebarFooter className="text-white border-t border-white/10 bg-white/5 backdrop-blur-md">
         <DashboardUserButton />
       </SidebarFooter>
     </Sidebar>

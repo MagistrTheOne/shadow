@@ -53,22 +53,16 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
 
   useEffect(() => {
     if (isStreaming && call) {
-      // Реальная интеграция с Stream Livestreaming API для статистики
-      const interval = setInterval(async () => {
-        try {
-          // В Stream Video SDK нет прямого метода getLivestreamStats
-          // Обновляем статистику на основе доступных данных
-          setStats(prev => ({
-            ...prev,
-            viewers: prev.viewers + Math.floor(Math.random() * 3) - 1, // Симуляция изменения зрителей
-            duration: formatDuration(Date.now() - (prev.startTime || Date.now())),
-            bitrate: 2500 + Math.floor(Math.random() * 500), // Симуляция битрейта
-            fps: 30 + Math.floor(Math.random() * 5) // Симуляция FPS
-          }));
-        } catch (error) {
-          console.error('Error updating stream stats:', error);
-        }
-      }, 2000);
+      // Обновляем только длительность стрима (реальные данные)
+      const startTime = Date.now();
+      setStats(prev => ({ ...prev, startTime: startTime }));
+      
+      const interval = setInterval(() => {
+        setStats(prev => ({
+          ...prev,
+          duration: formatDuration(Date.now() - (prev.startTime || Date.now())),
+        }));
+      }, 1000);
 
       return () => clearInterval(interval);
     }
@@ -116,6 +110,13 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
       setIsStreaming(false);
       setStreamUrl("");
       setStreamKey("");
+      setStats({
+        viewers: 0,
+        duration: "00:00:00",
+        quality: '1080p',
+        bitrate: 2500,
+        fps: 30
+      });
       toast.success('Livestream stopped');
     } catch (error) {
       console.error('Error stopping stream:', error);
@@ -282,28 +283,13 @@ export const Livestreaming = ({ isEnabled, onToggle }: LivestreamingProps) => {
         {isStreaming && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-gray-300">Stream Stats</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white/5 p-2 rounded">
-                <div className="flex items-center gap-1">
-                  <UsersIcon className="w-3 h-3 text-blue-400" />
-                  <span className="text-gray-400">Viewers</span>
-                </div>
-                <p className="text-white font-medium">{stats.viewers}</p>
-              </div>
+            <div className="grid grid-cols-1 gap-2 text-xs">
               <div className="bg-white/5 p-2 rounded">
                 <div className="flex items-center gap-1">
                   <EyeIcon className="w-3 h-3 text-green-400" />
                   <span className="text-gray-400">Duration</span>
                 </div>
                 <p className="text-white font-medium">{stats.duration}</p>
-              </div>
-              <div className="bg-white/5 p-2 rounded">
-                <span className="text-gray-400">Quality</span>
-                <p className="text-white font-medium">{stats.quality}</p>
-              </div>
-              <div className="bg-white/5 p-2 rounded">
-                <span className="text-gray-400">Bitrate</span>
-                <p className="text-white font-medium">{stats.bitrate} kbps</p>
               </div>
             </div>
           </div>

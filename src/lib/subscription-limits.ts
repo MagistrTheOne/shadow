@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { subscriptions, meetings, transcripts, agents } from "@/db/schema";
+import { subscriptions, meetings, transcripts, agents, recordings } from "@/db/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface SubscriptionLimits {
@@ -91,13 +91,19 @@ export async function checkStorageLimit(userId: string): Promise<{
     return { canUpload: true, currentGB: 0, limitGB: -1 };
   }
 
-  // Calculate current storage usage
-  // This is a simplified calculation - in production you'd sum file sizes
-  const currentGB = 0; // TODO: Implement actual storage calculation
+  // Calculate current storage usage by summing file sizes from recordings
+  const storageData = await db
+    .select({ fileSize: recordings.fileSize })
+    .from(recordings)
+    .innerJoin(meetings, eq(recordings.meetingId, meetings.id))
+    .where(eq(meetings.userId, userId));
+
+  const currentBytes = storageData.reduce((sum, r) => sum + (r.fileSize || 0), 0);
+  const currentGB = currentBytes / (1024 * 1024 * 1024);
 
   return {
     canUpload: currentGB < limits.storageGB,
-    currentGB,
+    currentGB: Math.round(currentGB * 100) / 100,
     limitGB: limits.storageGB,
   };
 }

@@ -51,11 +51,6 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
 
   const call = useCall();
 
-  // Моковые данные для демонстрации
-  // Реальные разрешения будут загружаться из Stream Permissions API
-
-  // Реальные действия модерации будут загружаться из Stream Moderation API
-
   const categories = [
     { id: 'all', name: 'All', icon: SettingsIcon },
     { id: 'audio', name: 'Audio', icon: MicIcon },
@@ -66,12 +61,14 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
   ] as const;
 
   useEffect(() => {
-    if (isEnabled) {
-      // TODO: Загрузить реальные разрешения из Stream API
-      // setPermissions(realPermissions);
-      // setModerationActions(realModerationActions);
+    if (isEnabled && call) {
+      // Stream Video SDK не предоставляет прямой API для permissions/moderations
+      // Компонент отображает пустой список - функциональность будет добавлена
+      // когда Stream добавит соответствующий API
+      setPermissions([]);
+      setModerationActions([]);
     }
-  }, [isEnabled]);
+  }, [isEnabled, call]);
 
   const togglePermission = async (permissionId: string) => {
     setIsLoading(true);

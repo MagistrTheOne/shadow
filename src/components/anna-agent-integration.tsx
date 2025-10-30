@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AnnaAvatar } from './anna-avatar';
 import { trpc } from '@/trpc/client';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Bot, Mic, MicOff, MessageSquare, Video } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { useTextToSpeech } from '@/hooks/useTextToSpeech';
+import { useConversationHistory } from '@/hooks/useConversationHistory';
 
 interface AnnaAgentIntegrationProps {
   agentId: string;
@@ -24,15 +27,17 @@ export function AnnaAgentIntegration({
   isActive = false,
   onAgentResponse
 }: AnnaAgentIntegrationProps) {
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentMessage, setCurrentMessage] = useState('');
-  const [conversationHistory, setConversationHistory] = useState<Array<{
-    id: string;
-    type: 'user' | 'agent';
-    message: string;
-    timestamp: Date;
-  }>>([]);
+  const { history: conversationHistory, add: addMessage } = useConversationHistory();
+  const { isSpeaking, isMuted, speak, toggleMute, cancel } = useTextToSpeech({ lang: 'en-US' });
+  const { isSupported, isListening, start, stop } = useSpeechRecognition({
+    lang: 'en-US',
+    onResult: (text) => {
+      setCurrentMessage(text);
+      handleSendMessage(text);
+    },
+    onError: () => toast.error('Speech recognition failed'),
+  });
 
   // Получаем данные агента
   const { data: agent } = trpc.agents.getOne.useQuery({ id: agentId });
@@ -40,86 +45,31 @@ export function AnnaAgentIntegration({
   // Мутация для отправки сообщения агенту
   const sendMessage = trpc.agents.testAgent.useMutation({
     onSuccess: (response) => {
-      const agentMessage = {
-        id: Date.now().toString(),
-        type: 'agent' as const,
-        message: response.response || 'I understand your message.',
-        timestamp: new Date()
-      };
-      
-      setConversationHistory(prev => [...prev, agentMessage]);
-      onAgentResponse?.(agentMessage.message);
-      setIsSpeaking(false);
+      const msg = response.response || 'I understand your message.';
+      addMessage({ type: 'agent', message: msg });
+      onAgentResponse?.(msg);
+      speak(msg);
     },
     onError: (error) => {
       toast.error('Failed to get response from agent');
-      setIsSpeaking(false);
+      cancel();
     }
   });
 
-  // Обработка голосового ввода
   const handleVoiceInput = () => {
-    if (!isListening) {
-      startListening();
-    } else {
-      stopListening();
-    }
-  };
-
-  const startListening = () => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      const recognition = new SpeechRecognition();
-      
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        setIsListening(true);
-        toast.info('Listening...');
-      };
-
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setCurrentMessage(transcript);
-        handleSendMessage(transcript);
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        toast.error('Speech recognition failed');
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognition.start();
-    } else {
+    if (!isSupported) {
       toast.error('Speech recognition not supported');
+      return;
     }
-  };
-
-  const stopListening = () => {
-    setIsListening(false);
+    isListening ? stop() : start();
   };
 
   // Отправка сообщения агенту
   const handleSendMessage = (message: string) => {
     if (!message.trim() || !agent) return;
 
-    const userMessage = {
-      id: Date.now().toString(),
-      type: 'user' as const,
-      message: message.trim(),
-      timestamp: new Date()
-    };
-
-    setConversationHistory(prev => [...prev, userMessage]);
+    addMessage({ type: 'user', message: message.trim() });
     setCurrentMessage('');
-    setIsSpeaking(true);
 
     // Отправляем сообщение агенту через tRPC
     sendMessage.mutate({
@@ -137,9 +87,9 @@ export function AnnaAgentIntegration({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-white/5 backdrop-blur-sm border-white/10">
+    <Card className="w-full max-w-2xl mx-auto dashboard-card">
       <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-white">
+        <CardTitle className="flex items-center justify-center gap-2">
           <Bot className="w-5 h-5" />
           ANNA + {agentName}
         </CardTitle>
@@ -202,20 +152,14 @@ export function AnnaAgentIntegration({
             disabled={isSpeaking}
           />
           
-          <Button
-            onClick={handleVoiceInput}
-            variant={isListening ? "destructive" : "outline"}
-            size="sm"
-            disabled={isSpeaking}
-            className="px-3"
-          >
+          <Button onClick={handleVoiceInput} variant={isListening ? "destructive" : "outline"} size="sm" className="px-3">
             {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </Button>
 
           <Button
             onClick={() => handleSendMessage(currentMessage)}
             size="sm"
-            disabled={!currentMessage.trim() || isSpeaking}
+            disabled={!currentMessage.trim()}
             className="px-3"
           >
             <MessageSquare className="w-4 h-4" />
