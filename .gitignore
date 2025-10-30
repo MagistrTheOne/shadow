@@ -28,6 +28,8 @@ test-heygen-direct.js
 .DS_Store
 *.pem
 .env*
+# docs to ignore
+STREAM_SETUP.md
 # debug
 npm-debug.log*
 yarn-debug.log*
