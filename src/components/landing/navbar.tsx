@@ -47,9 +47,9 @@ export const Navbar = ({ session }: NavbarProps) => {
             <LanguageSwitcher />
             {!session ? (
               <>
-                <Link href="/sign-up">
+                {/* <Link href="/sign-up">
                   <Button variant="secondary" size="sm">Sign Up</Button>
-                </Link>
+                </Link> */}
               </>
             ) : (
               <>
@@ -97,13 +97,14 @@ export const Navbar = ({ session }: NavbarProps) => {
                   <LanguageSwitcher />
                 </div>
                 {!session ? (
-                  <Link
+                  {/* <Link
                     href="/sign-up"
                     className="block px-3 py-2 rounded-lg text-white bg-cyan-600 hover:bg-cyan-500 text-center transition"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign Up
-                  </Link>
+                  </Link> */}
+                  null
                 ) : (
                   <Link
                     href={`/dashboard/profile/${session.user?.id || "me"}`}
