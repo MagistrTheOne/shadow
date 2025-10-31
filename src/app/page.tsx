@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { PricingSection } from "@/components/landing/pricing-section";
@@ -11,8 +12,10 @@ export default async function HomePage() {
     headers: await headers(),
   });
 
-  // Middleware уже обрабатывает редиректы для авторизованных пользователей
-  // Здесь просто показываем лендинг
+  // Защита лендинга от авторизованных пользователей
+  if (session) {
+    redirect("/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
