@@ -62,49 +62,47 @@ export const CallStateObserver = ({ isEnabled, onToggle }: CallStateObserverProp
   
   const callingState = useCallCallingState();
   const participants = useParticipants();
-  // const recordingState = useCallRecordingState(); // Хук не существует
-
-  // Реальные события будут загружаться из Stream API
 
   useEffect(() => {
     if (isEnabled && call) {
-      // Реальная интеграция с Stream Call State Observer
-      const initializeCallObserver = async () => {
-        try {
-          // Подписываемся на события звонка
-          const unsubscribe = call.on('call.updated', (event) => {
-            const newEvent: CallEvent = {
-              id: Date.now().toString(),
-              type: 'call_updated',
-              timestamp: new Date(),
-              details: 'Call state updated',
-              participant: 'System'
-            };
-            
-            setEvents(prev => [newEvent, ...prev.slice(0, 19)]); // Keep last 20 events
-          });
+      let unsubscribe: (() => void) | null = null;
 
-          // Статистика звонка будет обновляться через другие события
-          // call.stats не является валидным типом события в Stream Video SDK
+      try {
+        // Подписываемся на события звонка
+        unsubscribe = call.on('call.updated', (event) => {
+          const newEvent: CallEvent = {
+            id: Date.now().toString(),
+            type: 'call_updated',
+            timestamp: new Date(),
+            details: 'Call state updated',
+            participant: 'System'
+          };
+          
+          setEvents(prev => [newEvent, ...prev.slice(0, 19)]);
+        });
 
-          // Сохраняем функции отписки
-          (window as any).callObserverUnsubscribe = unsubscribe;
-        } catch (error) {
-          console.error('Error initializing call observer:', error);
-          toast.error('Failed to initialize call observer');
-        }
-      };
-
-      initializeCallObserver();
+      } catch (error) {
+        console.error('Error initializing call observer:', error);
+        toast.error('Failed to initialize call observer');
+      }
 
       return () => {
-        // Очищаем подписки при размонтировании
-        if ((window as any).callObserverUnsubscribe) {
-          (window as any).callObserverUnsubscribe();
+        if (unsubscribe) {
+          unsubscribe();
         }
       };
     }
   }, [isEnabled, call, participants.length]);
+
+  useEffect(() => {
+    if (isEnabled) {
+      // Обновляем статистику участников из реальных данных
+      setStats(prev => ({
+        ...prev,
+        participants: participants.length
+      }));
+    }
+  }, [isEnabled, participants.length]);
 
   const formatDuration = (ms: number) => {
     const seconds = Math.floor(ms / 1000);

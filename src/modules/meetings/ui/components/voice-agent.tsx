@@ -64,13 +64,12 @@ export const VoiceAgent = ({ callId, callType = 'default', isEnabled, onToggle }
     if (!isConnected) return;
     
     setIsListening(true);
-    // Здесь будет логика для начала прослушивания
-    // В реальном приложении это будет интегрировано с Web Speech API
+    // Логика прослушивания должна быть интегрирована с Web Speech API
+    // через voice agent backend API
   };
 
   const stopListening = () => {
     setIsListening(false);
-    // Здесь будет логика для остановки прослушивания
   };
 
   useEffect(() => {

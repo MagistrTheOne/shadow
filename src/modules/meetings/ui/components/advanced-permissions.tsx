@@ -63,8 +63,7 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
   useEffect(() => {
     if (isEnabled && call) {
       // Stream Video SDK не предоставляет прямой API для permissions/moderations
-      // Компонент отображает пустой список - функциональность будет добавлена
-      // когда Stream добавит соответствующий API
+      // Компонент отображает пустой список
       setPermissions([]);
       setModerationActions([]);
     }
@@ -73,7 +72,7 @@ export const AdvancedPermissions = ({ isEnabled, onToggle }: AdvancedPermissions
   const togglePermission = async (permissionId: string) => {
     setIsLoading(true);
     try {
-      // В реальном приложении здесь будет вызов Stream API для изменения разрешений
+      // Stream Video SDK не предоставляет прямой API для permissions
       setPermissions(prev => 
         prev.map(p => 
           p.id === permissionId 

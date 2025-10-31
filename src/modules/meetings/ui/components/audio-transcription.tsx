@@ -40,35 +40,10 @@ export const AudioTranscription = ({ isEnabled, onToggle }: AudioTranscriptionPr
   const call = useCall();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Реальные транскрипции будут загружаться из Stream Audio Transcription API
-
   useEffect(() => {
-    if (isEnabled && call) {
-      // Реальная интеграция с Stream Audio Transcription
-      const initializeTranscription = async () => {
-        try {
-          // Подключаемся к Stream Audio Transcription
-          // Stream Video SDK не имеет встроенного Audio Transcription
-          // Используем внешнюю интеграцию с Deepgram
-          console.log('Audio Transcription started');
-          
-          // Симуляция успешной инициализации
-          const transcription = {
-            id: 'transcription-' + Date.now(),
-            isActive: true,
-            language: 'auto'
-          };
-
-          // Сохраняем ссылку для управления
-          (window as any).streamTranscription = transcription;
-        } catch (error) {
-          console.error('Error initializing transcription:', error);
-          toast.error('Failed to initialize transcription');
-        }
-      };
-
-      initializeTranscription();
-    }
+    // Stream Video SDK не имеет встроенного Audio Transcription
+    // Для реальной транскрипции требуется интеграция с внешним сервисом (Deepgram)
+    // Компонент отображает только уже существующие транскрипции
   }, [isEnabled, call]);
 
   useEffect(() => {
@@ -83,20 +58,9 @@ export const AudioTranscription = ({ isEnabled, onToggle }: AudioTranscriptionPr
       if (!call) throw new Error('Call not available');
 
       // Stream Video SDK не имеет встроенного Audio Transcription
-      // Используем внешнюю интеграцию с Deepgram
-      console.log('Audio Transcription started');
-      
-      // Симуляция успешной инициализации
-      const transcription = {
-        id: 'transcription-' + Date.now(),
-        isActive: true,
-        language: 'auto'
-      };
-
-      // Сохраняем ссылку для управления
-      (window as any).streamTranscription = transcription;
+      // Для реальной транскрипции требуется интеграция с внешним сервисом (Deepgram)
       setIsRecording(true);
-      toast.success('Transcription started');
+      toast.info('Audio transcription requires external service integration');
     } catch (error) {
       console.error('Error starting transcription:', error);
       toast.error('Failed to start transcription');
@@ -109,12 +73,6 @@ export const AudioTranscription = ({ isEnabled, onToggle }: AudioTranscriptionPr
     try {
       if (!call) return;
 
-      // Останавливаем Stream Audio Transcription
-      if ((window as any).streamTranscription) {
-        await (window as any).streamTranscription.disable();
-        delete (window as any).streamTranscription;
-      }
-      
       setIsRecording(false);
       toast.success('Transcription stopped');
     } catch (error) {

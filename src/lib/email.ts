@@ -24,14 +24,14 @@ async function getResendClient() {
 
   try {
     // Dynamic import с обработкой ошибок
-    // @ts-ignore - resend может быть не установлен
-    const resendModule = await import('resend').catch(() => null);
+    // Используем Function constructor для предотвращения статического анализа Next.js
+    const importResend = new Function('return import("resend")');
+    const resendModule = await (importResend() as Promise<any>).catch(() => null);
     if (!resendModule || !resendModule.Resend) {
       console.warn('Resend package not installed, email sending disabled');
       return null;
     }
     const { Resend } = resendModule;
-    // @ts-ignore - Resend может быть не установлен
     resendClient = new Resend(RESEND_API_KEY);
     return resendClient;
   } catch (error) {

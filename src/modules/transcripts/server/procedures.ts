@@ -4,6 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and, ilike, or } from "drizzle-orm";
 import { z } from "zod";
 import { generateSummary, answerQuestion } from "@/lib/gigachat";
+import { generateKeyPoints, generateActionItems } from "@/lib/gigachat-summary";
 
 export const transcriptsRouter = createTRPCRouter({
   getByMeeting: protectedProcedure
@@ -154,8 +155,12 @@ export const transcriptsRouter = createTRPCRouter({
         return existingSummary;
       }
 
-      // Generate AI summary
-      const summary = await generateSummary(transcriptData.transcript.content);
+      // Generate AI summary, key points, and action items
+      const [summary, keyPoints, actionItems] = await Promise.all([
+        generateSummary(transcriptData.transcript.content),
+        generateKeyPoints(transcriptData.transcript.content),
+        generateActionItems(transcriptData.transcript.content),
+      ]);
 
       // Save summary to database
       const [createdSummary] = await db
@@ -163,8 +168,8 @@ export const transcriptsRouter = createTRPCRouter({
         .values({
           transcriptId: input.transcriptId,
           summary,
-          keyPoints: null, // TODO: Extract key points
-          actionItems: null, // TODO: Extract action items
+          keyPoints: keyPoints.length > 0 ? keyPoints : null,
+          actionItems: actionItems.length > 0 ? actionItems : null,
         })
         .returning();
 

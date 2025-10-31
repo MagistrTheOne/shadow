@@ -9,6 +9,7 @@ import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface PricingPlan {
@@ -90,10 +91,11 @@ const pricingPlans = [
 ];
 
 export const PricingView = () => {
+  const router = useRouter();
   const createSubscriptionMutation = trpc.subscriptions.create.useMutation({
     onSuccess: () => {
       toast.success("Plan upgraded successfully!");
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     },
     onError: (error) => {
       toast.error("Failed to upgrade plan", {

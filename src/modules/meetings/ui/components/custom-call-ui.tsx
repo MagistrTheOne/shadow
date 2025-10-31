@@ -129,14 +129,11 @@ export const CustomCallUI = ({ isEnabled, onToggle }: CustomCallUIProps) => {
   }, [isEnabled, selectedTheme, currentTheme]);
 
   const applyCustomStyles = () => {
-    // В реальном приложении здесь будет применение кастомных стилей
-    console.log('Applying custom styles:', {
-      theme: selectedTheme,
-      layout: selectedLayout,
-      opacity: opacity[0],
-      blur: blur[0],
-      scale: scale[0]
-    });
+    // Применяем кастомные стили через CSS переменные
+    const root = document.documentElement;
+    root.style.setProperty('--ui-opacity', `${opacity[0]}%`);
+    root.style.setProperty('--ui-blur', `${blur[0]}px`);
+    root.style.setProperty('--ui-scale', `${scale[0]}%`);
   };
 
   if (!isEnabled) {

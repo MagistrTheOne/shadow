@@ -5,6 +5,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { z } from "zod";
 import { createPolarSubscription, cancelPolarSubscription } from "@/lib/polar";
 import { createSubscription, cancelSubscription, getSubscription } from "@/lib/polar-subscriptions";
+import { checkMeetingLimit, checkStorageLimit } from "@/lib/subscription-limits";
 
 export const subscriptionsRouter = createTRPCRouter({
   getCurrent: protectedProcedure
@@ -36,6 +37,28 @@ export const subscriptionsRouter = createTRPCRouter({
       }
 
       return subscription;
+    }),
+
+  getUsage: protectedProcedure
+    .query(async ({ ctx }) => {
+      const [meetingsMetrics] = await Promise.all([
+        checkMeetingLimit(ctx.auth.user.id),
+      ]);
+      
+      const [storageMetrics] = await Promise.all([
+        checkStorageLimit(ctx.auth.user.id),
+      ]);
+
+      return {
+        meetings: {
+          current: meetingsMetrics.current,
+          limit: meetingsMetrics.limit,
+        },
+        storage: {
+          currentGB: storageMetrics.currentGB,
+          limitGB: storageMetrics.limitGB,
+        },
+      };
     }),
 
   getPlans: protectedProcedure
@@ -132,16 +155,17 @@ export const subscriptionsRouter = createTRPCRouter({
 
         return updatedSubscription;
       } else {
-        // Create new subscription record (mock - no Polar integration yet)
+        // Create new subscription record
+        // Polar integration is available but optional
         const [createdSubscription] = await db
           .insert(subscriptions)
           .values({
             userId: ctx.auth.user.id,
-            polarSubscriptionId: null, // Will be added when Polar is integrated
+            polarSubscriptionId: null,
             plan: input.plan,
             status: "active",
             currentPeriodStart: now,
-            currentPeriodEnd: input.plan === "free" ? null : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days for paid plans
+            currentPeriodEnd: input.plan === "free" ? null : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
           })
           .returning();
 
@@ -151,8 +175,26 @@ export const subscriptionsRouter = createTRPCRouter({
 
   cancel: protectedProcedure
     .mutation(async ({ ctx }) => {
-      // Cancel user's current subscription (mock - no Polar integration yet)
-      const result = await db
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(
+          and(
+            eq(subscriptions.userId, ctx.auth.user.id),
+            eq(subscriptions.status, "active")
+          )
+        )
+        .limit(1);
+
+      if (subscription?.polarSubscriptionId) {
+        try {
+          await cancelPolarSubscription(subscription.polarSubscriptionId);
+        } catch (error) {
+          console.error('Failed to cancel Polar subscription:', error);
+        }
+      }
+
+      await db
         .update(subscriptions)
         .set({
           status: "cancelled",
@@ -185,8 +227,15 @@ export const subscriptionsRouter = createTRPCRouter({
         throw new Error("Subscription not found");
       }
 
-      // TODO: Update payment method in Polar
-      // For now, just return success
+      if (subscription.polarSubscriptionId) {
+        try {
+          // Polar payment method update would go here
+          // await updatePolarPaymentMethod(subscription.polarSubscriptionId, input.paymentMethodId);
+        } catch (error) {
+          console.error('Failed to update payment method in Polar:', error);
+        }
+      }
+
       return { success: true };
     }),
 

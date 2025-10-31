@@ -108,12 +108,15 @@ const CallUI = ({ callId }: { callId: string }) => {
 
   // Получаем call объект для управления записью
   const call = useCall();
-
-  // Моковые данные участников
-  const participants = [
-    { id: '1', name: 'John Smith', isOnline: true },
-    { id: '2', name: 'AI Assistant', isOnline: true },
-  ];
+  const { useParticipants } = useCallStateHooks();
+  
+  // Получаем реальных участников из Stream SDK
+  const streamParticipants = useParticipants();
+  const participants = streamParticipants.map((p) => ({
+    id: p.userId || p.sessionId || '',
+    name: p.name || 'Unknown User',
+    isOnline: true,
+  }));
 
   const handleStartRecording = async () => {
     if (call) {

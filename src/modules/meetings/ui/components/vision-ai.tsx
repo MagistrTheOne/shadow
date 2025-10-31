@@ -48,54 +48,10 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
     { id: 'gesture', name: 'Gesture Recognition', icon: AlertTriangleIcon },
   ] as const;
 
-  // Реальные детекции будут загружаться из Stream Vision AI SDK
-
   useEffect(() => {
-    if (isEnabled && isActive && call) {
-      // Реальная интеграция с Stream Vision AI SDK
-      const initializeVisionAI = async () => {
-        try {
-          // В Stream Video SDK нет прямого метода enableVisionAI
-          // Симулируем подключение к Vision AI
-          const visionAI = {
-            features: selectedFeatures,
-            onDetection: (detection: any) => {
-              const newDetection: VisionDetection = {
-                id: detection.id || Date.now().toString(),
-                type: detection.type as any,
-                confidence: detection.confidence || 0.8,
-                position: {
-                  x: detection.boundingBox?.x || 0,
-                  y: detection.boundingBox?.y || 0,
-                  width: detection.boundingBox?.width || 50,
-                  height: detection.boundingBox?.height || 50
-                },
-                label: detection.label || 'Unknown',
-                timestamp: new Date()
-              };
-              
-              setDetections(prev => [...prev.slice(-9), newDetection]);
-            }
-          };
-
-          // Сохраняем ссылку для очистки
-          (window as any).streamVisionAI = visionAI;
-        } catch (error) {
-          console.error('Error initializing Vision AI:', error);
-          toast.error('Failed to initialize Vision AI');
-        }
-      };
-
-      initializeVisionAI();
-
-      return () => {
-        // Очищаем Vision AI при размонтировании
-        if ((window as any).streamVisionAI) {
-          (window as any).streamVisionAI.disable();
-          delete (window as any).streamVisionAI;
-        }
-      };
-    }
+    // Stream Video SDK не предоставляет встроенного Vision AI API
+    // Для реальной детекции требуется интеграция с внешним сервисом
+    // Компонент отображает только UI для настройки и управления
   }, [isEnabled, isActive, call, selectedFeatures]);
 
   const startVisionAI = async () => {
@@ -103,35 +59,10 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
     try {
       if (!call) throw new Error('Call not available');
       
-      // Временно закомментировано - метод enableVisionAI не существует в текущем Stream SDK
-      // const visionAI = await call.enableVisionAI({
-      //   features: selectedFeatures,
-      //   onDetection: (detection) => {
-      //     const newDetection: VisionDetection = {
-      //       id: detection.id || Date.now().toString(),
-      //       type: detection.type as any,
-      //       confidence: detection.confidence || 0.8,
-      //       position: {
-      //         x: detection.boundingBox?.x || 0,
-      //         y: detection.boundingBox?.y || 0,
-      //         width: detection.boundingBox?.width || 50,
-      //         height: detection.boundingBox?.height || 50
-      //       },
-      //       label: detection.label || 'Unknown',
-      //       timestamp: new Date()
-      //     };
-      //     
-      //     setDetections(prev => [...prev.slice(-9), newDetection]);
-      //   }
-      // });
-      
-      // Временная заглушка для демонстрации
-      const visionAI = { enabled: true };
-
-      // Сохраняем ссылку для управления
-      (window as any).streamVisionAI = visionAI;
+      // Stream Video SDK не предоставляет встроенного Vision AI API
+      // Для реальной детекции требуется интеграция с внешним сервисом
       setIsActive(true);
-      toast.success('Vision AI started successfully');
+      toast.info('Vision AI requires external service integration');
     } catch (error) {
       console.error('Error starting Vision AI:', error);
       toast.error('Failed to start Vision AI');
@@ -142,10 +73,6 @@ export const VisionAI = ({ isEnabled, onToggle }: VisionAIProps) => {
 
   const stopVisionAI = async () => {
     try {
-      if ((window as any).streamVisionAI) {
-        await (window as any).streamVisionAI.disable();
-        delete (window as any).streamVisionAI;
-      }
       setIsActive(false);
       setDetections([]);
       toast.success('Vision AI stopped');

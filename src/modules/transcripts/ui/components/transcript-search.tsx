@@ -10,8 +10,10 @@ import { Search, FileText, Calendar, User } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { LoadingState } from "@/components/loading-state";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export function TranscriptSearch() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -90,9 +92,8 @@ export function TranscriptSearch() {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                              window.open(
-                                `/dashboard/meetings/${result.meeting.id}`,
-                                "_blank"
+                              router.push(
+                                `/dashboard/meetings/${result.meeting.id}`
                               )
                             }
                           >

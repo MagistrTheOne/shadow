@@ -3,6 +3,7 @@ import { recordings, meetings } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and } from "drizzle-orm";
 import { z } from "zod";
+import { getSignedUrlForS3 } from "@/lib/s3-utils";
 
 export const recordingsRouter = createTRPCRouter({
   getByMeeting: protectedProcedure
@@ -105,11 +106,24 @@ export const recordingsRouter = createTRPCRouter({
         throw new Error("Recording not found");
       }
 
-      // TODO: Generate presigned URL for S3
-      // For now, return the file URL directly
+      // Generate presigned URL for S3 if file is stored in S3
+      const fileUrl = recording.recording.fileUrl;
+      let downloadUrl = fileUrl;
+      const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+
+      try {
+        // Try to generate presigned URL if it's an S3 file
+        if (fileUrl.includes('amazonaws.com') || fileUrl.includes('s3')) {
+          downloadUrl = await getSignedUrlForS3(fileUrl, 3600);
+        }
+      } catch (error) {
+        console.error('Failed to generate presigned URL, using direct URL:', error);
+        // Fallback to direct URL if presigned URL generation fails
+      }
+
       return {
-        downloadUrl: recording.recording.fileUrl,
-        expiresAt: new Date(Date.now() + 3600000), // 1 hour
+        downloadUrl,
+        expiresAt,
       };
     }),
 });

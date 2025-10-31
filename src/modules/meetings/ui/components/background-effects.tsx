@@ -42,24 +42,22 @@ export const BackgroundEffects = ({ isEnabled, onToggle }: BackgroundEffectsProp
     if (!call) return;
 
     try {
+      // Stream Video SDK не предоставляет встроенного API для background effects
+      // Эффекты применяются только локально на уровне UI
       switch (effect) {
         case 'blur':
-          // В реальном приложении здесь будет вызов Stream API для blur эффекта
           setIsBlurEnabled(true);
           setIsVirtualBackgroundEnabled(false);
           setCustomBackground(null);
           break;
         case 'virtual':
-          // В реальном приложении здесь будет вызов Stream API для виртуального фона
           setIsBlurEnabled(false);
           setIsVirtualBackgroundEnabled(true);
           setCustomBackground(null);
           break;
         case 'custom':
-          // В реальном приложении здесь будет загрузка кастомного фона
           setIsBlurEnabled(false);
           setIsVirtualBackgroundEnabled(false);
-          setCustomBackground('custom-bg.jpg');
           break;
         default:
           setIsBlurEnabled(false);
@@ -74,7 +72,6 @@ export const BackgroundEffects = ({ isEnabled, onToggle }: BackgroundEffectsProp
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // В реальном приложении здесь будет загрузка файла на сервер
       const reader = new FileReader();
       reader.onload = (e) => {
         setCustomBackground(e.target?.result as string);

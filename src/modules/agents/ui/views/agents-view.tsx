@@ -1,4 +1,3 @@
-
 "use client";
 
 import { trpc } from "@/trpc/client";
@@ -6,12 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, BotIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { AgentCard } from "../components/agent-card";
 import { useState } from "react";
 
 export const AgentsView = () => {
+  const router = useRouter();
   const { data: agents, isLoading, isError, error } = trpc.agents.getMany.useQuery();
 
   if (isLoading) return <LoadingState title="Loading agents..." description="Fetching your AI agents." />;
@@ -39,15 +40,14 @@ export const AgentsView = () => {
               key={agent.id}
               agent={agent}
               onEdit={(agentId) => {
-                window.location.href = `/agents/${agentId}/edit`;
+                router.push(`/agents/${agentId}/edit`);
               }}
               onDuplicate={async (agentId) => {
-                // Handle duplicate - simplified
                 console.log('Duplicate agent:', agentId);
-                  window.location.reload();
+                router.refresh();
               }}
               onDelete={() => {
-                window.location.reload();
+                router.refresh();
               }}
             />
           ))}

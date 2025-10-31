@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface UpgradeDialogProps {
   isOpen: boolean;
@@ -21,13 +22,13 @@ interface UpgradeDialogProps {
 }
 
 export const UpgradeDialog = ({ isOpen, onClose, currentPlan }: UpgradeDialogProps) => {
+  const router = useRouter();
   const { data: plans } = trpc.subscriptions.getPlans.useQuery();
   const createSubscriptionMutation = trpc.subscriptions.create.useMutation({
     onSuccess: () => {
       toast.success("Plan upgraded successfully!");
       onClose();
-      // Refresh the page to update subscription status
-      window.location.reload();
+      router.refresh();
     },
     onError: (error) => {
       toast.error("Failed to upgrade plan", {

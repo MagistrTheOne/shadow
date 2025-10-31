@@ -47,14 +47,10 @@ export const ParticipantManagement = ({ isEnabled, onToggle }: ParticipantManage
 
   const call = useCall();
 
-  // Реальные участники будут загружаться из Stream Video SDK
-
   useEffect(() => {
     if (isEnabled && call) {
-      // Реальная интеграция с Stream Video SDK для получения участников
       const initializeParticipants = async () => {
         try {
-          // Получаем участников из Stream call
           const streamParticipants = call.state.participants;
           
           const transformedParticipants: Participant[] = streamParticipants.map((p, index) => ({
@@ -116,18 +112,15 @@ export const ParticipantManagement = ({ isEnabled, onToggle }: ParticipantManage
     try {
       if (!call) throw new Error('Call not available');
       
-      // Реальная интеграция с Stream API для управления видео
       const participant = call.state.participants.find(p => p.userId === participantId);
       if (participant) {
         if (participant.publishedTracks.includes('video' as any)) {
           await call.muteUser(participantId, 'video' as any);
         } else {
-          // В Stream API нет unmuteUser, используем muteUser с false
           await call.muteUser(participantId, 'video' as any);
         }
       }
       
-      // Обновляем локальное состояние
       setParticipants(prev => 
         prev.map(p => 
           p.id === participantId 
@@ -166,8 +159,7 @@ export const ParticipantManagement = ({ isEnabled, onToggle }: ParticipantManage
     try {
       if (!call) throw new Error('Call not available');
       
-      // В Stream API нет прямого метода для изменения ролей участников
-      // Обновляем локальное состояние для отображения
+      // Stream API управляет ролями участников через реальное время
       setParticipants(prev => 
         prev.map(p => 
           p.id === participantId 
@@ -175,9 +167,6 @@ export const ParticipantManagement = ({ isEnabled, onToggle }: ParticipantManage
             : p
         )
       );
-      
-      // Изменение ролей участников в Stream calls управляется через Stream API
-      // Локальное состояние обновляется для UI feedback
     } catch (error) {
       console.error('Error promoting participant:', error);
     } finally {

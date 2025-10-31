@@ -1,4 +1,5 @@
-import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || 'us-east-1',
@@ -67,5 +68,33 @@ export async function deleteS3Files(fileUrls: string[]): Promise<void> {
     console.error(`Failed to delete ${url}:`, err);
     // Continue with other deletions even if one fails
   })));
+}
+
+/**
+ * Generate presigned URL for S3 file download
+ */
+export async function getSignedUrlForS3(fileUrl: string, expiresIn: number = 3600): Promise<string> {
+  if (!BUCKET_NAME) {
+    console.warn('AWS_S3_BUCKET_NAME not configured, returning original URL');
+    return fileUrl;
+  }
+
+  const key = extractS3Key(fileUrl);
+  if (!key) {
+    throw new Error(`Invalid file URL: ${fileUrl}`);
+  }
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+
+    const url = await getSignedUrl(s3Client, command, { expiresIn });
+    return url;
+  } catch (error) {
+    console.error(`Failed to generate presigned URL for ${key}:`, error);
+    throw error;
+  }
 }
 

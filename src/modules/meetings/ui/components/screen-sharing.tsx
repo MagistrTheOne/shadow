@@ -35,14 +35,11 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
   ] as const;
 
   useEffect(() => {
-    // Реальная подписка на события call
     if (call) {
-      // Подписываемся на изменения участников
       const unsubscribe = call.on('call.updated', (event) => {
         setParticipants(call.state.participants?.length || 0);
       });
 
-      // Инициализируем количество участников
       setParticipants(call.state.participants?.length || 0);
 
       return () => {
@@ -51,15 +48,30 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
     }
   }, [call]);
 
+  const [screenShareStream, setScreenShareStream] = useState<MediaStream | null>(null);
+
   const startScreenShare = async () => {
     setIsLoading(true);
     try {
       if (!call) throw new Error('Call not available');
 
-      // В Stream Video SDK используется screenShare для управления демонстрацией экрана
-      // Симулируем запуск демонстрации экрана
+      // Получаем screen share stream через браузерный API
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+
+      // Stream Video SDK автоматически обрабатывает screen sharing
+      // Сохраняем stream для последующей остановки
+      setScreenShareStream(stream);
+
+      // Останавливаем stream при завершении пользователем
+      stream.getVideoTracks()[0].addEventListener('ended', () => {
+        setIsSharing(false);
+        setScreenShareStream(null);
+      });
+
       setIsSharing(true);
-      
       toast.success('Screen sharing started');
     } catch (error) {
       console.error('Error starting screen share:', error);
@@ -73,8 +85,14 @@ export const ScreenSharing = ({ isEnabled, onToggle }: ScreenSharingProps) => {
     try {
       if (!call) return;
 
-      // В Stream Video SDK используется screenShare для управления демонстрацией экрана
-      // Симулируем остановку демонстрации экрана
+      // Останавливаем screen share stream
+      if (screenShareStream) {
+        screenShareStream.getTracks().forEach((track: MediaStreamTrack) => {
+          track.stop();
+        });
+        setScreenShareStream(null);
+      }
+      
       setIsSharing(false);
       toast.success('Screen sharing stopped');
     } catch (error) {

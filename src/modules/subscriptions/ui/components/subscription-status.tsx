@@ -11,6 +11,10 @@ import Link from "next/link";
 
 export const SubscriptionStatus = () => {
   const { data: subscription, isLoading } = trpc.subscriptions.getCurrent.useQuery();
+  const { data: usageMetrics, isLoading: isLoadingUsage } = trpc.subscriptions.getUsage.useQuery(
+    undefined,
+    { enabled: subscription?.plan !== "free" }
+  );
 
   if (isLoading) {
     return (
@@ -101,25 +105,43 @@ export const SubscriptionStatus = () => {
           </div>
         )}
 
-        {/* Usage Progress - Mock data for now */}
-        {currentPlan !== "free" && (
+        {/* Usage Progress */}
+        {currentPlan !== "free" && !isLoadingUsage && usageMetrics && (
           <div className="space-y-3 pt-4 border-t border-white/10">
             <h4 className="text-white font-medium">Usage This Month</h4>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Meetings</span>
-                <span>2 / 50</span>
+                <span>
+                  {usageMetrics.meetings.current} / {usageMetrics.meetings.limit === -1 ? '∞' : usageMetrics.meetings.limit}
+                </span>
               </div>
-              <Progress value={4} className="h-2" />
+              <Progress 
+                value={
+                  usageMetrics.meetings.limit === -1 
+                    ? 0 
+                    : (usageMetrics.meetings.current / usageMetrics.meetings.limit) * 100
+                } 
+                className="h-2" 
+              />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Storage</span>
-                <span>0.5 / 100 GB</span>
+                <span>
+                  {usageMetrics.storage.currentGB.toFixed(2)} / {usageMetrics.storage.limitGB === -1 ? '∞' : usageMetrics.storage.limitGB.toFixed(0)} GB
+                </span>
               </div>
-              <Progress value={0.5} className="h-2" />
+              <Progress 
+                value={
+                  usageMetrics.storage.limitGB === -1 
+                    ? 0 
+                    : (usageMetrics.storage.currentGB / usageMetrics.storage.limitGB) * 100
+                } 
+                className="h-2" 
+              />
             </div>
           </div>
         )}

@@ -7,12 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, ClockIcon, VideoIcon, PlusIcon } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { MeetingActionsDropdown } from "./meeting-actions-dropdown";
 import type { Meeting } from "@/trpc/types";
 
 export const MeetingList = () => {
+  const router = useRouter();
   const { data: meetings, isLoading, isError, error } = trpc.meetings.getMany.useQuery({});
 
   if (isLoading) return <LoadingState title="Loading meetings..." description="Fetching your scheduled and past meetings." />;
@@ -51,17 +53,14 @@ export const MeetingList = () => {
                     <MeetingActionsDropdown
                       meeting={meeting}
                       onEdit={(meetingId) => {
-                        // Handle edit - could navigate to edit page or open modal
-                        window.location.href = `/meetings/${meetingId}/edit`;
+                        router.push(`/meetings/${meetingId}/edit`);
                       }}
                       onDuplicate={async (meetingId) => {
-                        // Handle duplicate - simplified
                         console.log('Duplicate meeting:', meetingId);
-                          window.location.reload();
+                        router.refresh();
                       }}
                       onDelete={() => {
-                        // Refetch meetings after delete
-                        window.location.reload();
+                        router.refresh();
                       }}
                     />
                   </div>
