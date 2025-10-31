@@ -108,10 +108,10 @@ export const SignUpView =() => {
              <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col items-center text-center">
-                        <h1 className="text-3xl font-bold">
+                        <h1 className="text-3xl font-bold text-white">
                         Let&apos;s get started
                         </h1>
-                        <p className="text-muted-foreground text-balance">
+                        <p className="text-white/70 text-balance">
                          Create your account
                         </p>
                     </div>
@@ -121,7 +121,7 @@ export const SignUpView =() => {
                     name="name"
                     render={({field}) =>(
                     <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel className="text-white">Name</FormLabel>
                     <FormControl>
                         <Input
                         type="text"
@@ -140,7 +140,7 @@ export const SignUpView =() => {
                     name="email"
                     render={({field}) =>(
                     <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-white">Email</FormLabel>
                     <FormControl>
                         <Input
                         type="email"
@@ -159,7 +159,7 @@ export const SignUpView =() => {
                     name="password"
                     render={({field}) =>(
                     <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="text-white">Password</FormLabel>
                     <FormControl>
                         <Input
                         type="password"
@@ -178,7 +178,7 @@ export const SignUpView =() => {
                     name="confirmPassword"
                     render={({field}) =>(
                     <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel className="text-white">Confirm Password</FormLabel>
                     <FormControl>
                         <Input
                         type="password"
@@ -205,7 +205,7 @@ export const SignUpView =() => {
                 >Sign up
                 </Button>
                  <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className=" bg-card text-muted-foreground relative z-10 px-2">
+                <span className=" bg-card text-white/70 relative z-10 px-2">
                     or continue with
                 </span>
                 </div>
@@ -229,11 +229,11 @@ export const SignUpView =() => {
                  <FaGithub/>
                 </Button>
                 </div>
-                <div className="text-center text-sm">
+                <div className="text-center text-sm text-white/70">
                     Already have an account?{"   "}
                     <Link 
                     href="/sign-in"
-                    className="underline underline-offset-4"
+                    className="text-white hover:text-white/90 underline underline-offset-4"
                     >
                     Sign in
                     </Link>
@@ -247,8 +247,8 @@ export const SignUpView =() => {
                 </div>
             </CardContent>
         </Card>
-        <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[]:underline *:[]:underline-offset-4">
-                By clicking continue you agre to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        <div className="text-white/60 *:[a]:hover:text-white/90 text-center text-xs text-balance *:[]:underline *:[]:underline-offset-4">
+                By clicking continue you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
         </div>
 
 
