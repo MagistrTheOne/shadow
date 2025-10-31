@@ -97,13 +97,13 @@ export const Navbar = ({ session }: NavbarProps) => {
                   <LanguageSwitcher />
                 </div>
                 {!session ? (
-                  {/* <Link
-                    href="/sign-up"
-                    className="block px-3 py-2 rounded-lg text-white bg-cyan-600 hover:bg-cyan-500 text-center transition"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link> */}
+                  // <Link
+                  //   href="/sign-up"
+                  //   className="block px-3 py-2 rounded-lg text-white bg-cyan-600 hover:bg-cyan-500 text-center transition"
+                  //   onClick={() => setIsMenuOpen(false)}
+                  // >
+                  //   Sign Up
+                  // </Link>
                   null
                 ) : (
                   <Link
