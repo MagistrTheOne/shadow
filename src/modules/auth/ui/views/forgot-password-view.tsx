@@ -55,7 +55,7 @@ export const ForgotPasswordView = () => {
       setSuccess(true);
       setPending(false);
     } catch (err: any) {
-      spareError(err.message || "Failed to send reset email. Please try again.");
+      setError(err.message || "Failed to send reset email. Please try again.");
       setPending(false);
     }
   };
